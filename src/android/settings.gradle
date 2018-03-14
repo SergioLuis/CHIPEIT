@@ -1,2 +1,2 @@
-include ':app', ':chipeitlib'
-project(':chipeitlib').projectDir = new File(settingsDir, '../chipeitlib')
+include ':app'
+
