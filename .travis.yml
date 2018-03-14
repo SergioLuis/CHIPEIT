@@ -10,3 +10,8 @@ android:
 
 script:
   - cd src/android && ./gradlew build
+
+branches:
+  only:
+  - master
+  - dev
