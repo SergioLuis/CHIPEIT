@@ -3,7 +3,7 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 
-class Registers(override val vReg: IMemory<Byte>) : IRegisters {
+internal class Registers(override val vReg: IMemory<Byte>) : IRegisters {
     private val regI: ByteArray = ByteArray(2)
     private val regPC : ByteArray = ByteArray(2)
 

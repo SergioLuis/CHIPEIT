@@ -1,6 +1,6 @@
 package es.chipeit.lib.interfaces
 
-interface IRegisters {
+internal interface IRegisters {
     val vReg : IMemory<Byte>
 
     fun getI(): ByteArray
