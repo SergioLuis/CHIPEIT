@@ -3,43 +3,17 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 
-internal class Registers(override val vReg: IMemory<Byte>) : IRegisters {
-    private val regI: ByteArray = ByteArray(2)
-    private val regPC : ByteArray = ByteArray(2)
+internal class Registers(override val v: IMemory<Byte>) : IRegisters {
+    override var i: Short = 0x00
+    override var pc: Short = 0x00
 
-    private var regDT: Byte = 0x0
-    private var regST: Byte = 0x0
-    private var regSC: Byte = 0x0
+    override var sp: Byte = 0x0
 
-    override fun getI(): ByteArray {
-        return regI
-    }
+    override var dt: Byte = 0x0
+    override var st: Byte = 0x0
 
-    override fun getDT(): Byte {
-        return regDT
-    }
-
-    override fun setDT(value: Byte) {
-        regDT = value
-    }
-
-    override fun getST(): Byte {
-        return regST
-    }
-
-    override fun setST(value: Byte) {
-        regSC = value
-    }
-
-    override fun getPC(): ByteArray {
-        return regPC
-    }
-
-    override fun getSC(): Byte {
-        return regSC
-    }
-
-    override fun setSC(value: Byte) {
-        regSC = value
+    init {
+        if(v.size != 16)
+            throw IllegalArgumentException("Parameter v has ${v.size} elements, 16 needed")
     }
 }

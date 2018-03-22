@@ -1,18 +1,12 @@
 package es.chipeit.lib.interfaces
 
 internal interface IRegisters {
-    val vReg : IMemory<Byte>
+    val v: IMemory<Byte>
+    var i: Short
+    var pc: Short
 
-    fun getI(): ByteArray
+    var sp: Byte
 
-    fun getDT(): Byte
-    fun setDT(value: Byte)
-
-    fun getST(): Byte
-    fun setST(value: Byte)
-
-    fun getPC(): ByteArray
-
-    fun getSC(): Byte
-    fun setSC(value: Byte)
+    var dt: Byte
+    var st: Byte
 }
