@@ -9,9 +9,6 @@ internal class Registers(override val v: IMemory<Byte>) : IRegisters {
 
     override var sp: Byte = 0x0
 
-    override var dt: Byte = 0x0
-    override var st: Byte = 0x0
-
     init {
         if(v.size != 16)
             throw IllegalArgumentException("Parameter v has ${v.size} elements, 16 needed")

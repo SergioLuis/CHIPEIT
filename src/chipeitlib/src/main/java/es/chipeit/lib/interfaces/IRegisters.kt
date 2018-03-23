@@ -6,7 +6,4 @@ internal interface IRegisters {
     var pc: Short
 
     var sp: Byte
-
-    var dt: Byte
-    var st: Byte
 }
