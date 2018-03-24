@@ -14,14 +14,17 @@ internal class Timer(observer: ISwitchObserver = NullSwitchObserver()) : ITimer 
         t = value
         if (isActive()) {
             observer.onEnable()
+        } else {
+            observer.onDisable()
         }
     }
 
     override fun decrementRegister() {
-        if (isActive()) {
-            t--
+        if (!isActive())
             return
-        }
-        observer.onDisable()
+
+        t--
+        if(!isActive())
+            observer.onDisable()
     }
 }
