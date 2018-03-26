@@ -1,19 +1,10 @@
-package es.chipeit.lib
+package es.chipeit.lib.interfaces
 
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 
-import es.chipeit.lib.core.Timer
-import es.chipeit.lib.core.TimerClockDivider
-import es.chipeit.lib.interfaces.hzToMs
-import es.chipeit.lib.interfaces.IClock
-import es.chipeit.lib.interfaces.msToHz
-import es.chipeit.lib.io.ISwitchObserver
-
-class MyClassTests {
+class UtilFunctionsTests {
     @Test
     fun hzToMsTest() {
         assertEquals(17, hzToMs(58)) // 17.24
