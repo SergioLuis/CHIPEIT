@@ -15,7 +15,7 @@ class TimerTests {
 
         // assertNotFails equivalent
         timer.setRegister(1)
-        timer.decrementRegister()
+        timer.onClockTick()
     }
 
     @Test
@@ -24,9 +24,9 @@ class TimerTests {
 
         timer.setRegister(1)
         assertTrue(timer.isActive())
-        timer.decrementRegister()
+        timer.onClockTick()
         assertFalse(timer.isActive())
-        timer.decrementRegister()
+        timer.onClockTick()
         assertFalse(timer.isActive())
     }
 
@@ -36,8 +36,8 @@ class TimerTests {
         val timer: ITimer = Timer(switchObserverMock)
 
         timer.setRegister(1) // switchObserverMock.onEnable()
-        timer.decrementRegister() // switchObserverMock.onDisable()
-        timer.decrementRegister() // nothing
+        timer.onClockTick() // switchObserverMock.onDisable()
+        timer.onClockTick() // nothing
         timer.setRegister(1) // switchObserverMock.onEnable()
         timer.setRegister(0) // switchObserverMock.onDisable()
 
