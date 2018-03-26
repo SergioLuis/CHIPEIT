@@ -19,7 +19,7 @@ internal class Timer(observer: ISwitchObserver = NullSwitchObserver()) : ITimer 
         }
     }
 
-    override fun decrementRegister() {
+    override fun onClockTick() {
         if (!isActive())
             return
 

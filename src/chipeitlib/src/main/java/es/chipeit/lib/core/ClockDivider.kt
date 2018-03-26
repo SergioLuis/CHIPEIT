@@ -2,12 +2,12 @@ package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IClock
 import es.chipeit.lib.interfaces.IClockDivider
-import es.chipeit.lib.interfaces.ITimer
+import es.chipeit.lib.interfaces.IClockObserver
 
-internal class TimerClockDivider : IClockDivider {
+internal class ClockDivider : IClockDivider {
     private val clock: IClock
     private var lastTime: Long
-    val timers = ArrayList<ITimer>()
+    val observers = ArrayList<IClockObserver>()
 
     override var msPerStep: Long
         set(value) {
@@ -28,8 +28,8 @@ internal class TimerClockDivider : IClockDivider {
         if (msLeft() > 0L)
             return
 
-        for (t in timers)
-            t.decrementRegister()
+        for (o in observers)
+            o.onClockTick()
 
         lastTime += msPerStep
     }

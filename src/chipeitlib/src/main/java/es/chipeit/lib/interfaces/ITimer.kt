@@ -1,8 +1,6 @@
 package es.chipeit.lib.interfaces
 
-internal interface ITimer {
+internal interface ITimer : IClockObserver {
     fun isActive(): Boolean
-
     fun setRegister(value: Byte)
-    fun decrementRegister()
 }
