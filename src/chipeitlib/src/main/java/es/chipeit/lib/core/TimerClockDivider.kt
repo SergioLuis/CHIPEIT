@@ -1,26 +1,37 @@
 package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IClock
+import es.chipeit.lib.interfaces.IClockDivider
 import es.chipeit.lib.interfaces.ITimer
 
-internal class TimerClockDivider(
-        clock: IClock,
-        msPerStep: Long
-) : ClockDivider(clock, msPerStep) {
+internal class TimerClockDivider : IClockDivider {
+    private val clock: IClock
+    private var lastTime: Long
     val timers = ArrayList<ITimer>()
 
+    override var msPerStep: Long
+        set(value) {
+            if (value <= 0)
+                throw IllegalArgumentException("Non-positive ms per step not allowed ($value)")
+            field = value
+        }
+
+    constructor(clock: IClock, msPerStep: Long) {
+        this.clock = clock
+        this.msPerStep = msPerStep
+        this.lastTime = this.clock.getMs()
+    }
+
+    override fun msLeft(): Long = (lastTime + msPerStep) - clock.getMs()
+
     override fun trigger() {
-        /*
-        Trigger returns if it’s not ready as a (optional) mean
-        to implement busy waiting.
-        */
         if (msLeft() > 0L)
             return
 
         for (t in timers)
             t.decrementRegister()
 
-        super.trigger()
+        lastTime += msPerStep
     }
 }
 
