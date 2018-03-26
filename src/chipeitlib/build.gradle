@@ -19,12 +19,14 @@ sourceCompatibility = 1.7
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     testImplementation  "junit:junit:4.12"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testImplementation "org.mockito:mockito-core:2.17.+"
 }
 
 test {
