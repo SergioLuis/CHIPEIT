@@ -34,35 +34,3 @@ internal class ClockDivider : IClockDivider {
         lastTime += msPerStep
     }
 }
-
-/*
-
-TODO: Check if this way of reasoning works! Consider coroutines
-
-Clock Thread {
-
-    // Thread actual work
-    fun doWork() {
-        while (true) {
-            // This IClockDivider handles countdown timers
-            delaysClockDivider.trigger()
-
-            // This IClockDivider triggers CPU cycle execution
-            instructionsClockDivider.trigger()
-
-            Thread.Sleep(
-                Math.max(0,
-                    Math.min(
-                        delaysClockDivider.msLeft(),
-                        instructionsClockDivider.msLeft()
-                    )
-                )
-            )
-        }
-    }
-
-    IClockDivider delaysClockDivider          // 60Hz
-    IClockDivider instructionsClockDivider    // 500Hz
-}
-
- */
