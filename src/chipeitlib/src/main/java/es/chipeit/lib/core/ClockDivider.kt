@@ -3,11 +3,14 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IClock
 import es.chipeit.lib.interfaces.IClockDivider
 
-internal abstract class ClockDivider(val clock: IClock, msPerStep: Long) : IClockDivider {
+internal abstract class ClockDivider(
+        protected val clock: IClock,
+        msPerStep: Long
+) : IClockDivider {
     override var msPerStep = msPerStep
         set(value) {
-            if (value < 0)
-                throw IllegalArgumentException("Negative ms per step not allowed ($value)")
+            if (value <= 0)
+                throw IllegalArgumentException("Non-positive ms per step not allowed ($value)")
             field = value
         }
     protected var lastTime = clock.getMs()
