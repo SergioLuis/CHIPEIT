@@ -13,8 +13,6 @@ internal fun msToHz(ms: Long): Short {
     if (ms <= 0)
         throw IllegalArgumentException("Non-positive ms ($ms)")
 
-    var x = 1000.0 / ms
-
     return round(1000.0 / ms).toShort()
 }
 
