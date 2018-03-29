@@ -34,11 +34,11 @@ captures/
 
 # Intellij
 *.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/dictionaries
-.idea/libraries
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/gradle.xml
+**/.idea/dictionaries
+**/.idea/libraries
 
 # Keystore files
 *.jks
@@ -56,3 +56,4 @@ freeline_project_description.json
 
 # Finder should not be used
 .DS_Store
+/src/console/.idea/libraries/
