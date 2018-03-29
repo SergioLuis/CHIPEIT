@@ -3,10 +3,13 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IClockObserver
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.io.IRenderer
 
 internal class Cpu(
         private val memory: IMemory<Byte>,
-        private val registers: IRegisters
+        private val registers: IRegisters,
+        private val stack: IMemory<Short>,
+        private val renderer: IRenderer
 ) : IClockObserver {
 
     init {
@@ -72,7 +75,7 @@ internal class Cpu(
             // Cxkk - RND Vx, byte
             0xC000 -> TODO()
 
-            // Dxyn - RND Vx, byte
+            // Dxyn - DRW Vx, Vy, nibble
             0xD000 -> TODO()
 
             // Ex9E - SKP Vx
