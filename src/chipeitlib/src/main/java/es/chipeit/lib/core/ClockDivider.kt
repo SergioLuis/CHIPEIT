@@ -19,13 +19,17 @@ internal class ClockDivider : IClockDivider {
     constructor(clock: IClock, msPerStep: Long) {
         this.clock = clock
         this.msPerStep = msPerStep
-        this.lastTime = this.clock.getMs()
+        lastTime = 0
     }
 
-    override fun msLeft(): Long = (lastTime + msPerStep) - clock.getMs()
+    override fun init() {
+        lastTime = clock.getMs()
+    }
+
+    override fun getMsLeft(): Long = (lastTime + msPerStep) - clock.getMs()
 
     override fun trigger() {
-        if (msLeft() > 0L)
+        if (getMsLeft() > 0L)
             return
 
         for (o in observers)

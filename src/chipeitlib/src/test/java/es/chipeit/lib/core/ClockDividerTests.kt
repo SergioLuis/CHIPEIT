@@ -41,6 +41,7 @@ class ClockDividerTests {
 
         val clockDivider = ClockDivider(clock, 1000)
 
+        clockDivider.init()
         for (i in 1..2000) {
             clockAnswer.ms = i.toLong()
 
@@ -69,6 +70,7 @@ class ClockDividerTests {
         clockDivider.observers.add(firstClockObserverMock)
         clockDivider.observers.add(secondClockObserverMock)
 
+        clockDivider.init()
         for (i in 1..2000) {
             clockAnswer.ms = i.toLong()
             clockDivider.trigger()
@@ -105,7 +107,8 @@ class ClockDividerTests {
 
         clockAnswer.ms = 10
 
-        while(clockDivider.msLeft() <= 0L)
+        clockDivider.init()
+        while(clockDivider.getMsLeft() <= 0L)
             clockDivider.trigger()
 
         Mockito.verify(
