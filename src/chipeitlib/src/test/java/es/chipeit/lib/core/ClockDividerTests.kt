@@ -105,9 +105,8 @@ class ClockDividerTests {
 
         clockDivider.observers.add(firstClockObserverMock)
 
-        clockAnswer.ms = 10
-
         clockDivider.init()
+        clockAnswer.ms = 10
         while(clockDivider.getMsLeft() <= 0L)
             clockDivider.trigger()
 
