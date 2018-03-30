@@ -1,6 +1,5 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.core.*
 import es.chipeit.lib.interfaces.IClockObserver
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
@@ -18,7 +17,10 @@ internal class Cpu(
     }
 
     override fun onClockTick() {
-        val instruction = (memory[registers.pc++].toInt() shl 8) or memory[registers.pc++].toInt()
+        val higherBytes = memory[registers.pc++].toInt()
+        val lowerBytes = memory[registers.pc++].toInt()
+        val instruction = (higherBytes shl 8) or lowerBytes
+
         decodeAndExecute(instruction)
     }
 
