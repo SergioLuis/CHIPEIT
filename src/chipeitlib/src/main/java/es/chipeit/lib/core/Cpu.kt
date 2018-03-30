@@ -17,10 +17,7 @@ internal class Cpu(
     }
 
     override fun onClockTick() {
-        var instruction: Int = 0
-        instruction = instruction or (memory[registers.pc++].toInt() shl 4)
-        instruction = instruction or memory[registers.pc].toInt()
-
+        val instruction = (memory[registers.pc++].toInt() shl 8) or memory[registers.pc++].toInt()
         decodeAndExecute(instruction)
     }
 
