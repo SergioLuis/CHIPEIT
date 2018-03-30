@@ -21,7 +21,7 @@ class Chipeit(
     private var running: Boolean = false
     private val memory = LoggedMemory(
             "Main memory",
-            PaddedMemory(ByteMemory(romContent), 200)
+            PaddedMemory(ByteMemory(romContent), 0x200)
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",
