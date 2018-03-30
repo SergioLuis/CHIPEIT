@@ -20,6 +20,6 @@ internal interface IClockDivider {
     var msPerStep: Long
     val msLeft: Long
 
-    fun init()
+    fun reset()
     fun trigger()
 }

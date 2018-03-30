@@ -22,7 +22,7 @@ internal class ClockDivider : IClockDivider {
         lastTime = 0
     }
 
-    override fun init() {
+    override fun reset() {
         lastTime = clock.getMs()
     }
 

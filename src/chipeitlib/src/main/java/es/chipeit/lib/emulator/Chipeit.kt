@@ -49,8 +49,8 @@ class Chipeit(
 
     fun run() {
         running = true
-        cpuClockDivider.init()
-        timersClockDivider.init()
+        cpuClockDivider.reset()
+        timersClockDivider.reset()
 
         while (running) {
             cpuClockDivider.trigger()
