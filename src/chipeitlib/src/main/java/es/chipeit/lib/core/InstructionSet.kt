@@ -1,12 +1,17 @@
 package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IRegisters
-
-// 0nnn - SYS addr
+import es.chipeit.lib.io.IRenderer
 
 // 00E0 - CLS
+internal fun cls(renderer: IRenderer) {
+    renderer.clear()
+}
 
 // 00EE - RET
+internal fun ret(registers: IRegisters) {
+    TODO()
+}
 
 // 1nnn - JP addr
 internal fun jpAddr(instruction: Int, registers: IRegisters) {

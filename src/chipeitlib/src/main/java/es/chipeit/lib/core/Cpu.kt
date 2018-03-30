@@ -27,7 +27,13 @@ internal class Cpu(
             // 0nnn - SYS addr
             // 00E0 - CLS
             // 00EE - RET
-            0x0000 -> TODO("Instruction $instruction not implemented")
+            0x0000 -> {
+                when (instruction) {
+                    0x00E0 -> cls(renderer)
+                    0x00EE -> ret(registers)
+                    else -> return // 0nnn - SYS addr (unused)
+                }
+            }
 
             // 1nnn - JP addr
             0x1000 -> jpAddr(instruction, registers)

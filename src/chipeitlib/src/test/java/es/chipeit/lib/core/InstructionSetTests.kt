@@ -6,8 +6,21 @@ import org.mockito.Mockito.times
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.io.IRenderer
 
 class InstructionSetTests {
+    @Test
+    fun clsTest() {
+        val rendererMock = Mockito.mock(IRenderer::class.java)
+
+        cls(rendererMock)
+
+        Mockito.verify(
+                rendererMock,
+                times(1)
+        ).clear()
+    }
+
     @Test
     fun jpAddrTest() {
         val registersMock = Mockito.mock(IRegisters::class.java)
