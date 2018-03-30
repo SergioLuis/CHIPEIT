@@ -27,28 +27,28 @@ internal class Cpu(
             // 0nnn - SYS addr
             // 00E0 - CLS
             // 00EE - RET
-            0x0000 -> TODO()
+            0x0000 -> TODO("Instruction $instruction not implemented")
 
             // 1nnn - JP addr
             0x1000 -> jpAddr(instruction, registers)
 
             // 2nnn - CALL addr
-            0x2000 -> TODO()
+            0x2000 -> TODO("Instruction $instruction not implemented")
 
             // 3xkk - SE Vx, byte
-            0x3000 -> TODO()
+            0x3000 -> TODO("Instruction $instruction not implemented")
 
             // 4xkk - SNE Vx, byte
-            0x4000 -> TODO()
+            0x4000 -> TODO("Instruction $instruction not implemented")
 
             // 5xy0 - SE Vx, Vy
-            0x5000 -> TODO()
+            0x5000 -> TODO("Instruction $instruction not implemented")
 
             // 6xkk - LD Vx, byte
-            0x6000 -> TODO()
+            0x6000 -> ldVxByte(instruction, registers)
 
             // 7xkk - ADD Vx, byte
-            0x7000 -> TODO()
+            0x7000 -> TODO("Instruction $instruction not implemented")
 
             // 8xy0 - LD Vx, Vy
             // 8xy1 - OR Vx, Vy
@@ -59,26 +59,26 @@ internal class Cpu(
             // 8xy6 - SHR Vx {, Vy}
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
-            0x8000 -> TODO()
+            0x8000 -> TODO("Instruction $instruction not implemented")
 
             // 9xy0 - SNE Vx, Vy
-            0x9000 -> TODO()
+            0x9000 -> TODO("Instruction $instruction not implemented")
 
             // Annn - LD I, addr
-            0xA000 -> TODO()
+            0xA000 -> TODO("Instruction $instruction not implemented")
 
             // Bnnn - JP V0, addr
-            0xB000 -> TODO()
+            0xB000 -> TODO("Instruction $instruction not implemented")
 
             // Cxkk - RND Vx, byte
-            0xC000 -> TODO()
+            0xC000 -> TODO("Instruction $instruction not implemented")
 
             // Dxyn - DRW Vx, Vy, nibble
-            0xD000 -> TODO()
+            0xD000 -> TODO("Instruction $instruction not implemented")
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx
-            0xE000 -> TODO()
+            0xE000 -> TODO("Instruction $instruction not implemented")
 
             // Fx07 - LD Vx, DT
             // Fx0A - LD Vx, K
@@ -89,7 +89,7 @@ internal class Cpu(
             // Fx33 - LD B, Vx
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
-            0xF000 -> TODO()
+            0xF000 -> TODO("Instruction $instruction not implemented")
             else -> {
                 throw IllegalStateException(
                         "The instruction $instruction does not comply with " +
