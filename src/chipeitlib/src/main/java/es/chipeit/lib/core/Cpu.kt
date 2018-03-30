@@ -1,5 +1,6 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.core.*
 import es.chipeit.lib.interfaces.IClockObserver
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
@@ -29,7 +30,7 @@ internal class Cpu(
             0x0000 -> TODO()
 
             // 1nnn - JP addr
-            0x1000 -> TODO()
+            0x1000 -> jpAddr(instruction, registers)
 
             // 2nnn - CALL addr
             0x2000 -> TODO()
