@@ -18,8 +18,8 @@ internal fun msToHz(ms: Long): Short {
 
 internal interface IClockDivider {
     var msPerStep: Long
+    val msLeft: Long
 
     fun init()
-    fun getMsLeft(): Long
     fun trigger()
 }

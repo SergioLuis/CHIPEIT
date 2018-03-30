@@ -58,8 +58,8 @@ class Chipeit(
 
             val timeToSleep =
                 max(0, min(
-                    cpuClockDivider.getMsLeft(),
-                    timersClockDivider.getMsLeft())
+                    cpuClockDivider.msLeft,
+                    timersClockDivider.msLeft)
                 )
 
             sleeper.sleep(timeToSleep)

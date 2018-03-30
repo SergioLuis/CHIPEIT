@@ -26,10 +26,11 @@ internal class ClockDivider : IClockDivider {
         lastTime = clock.getMs()
     }
 
-    override fun getMsLeft(): Long = (lastTime + msPerStep) - clock.getMs()
+    override val msLeft
+        get() = (lastTime + msPerStep) - clock.getMs()
 
     override fun trigger() {
-        if (getMsLeft() > 0L)
+        if (msLeft > 0L)
             return
 
         for (o in observers)

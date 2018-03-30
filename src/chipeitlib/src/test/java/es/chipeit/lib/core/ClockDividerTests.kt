@@ -107,7 +107,7 @@ class ClockDividerTests {
 
         clockDivider.init()
         clockAnswer.ms = 10
-        while(clockDivider.getMsLeft() <= 0L)
+        while(clockDivider.msLeft <= 0L)
             clockDivider.trigger()
 
         Mockito.verify(
