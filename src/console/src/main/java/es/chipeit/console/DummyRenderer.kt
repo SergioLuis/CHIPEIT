@@ -6,4 +6,8 @@ class DummyRenderer : IRenderer {
     override fun render(graphicsMemory: ByteArray) {
         println("Render!")
     }
+
+    override fun clear() {
+        println("Clear!")
+    }
 }
