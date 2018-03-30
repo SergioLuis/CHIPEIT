@@ -53,6 +53,8 @@ class Chipeit(
         timersClockDivider.reset()
 
         while (running) {
+            clock.update()
+
             cpuClockDivider.trigger()
             timersClockDivider.trigger()
 

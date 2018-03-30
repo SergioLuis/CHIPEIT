@@ -37,7 +37,7 @@ class ClockDividerTests {
         }
 
         val clock = Mockito.mock(IClock::class.java)
-        Mockito.`when`(clock.getMs()).thenAnswer(clockAnswer)
+        Mockito.`when`(clock.ms).thenAnswer(clockAnswer)
 
         val clockDivider = ClockDivider(clock, 1000)
 
@@ -61,7 +61,7 @@ class ClockDividerTests {
         }
 
         val clock = Mockito.mock(IClock::class.java)
-        Mockito.`when`(clock.getMs()).thenAnswer(clockAnswer)
+        Mockito.`when`(clock.ms).thenAnswer(clockAnswer)
 
         val clockDivider = ClockDivider(clock, 500)
         val firstClockObserverMock = Mockito.mock(IClockObserver::class.java)
@@ -98,7 +98,7 @@ class ClockDividerTests {
         }
 
         val clock = Mockito.mock(IClock::class.java)
-        Mockito.`when`(clock.getMs()).thenAnswer(clockAnswer)
+        Mockito.`when`(clock.ms).thenAnswer(clockAnswer)
 
         val clockDivider = ClockDivider(clock, 1)
         val firstClockObserverMock = Mockito.mock(IClockObserver::class.java)

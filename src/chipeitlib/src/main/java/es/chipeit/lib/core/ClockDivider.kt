@@ -23,11 +23,11 @@ internal class ClockDivider : IClockDivider {
     }
 
     override fun reset() {
-        lastTime = clock.getMs()
+        lastTime = clock.ms
     }
 
-    override val msLeft
-        get() = (lastTime + msPerStep) - clock.getMs()
+    override val msLeft: Long
+        get() = (lastTime + msPerStep) - clock.ms
 
     override fun trigger() {
         if (msLeft > 0L)

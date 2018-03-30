@@ -1,5 +1,6 @@
 package es.chipeit.lib.interfaces
 
 internal interface IClock {
-    fun getMs(): Long
+    var ms: Long
+    fun update()
 }
