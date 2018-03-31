@@ -29,8 +29,8 @@ internal fun jpAddr(instruction: Int, registers: IRegisters) {
 // 6xkk - LD Vx, byte
 internal fun ldVxByte(instruction: Int, registers: IRegisters) {
     val register = (instruction and 0x0F00) shr 8
-    val b = instruction and 0x00FF
-    registers.v[register] = b.toByte()
+    val byte = (instruction and 0x00FF).toByte()
+    registers.v[register] = byte
 }
 
 // 7xkk - ADD Vx, byte
