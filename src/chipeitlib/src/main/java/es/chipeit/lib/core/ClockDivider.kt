@@ -19,10 +19,7 @@ internal class ClockDivider : IClockDivider {
     constructor(clock: IClock, msPerStep: Long) {
         this.clock = clock
         this.msPerStep = msPerStep
-        lastTime = 0
-    }
 
-    override fun reset() {
         lastTime = clock.ms
     }
 

@@ -6,9 +6,10 @@ internal class Clock : IClock {
     private var lastMs: Long = 0
 
     override var ms: Long = 0
-    get() = lastMs
+        get() = lastMs
 
-    override fun update() {
-      lastMs = System.currentTimeMillis()
+    override fun update(): IClock {
+        lastMs = System.currentTimeMillis()
+        return this
     }
 }

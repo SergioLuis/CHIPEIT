@@ -36,10 +36,10 @@ class Chipeit(
     private val soundTimer = Timer(soundPlayer)
     private val eventTimer = Timer() // FIXME: I still don't know the f*cking purpose of this
 
-    private val clock = Clock()
+    private val chronometer = Chronometer(Clock())
 
-    private val cpuClockDivider = ClockDivider(clock, hzToMs(cpuClockRate))
-    private val timersClockDivider = ClockDivider(clock, hzToMs(timersClockRate))
+    private val cpuClockDivider = ClockDivider(chronometer, hzToMs(cpuClockRate))
+    private val timersClockDivider = ClockDivider(chronometer, hzToMs(timersClockRate))
 
     init {
         cpuClockDivider.observers.add(cpu)
@@ -48,12 +48,10 @@ class Chipeit(
     }
 
     fun run() {
-        running = true
-        cpuClockDivider.reset()
-        timersClockDivider.reset()
+        chronometer.start()
 
-        while (running) {
-            clock.update()
+        while (chronometer.isRunning) {
+            chronometer.update()
 
             cpuClockDivider.trigger()
             timersClockDivider.trigger()
@@ -69,6 +67,6 @@ class Chipeit(
     }
 
     fun stop() {
-        running = false
+        chronometer.stop()
     }
 }
