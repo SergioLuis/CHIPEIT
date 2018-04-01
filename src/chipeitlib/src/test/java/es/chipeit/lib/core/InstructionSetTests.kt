@@ -10,13 +10,13 @@ import es.chipeit.lib.interfaces.IRegisters
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val graphicMemory = Mockito.mock(ByteMemory::class.java)
+        val graphicMemory = Mockito.mock(IMemory::class.java)
 
-        cls(graphicMemory)
+        cls(graphicMemory as IMemory<Byte>)
 
         Mockito.verify(
-                graphicMemory,
-                times(1)
+                 graphicMemory,
+                 times(1)
         ).fill(0)
     }
 
