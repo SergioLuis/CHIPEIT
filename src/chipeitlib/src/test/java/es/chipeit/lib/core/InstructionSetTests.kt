@@ -6,19 +6,18 @@ import org.mockito.Mockito.times
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.io.IRenderer
 
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val rendererMock = Mockito.mock(IRenderer::class.java)
+        val graphicMemory = Mockito.mock(ByteMemory::class.java)
 
-        cls(rendererMock)
+        cls(graphicMemory)
 
         Mockito.verify(
-                rendererMock,
+                graphicMemory,
                 times(1)
-        ).clear()
+        ).fill(0)
     }
 
     @Test

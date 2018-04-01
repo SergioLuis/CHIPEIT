@@ -16,4 +16,8 @@ internal class PaddedMemory<T>(
     override fun set(index: Int, value: T) {
         memory[index - padding] = value
     }
+
+    override fun fill(element: T, fromIndex: Int, toIndex: Int) {
+        memory.fill(element, fromIndex, toIndex)
+    }
 }

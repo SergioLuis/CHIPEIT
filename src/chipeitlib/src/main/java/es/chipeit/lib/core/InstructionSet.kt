@@ -1,11 +1,11 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.io.IRenderer
 
 // 00E0 - CLS
-internal fun cls(renderer: IRenderer) {
-    renderer.clear()
+internal fun cls(graphicsMemory: IMemory<Byte>) {
+    graphicsMemory.fill(0)
 }
 
 // 00EE - RET

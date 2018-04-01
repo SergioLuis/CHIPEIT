@@ -13,4 +13,8 @@ internal class ByteMemory(private val memory: ByteArray): IMemory<Byte> {
     override fun set(index: Int, value: Byte) {
         memory[index] = value
     }
+
+    override fun fill(element: Byte, fromIndex: Int, toIndex: Int) {
+        memory.fill(element, fromIndex, toIndex)
+    }
 }

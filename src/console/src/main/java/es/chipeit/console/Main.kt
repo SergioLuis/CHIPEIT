@@ -20,7 +20,6 @@ fun main(args: Array<String>) {
     }
 
     val chipeit = Chipeit(
-            DummyRenderer(),
             DummySoundPlayer(),
             romResult.second,
             10,

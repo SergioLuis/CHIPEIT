@@ -6,22 +6,36 @@ import kotlin.math.min
 import es.chipeit.lib.core.*
 import es.chipeit.lib.core.log.LoggedMemory
 import es.chipeit.lib.interfaces.hzToMs
-import es.chipeit.lib.io.IRenderer
 import es.chipeit.lib.io.ISwitchObserver
 
+internal fun byteArrayCopy(src: ByteArray, dst: ByteArray) {
+    for(i in src.indices)
+        dst[i] = src[i]
+}
+
 class Chipeit(
-        renderer: IRenderer,
         soundPlayer: ISwitchObserver,
         romContent: ByteArray,
         cpuClockRate: Short = 500,
         timersClockRate: Short = 60,
         private val sleeper: ISleeper
 ) {
+    val SCREEN_WIDTH = 64
+    val SCREEN_HEIGHT = 32
+
+    private val _graphicsMemory = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
+    val PUBLIC_GRAPHICS_MEMORY = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
+
     @Volatile
     private var running: Boolean = false
     private val memory = LoggedMemory(
             "Main memory",
             PaddedMemory(ByteMemory(romContent), 0x200)
+    )
+
+    private val graphicMemory = LoggedMemory(
+            "Graphic memory",
+            ByteMemory(_graphicsMemory)
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",
@@ -32,9 +46,9 @@ class Chipeit(
             ShortMemory(ShortArray(16))
     )
 
-    private val cpu = Cpu(memory, registers, stack, renderer)
+    private val cpu = Cpu(memory, graphicMemory, registers, stack)
     private val soundTimer = Timer(soundPlayer)
-    private val eventTimer = Timer() // FIXME: I still don't know the f*cking purpose of this
+    private val delayTimer = Timer()
 
     private val chronometer = Chronometer(Clock())
 
@@ -44,7 +58,7 @@ class Chipeit(
     init {
         cpuClockDivider.observers.add(cpu)
         timersClockDivider.observers.add(soundTimer)
-        timersClockDivider.observers.add(eventTimer)
+        timersClockDivider.observers.add(delayTimer)
     }
 
     fun run() {
@@ -55,6 +69,8 @@ class Chipeit(
 
             cpuClockDivider.trigger()
             timersClockDivider.trigger()
+
+            byteArrayCopy(_graphicsMemory, PUBLIC_GRAPHICS_MEMORY)
 
             val timeToSleep =
                 max(0, min(
