@@ -1,0 +1,3 @@
+rootProject.name = 'console'
+include ':chipeitlib'
+project(':chipeitlib').projectDir = new File(settingsDir, '../chipeitlib')

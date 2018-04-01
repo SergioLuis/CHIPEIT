@@ -1,0 +1,51 @@
+group 'es.chipeit.console'
+version '1.0'
+
+buildscript {
+    ext.kotlin_version = '1.2.30'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    extraLibs
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation project(':chipeitlib')
+
+    // Necessary in order to zip them into the final JAR,
+    // as Gradle doesn't allow to directly resolve
+    // 'configurations.implementation'.
+    extraLibs "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    extraLibs project(':chipeitlib')
+}
+
+jar {
+    dependsOn ':chipeitlib:assemble'
+    manifest {
+        attributes (
+                'Main-Class': 'es.chipeit.console.MainKt',
+                "Implementation-Title": "CHIPEIT Console emulator",
+                "Implementation-Version": version
+        )
+    }
+
+    from {
+        configurations.extraLibs.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
