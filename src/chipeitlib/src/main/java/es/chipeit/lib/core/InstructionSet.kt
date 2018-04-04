@@ -73,22 +73,18 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 // Ex9E - SKP Vx
 internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val vReg = (instruction and 0x0F00) shr 8
-    val vRegValue = registers.v[vReg].toInt()
+    val keyIndex = registers.v[vReg].toInt()
 
-    val isDown = (keyboard.keysDown and (1 shl vRegValue)) != 0
-
-    if (isDown)
+    if (keyboard.isDown(keyIndex))
         registers.pc += 2
 }
 
 // ExA1 - SKNP Vx
 internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val vReg = (instruction and 0x0F00) shr 8
-    val vRegValue = registers.v[vReg].toInt()
+    val keyIndex = registers.v[vReg].toInt()
 
-    val isUp = (keyboard.keysDown and (1 shl vRegValue)) == 0
-
-    if (isUp)
+    if (!keyboard.isDown(keyIndex))
         registers.pc += 2
 }
 

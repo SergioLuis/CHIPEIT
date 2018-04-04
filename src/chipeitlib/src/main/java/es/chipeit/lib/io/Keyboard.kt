@@ -32,4 +32,8 @@ class Keyboard {
     fun keyUp(key: Keys) {
         _keysDown = _keysDown and key.id.inv()
     }
+
+    fun isDown(keyIndex: Int): Boolean {
+        return (_keysDown and (1 shl keyIndex)) != 0
+    }
 }
