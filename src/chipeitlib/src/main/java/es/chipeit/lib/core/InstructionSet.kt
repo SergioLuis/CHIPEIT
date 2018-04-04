@@ -19,6 +19,11 @@ internal fun jpAddr(instruction: Int, registers: IRegisters) {
 }
 
 // 2nnn - CALL addr
+internal fun call(instruction: Int, registers: IRegisters, stack: IMemory<Int>) {
+    registers.sp += 1
+    stack[registers.sp] = registers.pc
+    registers.pc = instruction and 0x0FFF
+}
 
 // 3xkk - SE Vx, byte
 

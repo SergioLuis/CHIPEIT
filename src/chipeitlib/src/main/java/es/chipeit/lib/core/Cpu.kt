@@ -41,7 +41,7 @@ internal class Cpu(
             0x1000 -> jpAddr(instruction, registers)
 
             // 2nnn - CALL addr
-            0x2000 -> TODO("Instruction $instruction not implemented")
+            0x2000 -> call(instruction, registers, stack)
 
             // 3xkk - SE Vx, byte
             0x3000 -> TODO("Instruction $instruction not implemented")

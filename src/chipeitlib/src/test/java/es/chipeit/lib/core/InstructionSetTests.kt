@@ -1,6 +1,7 @@
 package es.chipeit.lib.core
 
 import org.junit.Test
+import kotlin.test.assertEquals
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 
@@ -42,6 +43,42 @@ class InstructionSetTests {
                 registersMock,
                 times(1)
         ).pc = 0x0FFF
+    }
+
+    @Test
+    fun callTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+        val stackMock = Mockito.mock(IMemory::class.java) as IMemory<Int>
+
+        registers.sp = -1
+        registers.pc = 0x789
+
+        call(0x2345, registers, stackMock)
+
+        assertEquals(0, registers.sp)
+        assertEquals(0x345, registers.pc)
+        Mockito.verify(
+                stackMock,
+                times(1)
+        )[0] = 0x789
+
+        call(0x2200, registers, stackMock)
+
+        assertEquals(1, registers.sp)
+        assertEquals(0x200, registers.pc)
+        Mockito.verify(
+                stackMock,
+                times(1)
+        )[1] = 0x345
+
+        call(0x2FFF, registers, stackMock)
+
+        assertEquals(2, registers.sp)
+        assertEquals(0xFFF, registers.pc)
+        Mockito.verify(
+                stackMock,
+                times(1)
+        )[2] = 0x200
     }
 
     @Test
