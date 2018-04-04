@@ -16,8 +16,8 @@ internal class Cpu(
     }
 
     override fun onClockTick() {
-        val higherBytes = memory[registers.pc++].toInt()
-        val lowerBytes = memory[registers.pc++].toInt()
+        val higherBytes = memory[registers.pc].toInt()
+        val lowerBytes = memory[registers.pc + 1].toInt()
         val instruction = (higherBytes shl 8) or lowerBytes
 
         decodeAndExecute(instruction)
@@ -30,7 +30,7 @@ internal class Cpu(
             // 00EE - RET
             0x0000 -> {
                 when (instruction) {
-                    0x00E0 -> cls(graphicsMemory)
+                    0x00E0 -> cls(registers, graphicsMemory)
                     0x00EE -> ret(registers)
                     else -> return // 0nnn - SYS addr (unused)
                 }
