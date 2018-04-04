@@ -2,6 +2,7 @@ package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.io.Keyboard
 
 // 00E0 - CLS
 internal fun cls(graphicsMemory: IMemory<Byte>) {
@@ -70,6 +71,15 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 // Dxyn - RND Vx, byte
 
 // Ex9E - SKP Vx
+internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
+    val vReg = (instruction and 0x0F00) shr 8
+    val vRegValue = registers.v[vReg].toInt()
+
+    val isDown = (keyboard.keysDown and (1 shl vRegValue)) != 0
+
+    if (isDown)
+        registers.pc += 2
+}
 
 // ExA1 - SKNP Vx
 

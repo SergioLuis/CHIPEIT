@@ -7,6 +7,7 @@ import org.mockito.Mockito.times
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.io.Keyboard
 
 class InstructionSetTests {
     @Test
@@ -223,5 +224,36 @@ class InstructionSetTests {
                 registersMemoryMock,
                 times(1)
         )[15] = 0x00
+    }
+
+    @Test
+    fun skpVxTest() {
+        val vRegsMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(vRegsMock.size).thenReturn(16)
+        Mockito.`when`(vRegsMock[0xA]).thenReturn(3)
+        Mockito.`when`(vRegsMock[0xB]).thenReturn(8)
+
+        val keyboard = Keyboard()
+        keyboard.keyDown(Keyboard.Keys.KEY_3)
+        keyboard.keyUp(Keyboard.Keys.KEY_8)
+
+        val registersMock = Registers(vRegsMock)
+        registersMock.pc = 0x0200
+
+        skpVx(0xEA9E, registersMock, keyboard)
+
+        assertEquals(0x0200 + 2, registersMock.pc)
+        Mockito.verify(
+                vRegsMock,
+                times(1)
+        )[0xA]
+
+        skpVx(0xEB9E, registersMock, keyboard)
+
+        assertEquals(0x0200 + 2, registersMock.pc)
+        Mockito.verify(
+                vRegsMock,
+                times(1)
+        )[0xB]
     }
 }
