@@ -32,7 +32,7 @@ internal class Cpu(
             0x0000 -> {
                 when (instruction) {
                     0x00E0 -> cls(graphicsMemory)
-                    0x00EE -> ret(registers)
+                    0x00EE -> ret(registers, stack)
                     else -> return // 0nnn - SYS addr (unused)
                 }
             }

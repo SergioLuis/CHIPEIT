@@ -22,6 +22,45 @@ class InstructionSetTests {
     }
 
     @Test
+    fun retTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+        val stackMock = Mockito.mock(IMemory::class.java) as IMemory<Int>
+
+        Mockito.`when`(stackMock[2]).thenReturn(0x0222)
+        Mockito.`when`(stackMock[1]).thenReturn(0x0456)
+        Mockito.`when`(stackMock[0]).thenReturn(0x0789)
+
+        registers.sp = 2
+
+        ret(registers, stackMock)
+
+        assertEquals(1, registers.sp)
+        assertEquals(0x222, registers.pc)
+        Mockito.verify(
+                stackMock,
+                times(1)
+        )[2]
+
+        ret(registers, stackMock)
+
+        assertEquals(0, registers.sp)
+        assertEquals(0x456, registers.pc)
+        Mockito.verify(
+                stackMock,
+                times(1)
+        )[1]
+
+        ret(registers, stackMock)
+
+        assertEquals(-1, registers.sp)
+        assertEquals(0x789, registers.pc)
+        Mockito.verify(
+                stackMock,
+                times(1)
+        )[0]
+    }
+
+    @Test
     fun jpAddrTest() {
         val registersMock = Mockito.mock(IRegisters::class.java)
 

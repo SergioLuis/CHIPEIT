@@ -9,8 +9,9 @@ internal fun cls(graphicsMemory: IMemory<Byte>) {
 }
 
 // 00EE - RET
-internal fun ret(registers: IRegisters) {
-    TODO()
+internal fun ret(registers: IRegisters, stack: IMemory<Int>) {
+    registers.pc = stack[registers.sp]
+    registers.sp -= 1
 }
 
 // 1nnn - JP addr
