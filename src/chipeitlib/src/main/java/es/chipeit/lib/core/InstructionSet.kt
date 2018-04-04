@@ -5,8 +5,9 @@ import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.io.Keyboard
 
 // 00E0 - CLS
-internal fun cls(graphicsMemory: IMemory<Byte>) {
+internal fun cls(registers: IRegisters, graphicsMemory: IMemory<Byte>) {
     graphicsMemory.fill(0)
+    registers.pc += 2
 }
 
 // 00EE - RET
@@ -38,6 +39,7 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
     val register = (instruction and 0x0F00) shr 8
     val byte = (instruction and 0x00FF).toByte()
     registers.v[register] = byte
+    registers.pc += 2
 }
 
 // 7xkk - ADD Vx, byte

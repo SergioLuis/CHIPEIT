@@ -12,10 +12,14 @@ import es.chipeit.lib.io.Keyboard
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val graphicMemory = Mockito.mock(IMemory::class.java)
+        val graphicMemory = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registers = Registers(ByteMemory(ByteArray(16)))
 
-        cls(graphicMemory as IMemory<Byte>)
+        registers.pc = 0x0200
 
+        cls(registers, graphicMemory)
+
+        assertEquals(0x0200 + 2, registers.pc)
         Mockito.verify(
                  graphicMemory,
                  times(1)
@@ -123,27 +127,59 @@ class InstructionSetTests {
 
     @Test
     fun ldVxByteTest() {
-        val registersMemoryMock = Mockito.mock(IMemory::class.java)
+        val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         Mockito.`when`(registersMemoryMock.size).thenAnswer { 16 }
 
-        val registersMock = Registers(registersMemoryMock as IMemory<Byte>)
+        val registersMock = Registers(registersMemoryMock)
+        registersMock.pc = 0x200
 
         ldVxByte(0x6011, registersMock)
+        assertEquals(0x0200 + 2, registersMock.pc)
+
         ldVxByte(0x6122, registersMock)
+        assertEquals(0x0200 + 4, registersMock.pc)
+
         ldVxByte(0x6233, registersMock)
+        assertEquals(0x0200 + 6, registersMock.pc)
+
         ldVxByte(0x6344, registersMock)
+        assertEquals(0x0200 + 8, registersMock.pc)
+
         ldVxByte(0x6455, registersMock)
+        assertEquals(0x0200 + 10, registersMock.pc)
+
         ldVxByte(0x6566, registersMock)
+        assertEquals(0x0200 + 12, registersMock.pc)
+
         ldVxByte(0x6677, registersMock)
+        assertEquals(0x0200 + 14, registersMock.pc)
+
         ldVxByte(0x6788, registersMock)
+        assertEquals(0x0200 + 16, registersMock.pc)
+
         ldVxByte(0x6899, registersMock)
+        assertEquals(0x0200 + 18, registersMock.pc)
+
         ldVxByte(0x69AA, registersMock)
+        assertEquals(0x0200 + 20, registersMock.pc)
+
         ldVxByte(0x6ABB, registersMock)
+        assertEquals(0x0200 + 22, registersMock.pc)
+
         ldVxByte(0x6BCC, registersMock)
+        assertEquals(0x0200 + 24, registersMock.pc)
+
         ldVxByte(0x6CDD, registersMock)
+        assertEquals(0x0200 + 26, registersMock.pc)
+
         ldVxByte(0x6DEE, registersMock)
+        assertEquals(0x0200 + 28, registersMock.pc)
+
         ldVxByte(0x6EFF, registersMock)
+        assertEquals(0x0200 + 30, registersMock.pc)
+
         ldVxByte(0x6F00, registersMock)
+        assertEquals(0x0200 + 32, registersMock.pc)
 
         Mockito.verify(
                 registersMemoryMock,
