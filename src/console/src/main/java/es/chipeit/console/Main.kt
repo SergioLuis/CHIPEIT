@@ -5,6 +5,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 import es.chipeit.lib.emulator.Chipeit
+import es.chipeit.lib.io.Keyboard
 
 fun main(args: Array<String>) {
     if (args.size != 1) {
@@ -22,6 +23,7 @@ fun main(args: Array<String>) {
     val chipeit = Chipeit(
             DummySoundPlayer(),
             romResult.second,
+            Keyboard(),
             10,
             60,
             DummySleeper()

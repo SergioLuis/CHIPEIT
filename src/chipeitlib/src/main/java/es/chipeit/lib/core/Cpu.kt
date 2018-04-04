@@ -3,12 +3,14 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IClockObserver
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.io.Keyboard
 
 internal class Cpu(
         private val memory: IMemory<Byte>,
         private val graphicsMemory: IMemory<Byte>,
         private val registers: IRegisters,
-        private val stack: IMemory<Int>
+        private val stack: IMemory<Int>,
+        private val keyboard: Keyboard
 ) : IClockObserver {
 
     init {
@@ -86,7 +88,13 @@ internal class Cpu(
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx
-            0xE000 -> TODO("Instruction $instruction not implemented")
+            0xE000 -> {
+                when (instruction and 0x00FF) {
+                    0x009E -> skpVx(instruction, registers, keyboard)
+                    0x00A1 -> sknpVx(instruction, registers, keyboard)
+                    else -> haltAndCatchFire(instruction)
+                }
+            }
 
             // Fx07 - LD Vx, DT
             // Fx0A - LD Vx, K
@@ -98,11 +106,13 @@ internal class Cpu(
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
             0xF000 -> TODO("Instruction $instruction not implemented")
-            else -> {
-                throw IllegalStateException(
-                        "The instruction $instruction does not comply with " +
-                                "the original CHIP-8 specification")
-            }
+            else -> haltAndCatchFire(instruction)
         }
+    }
+
+    private fun haltAndCatchFire(instruction: Int) {
+        throw IllegalStateException(
+                "The instruction $instruction does not comply with " +
+                        "the original CHIP-8 specification")
     }
 }
