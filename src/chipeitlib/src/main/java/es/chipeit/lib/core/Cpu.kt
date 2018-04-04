@@ -8,11 +8,12 @@ internal class Cpu(
         private val memory: IMemory<Byte>,
         private val graphicsMemory: IMemory<Byte>,
         private val registers: IRegisters,
-        private val stack: IMemory<Short>
+        private val stack: IMemory<Int>
 ) : IClockObserver {
 
     init {
         registers.pc = 0x200
+        registers.sp = -1
     }
 
     override fun onClockTick() {

@@ -5,9 +5,9 @@ import es.chipeit.lib.interfaces.IRegisters
 
 internal class Registers(override val v: IMemory<Byte>) : IRegisters {
     override var i: Short = 0x00
-    override var pc: Int = 0x00
+    override var pc: Int = 0
 
-    override var sp: Byte = 0x0
+    override var sp: Int = 0
 
     init {
         if(v.size != 16)

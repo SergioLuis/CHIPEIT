@@ -43,7 +43,7 @@ class Chipeit(
     )
     private val stack = LoggedMemory(
             "Stack memory",
-            ShortMemory(ShortArray(16))
+            IntMemory(IntArray(16))
     )
 
     private val cpu = Cpu(memory, graphicMemory, registers, stack)
