@@ -278,7 +278,8 @@ class InstructionSetTests {
 
         skpVx(0xEA9E, registersMock, keyboard)
 
-        assertEquals(0x0200 + 2, registersMock.pc)
+        // Next instruction was skipped
+        assertEquals(0x0200 + 4, registersMock.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
@@ -286,7 +287,8 @@ class InstructionSetTests {
 
         skpVx(0xEB9E, registersMock, keyboard)
 
-        assertEquals(0x0200 + 2, registersMock.pc)
+        // Next instruction was not skipped
+        assertEquals(0x0204 + 2, registersMock.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
@@ -307,17 +309,19 @@ class InstructionSetTests {
         val registersMock = Registers(vRegsMock)
         registersMock.pc = 0x0200
 
-        skpVx(0xEA9E, registersMock, keyboard)
+        sknpVx(0xEA9E, registersMock, keyboard)
 
-        assertEquals(0x0200, registersMock.pc)
+        // Next instruction was skipped
+        assertEquals(0x0200 + 4, registersMock.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
         )[0xA]
 
-        skpVx(0xEB9E, registersMock, keyboard)
+        sknpVx(0xEB9E, registersMock, keyboard)
 
-        assertEquals(0x0200 + 2, registersMock.pc)
+        // Next instruction was not skipped
+        assertEquals(0x0204 + 2, registersMock.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
