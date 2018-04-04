@@ -256,4 +256,35 @@ class InstructionSetTests {
                 times(1)
         )[0xB]
     }
+
+    @Test
+    fun sknpVxTest() {
+        val vRegsMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(vRegsMock.size).thenReturn(16)
+        Mockito.`when`(vRegsMock[0xA]).thenReturn(3)
+        Mockito.`when`(vRegsMock[0xB]).thenReturn(8)
+
+        val keyboard = Keyboard()
+        keyboard.keyUp(Keyboard.Keys.KEY_3)
+        keyboard.keyDown(Keyboard.Keys.KEY_8)
+
+        val registersMock = Registers(vRegsMock)
+        registersMock.pc = 0x0200
+
+        skpVx(0xEA9E, registersMock, keyboard)
+
+        assertEquals(0x0200, registersMock.pc)
+        Mockito.verify(
+                vRegsMock,
+                times(1)
+        )[0xA]
+
+        skpVx(0xEB9E, registersMock, keyboard)
+
+        assertEquals(0x0200 + 2, registersMock.pc)
+        Mockito.verify(
+                vRegsMock,
+                times(1)
+        )[0xB]
+    }
 }

@@ -82,6 +82,15 @@ internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) 
 }
 
 // ExA1 - SKNP Vx
+internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
+    val vReg = (instruction and 0x0F00) shr 8
+    val vRegValue = registers.v[vReg].toInt()
+
+    val isUp = (keyboard.keysDown and (1 shl vRegValue)) == 0
+
+    if (isUp)
+        registers.pc += 2
+}
 
 // Fx07 - LD Vx, DT
 
