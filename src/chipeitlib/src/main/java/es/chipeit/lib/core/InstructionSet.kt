@@ -76,21 +76,44 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val vReg = (instruction and 0x0F00) shr 8
     val keyIndex = registers.v[vReg].toInt()
+    val expectedKey = Keyboard.Keys.values()[keyIndex]
 
-    registers.pc += if (keyboard.isDown(keyIndex)) 4 else 2
+    registers.pc += if (keyboard.isPressed(expectedKey)) 4 else 2
 }
 
 // ExA1 - SKNP Vx
 internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val vReg = (instruction and 0x0F00) shr 8
     val keyIndex = registers.v[vReg].toInt()
+    val expectedKey = Keyboard.Keys.values()[keyIndex]
 
-    registers.pc += if (!keyboard.isDown(keyIndex)) 4 else 2
+    registers.pc += if (!keyboard.isPressed(expectedKey)) 4 else 2
 }
 
 // Fx07 - LD Vx, DT
 
 // Fx0A - LD Vx, K
+internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
+    // Execution is paused avoiding Program Counter update until a key
+    // is released. This way, the same instruction (this one) is
+    // executed over and over until a key is pressed and then released.
+    // This behavior matches original COSMAC VIP emulator behavior
+    // https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
+    if (!keyboard.isWaitingForKeyRelease) {
+        keyboard.clearLastKeyReleased()
+        keyboard.isWaitingForKeyRelease = true
+        return
+    }
+
+    if (keyboard.lastKeyReleased == Keyboard.Keys.NONE)
+        return
+
+    val vReg = (instruction and 0x0F00) shr 8
+    registers.v[vReg] = keyboard.lastKeyReleased.data.id
+    keyboard.isWaitingForKeyRelease = false
+
+    registers.pc += 2
+}
 
 // Fx15 - LD DR, Vx
 

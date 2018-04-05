@@ -2,8 +2,11 @@ package es.chipeit.lib.core
 
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import org.mockito.Mockito
 import org.mockito.Mockito.times
+
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
@@ -270,8 +273,8 @@ class InstructionSetTests {
         Mockito.`when`(vRegsMock[0xB]).thenReturn(8)
 
         val keyboard = Keyboard()
-        keyboard.keyDown(Keyboard.Keys.KEY_3)
-        keyboard.keyUp(Keyboard.Keys.KEY_8)
+        keyboard.pressKey(Keyboard.Keys.KEY_3)
+        keyboard.releaseKey(Keyboard.Keys.KEY_8)
 
         val registersMock = Registers(vRegsMock)
         registersMock.pc = 0x0200
@@ -303,8 +306,8 @@ class InstructionSetTests {
         Mockito.`when`(vRegsMock[0xB]).thenReturn(8)
 
         val keyboard = Keyboard()
-        keyboard.keyUp(Keyboard.Keys.KEY_3)
-        keyboard.keyDown(Keyboard.Keys.KEY_8)
+        keyboard.releaseKey(Keyboard.Keys.KEY_3)
+        keyboard.pressKey(Keyboard.Keys.KEY_8)
 
         val registersMock = Registers(vRegsMock)
         registersMock.pc = 0x0200
@@ -326,5 +329,48 @@ class InstructionSetTests {
                 vRegsMock,
                 times(1)
         )[0xB]
+    }
+
+    @Test
+    fun ldVxKTest() {
+        val vRegsMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(vRegsMock.size).thenReturn(16)
+
+        val registers = Registers(vRegsMock)
+        registers.pc = 0x0200
+
+        val keyboard = Keyboard()
+        val instruction = 0xF70A
+
+        assertFalse(keyboard.isWaitingForKeyRelease)
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertTrue(keyboard.isWaitingForKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertEquals(0x0200, registers.pc)
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertTrue(keyboard.isWaitingForKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertEquals(0x0200, registers.pc)
+
+        keyboard.pressKey(Keyboard.Keys.KEY_5)
+        ldVxK(instruction, registers, keyboard)
+
+        assertTrue(keyboard.isWaitingForKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertEquals(0x0200, registers.pc)
+
+        keyboard.releaseKey(Keyboard.Keys.KEY_5)
+        ldVxK(instruction, registers, keyboard)
+
+        assertFalse(keyboard.isWaitingForKeyRelease)
+        assertEquals(0x0200 + 2, registers.pc)
+        Mockito.verify(
+                vRegsMock,
+                times(1)
+        )[7] = Keyboard.Keys.KEY_5.data.id
     }
 }
