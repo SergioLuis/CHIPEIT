@@ -1,39 +1,52 @@
 package es.chipeit.lib.io
 
 class Keyboard {
-    enum class Keys(val id: Int) {
-        KEY_0(1 shl 0),
-        KEY_1(1 shl 1),
-        KEY_2(1 shl 2),
-        KEY_3(1 shl 3),
-        KEY_4(1 shl 4),
-        KEY_5(1 shl 5),
-        KEY_6(1 shl 6),
-        KEY_7(1 shl 7),
-        KEY_8(1 shl 8),
-        KEY_9(1 shl 9),
-        KEY_A(1 shl 10),
-        KEY_B(1 shl 11),
-        KEY_C(1 shl 12),
-        KEY_D(1 shl 13),
-        KEY_E(1 shl 14),
-        KEY_F(1 shl 15)
+    class KeyData(val id: Byte, val flags: Int)
+
+    enum class Keys(val data: KeyData) {
+        KEY_0(KeyData(0x0, 1 shl 0)),
+        KEY_1(KeyData(0x1, 1 shl 1)),
+        KEY_2(KeyData(0x2, 1 shl 2)),
+        KEY_3(KeyData(0x3, 1 shl 3)),
+        KEY_4(KeyData(0x4, 1 shl 4)),
+        KEY_5(KeyData(0x5, 1 shl 5)),
+        KEY_6(KeyData(0x6, 1 shl 6)),
+        KEY_7(KeyData(0x7, 1 shl 7)),
+        KEY_8(KeyData(0x8, 1 shl 8)),
+        KEY_9(KeyData(0x9, 1 shl 9)),
+        KEY_A(KeyData(0xA, 1 shl 10)),
+        KEY_B(KeyData(0xB, 1 shl 11)),
+        KEY_C(KeyData(0xC, 1 shl 12)),
+        KEY_D(KeyData(0xD, 1 shl 13)),
+        KEY_E(KeyData(0xE, 1 shl 14)),
+        KEY_F(KeyData(0xF, 1 shl 15)),
+        NONE(KeyData(-1, 0))
     }
 
-    private var _keysDown: Int = 0
+    private var pressedKeys: Int = 0
 
-    val keysDown: Int
-        get() = _keysDown
+    private var _lastKeyReleased: Keys = Keys.NONE
+    val lastKeyReleased: Keys
+        get() = _lastKeyReleased
 
-    fun keyDown(key: Keys) {
-        _keysDown = _keysDown or key.id
+    var isWaitingForKeyRelease: Boolean = false
+
+    fun clearLastKeyReleased() {
+        _lastKeyReleased = Keys.NONE
     }
 
-    fun keyUp(key: Keys) {
-        _keysDown = _keysDown and key.id.inv()
+    fun pressKey(key: Keys) {
+        pressedKeys = pressedKeys or key.data.flags
     }
 
-    fun isDown(keyIndex: Int): Boolean {
-        return (_keysDown and (1 shl keyIndex)) != 0
+    fun releaseKey(key: Keys) {
+        if (isPressed(key))
+            _lastKeyReleased = key
+
+        pressedKeys = pressedKeys and key.data.flags.inv()
+    }
+
+    fun isPressed(key: Keys): Boolean {
+        return (pressedKeys and key.data.flags) != 0
     }
 }
