@@ -11,6 +11,7 @@ import org.mockito.Mockito.times
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.io.Keyboard
+import org.mockito.Mock
 
 class InstructionSetTests {
     @Test
@@ -342,35 +343,62 @@ class InstructionSetTests {
         val keyboard = Keyboard()
         val instruction = 0xF70A
 
-        assertFalse(keyboard.isWaitingForKeyRelease)
+        assertFalse(keyboard.isCapturingNextKeyRelease)
 
         ldVxK(instruction, registers, keyboard)
 
-        assertTrue(keyboard.isWaitingForKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertTrue(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
 
         ldVxK(instruction, registers, keyboard)
 
-        assertTrue(keyboard.isWaitingForKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertTrue(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
 
         keyboard.pressKey(Keyboard.Keys.KEY_5)
+        keyboard.pressKey(Keyboard.Keys.KEY_8)
         ldVxK(instruction, registers, keyboard)
 
-        assertTrue(keyboard.isWaitingForKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertTrue(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
 
         keyboard.releaseKey(Keyboard.Keys.KEY_5)
+        keyboard.releaseKey(Keyboard.Keys.KEY_8)
+
+        assertEquals(Keyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
+
         ldVxK(instruction, registers, keyboard)
 
-        assertFalse(keyboard.isWaitingForKeyRelease)
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 2, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
         )[7] = Keyboard.Keys.KEY_5.data.id
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertTrue(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(0x0200 + 2, registers.pc)
+
+        keyboard.pressKey(Keyboard.Keys.KEY_8)
+        keyboard.pressKey(Keyboard.Keys.KEY_5)
+        keyboard.releaseKey(Keyboard.Keys.KEY_8)
+        keyboard.releaseKey(Keyboard.Keys.KEY_5)
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(0x0200 + 4, registers.pc)
+        Mockito.verify(
+                vRegsMock,
+                times(1)
+        )[7] = Keyboard.Keys.KEY_8.data.id
     }
 }

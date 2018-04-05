@@ -99,18 +99,18 @@ internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: Keyboard) 
     // executed over and over until a key is pressed and then released.
     // This behavior matches original COSMAC VIP emulator behavior
     // https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
-    if (!keyboard.isWaitingForKeyRelease) {
-        keyboard.clearLastKeyReleased()
-        keyboard.isWaitingForKeyRelease = true
+    if (keyboard.isCapturingNextKeyRelease) {
         return
     }
 
-    if (keyboard.lastKeyReleased == Keyboard.Keys.NONE)
+    if (keyboard.capturedKeyRelease == Keyboard.Keys.NONE) {
+        keyboard.captureNextKeyRelease()
         return
+    }
 
     val vReg = (instruction and 0x0F00) shr 8
-    registers.v[vReg] = keyboard.lastKeyReleased.data.id
-    keyboard.isWaitingForKeyRelease = false
+    registers.v[vReg] = keyboard.capturedKeyRelease.data.id
+    keyboard.clearLastCapturedKeyRelease()
 
     registers.pc += 2
 }

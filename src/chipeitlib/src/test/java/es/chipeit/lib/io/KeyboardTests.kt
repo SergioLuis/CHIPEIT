@@ -108,33 +108,25 @@ class KeyboardTests {
     }
 
     @Test
-    fun lastKeyReleasedTest() {
+    fun lastKeyReleaseCaptureTest() {
         val keyboard = Keyboard()
 
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
 
         keyboard.pressKey(Keyboard.Keys.KEY_8)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
 
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        keyboard.captureNextKeyRelease()
+        assertTrue(keyboard.isCapturingNextKeyRelease)
 
-        keyboard.pressKey(Keyboard.Keys.KEY_5)
-
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
-
+        // A Key is not considered as released if it was not pressed before
         keyboard.releaseKey(Keyboard.Keys.KEY_0)
-
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
-
-        keyboard.releaseKey(Keyboard.Keys.KEY_5)
-
-        assertEquals(Keyboard.Keys.KEY_5, keyboard.lastKeyReleased)
+        assertTrue(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
 
         keyboard.releaseKey(Keyboard.Keys.KEY_8)
-
-        assertEquals(Keyboard.Keys.KEY_8, keyboard.lastKeyReleased)
-
-        keyboard.clearLastKeyReleased()
-
-        assertEquals(Keyboard.Keys.NONE, keyboard.lastKeyReleased)
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(Keyboard.Keys.KEY_8, keyboard.capturedKeyRelease)
     }
 }

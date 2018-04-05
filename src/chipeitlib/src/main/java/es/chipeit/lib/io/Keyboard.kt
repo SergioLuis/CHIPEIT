@@ -25,14 +25,24 @@ class Keyboard {
 
     private var pressedKeys: Int = 0
 
-    private var _lastKeyReleased: Keys = Keys.NONE
-    val lastKeyReleased: Keys
-        get() = _lastKeyReleased
+    private var _capturedKeyRelease: Keys = Keys.NONE
+    // FIXME: this should be private to the core
+    val capturedKeyRelease: Keys
+        get() = _capturedKeyRelease
 
-    var isWaitingForKeyRelease: Boolean = false
+    private var _isCapturingNextKeyRelease: Boolean = false
+    // FIXME: this should be private to the core
+    val isCapturingNextKeyRelease: Boolean
+        get() = _isCapturingNextKeyRelease
 
-    fun clearLastKeyReleased() {
-        _lastKeyReleased = Keys.NONE
+    // FIXME: this should be private to the core
+    fun captureNextKeyRelease() {
+        _isCapturingNextKeyRelease = true
+    }
+
+    // FIXME: this should be private to the core
+    fun clearLastCapturedKeyRelease() {
+        _capturedKeyRelease = Keys.NONE
     }
 
     fun pressKey(key: Keys) {
@@ -40,8 +50,11 @@ class Keyboard {
     }
 
     fun releaseKey(key: Keys) {
-        if (isPressed(key))
-            _lastKeyReleased = key
+        if (_isCapturingNextKeyRelease && isPressed(key))
+        {
+            _capturedKeyRelease = key
+            _isCapturingNextKeyRelease = false
+        }
 
         pressedKeys = pressedKeys and key.data.flags.inv()
     }
