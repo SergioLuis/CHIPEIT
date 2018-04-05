@@ -2,7 +2,7 @@ package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.io.Keyboard
+import es.chipeit.lib.io.IKeyboard
 
 // 00E0 - CLS
 internal fun cls(registers: IRegisters, graphicsMemory: IMemory<Byte>) {
@@ -76,16 +76,16 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val vReg = (instruction and 0x0F00) shr 8
     val keyIndex = registers.v[vReg].toInt()
-    val expectedKey = Keyboard.Keys.values()[keyIndex]
+    val expectedKey = IKeyboard.Keys.values()[keyIndex]
 
     registers.pc += if (keyboard.isPressed(expectedKey)) 4 else 2
 }
 
 // ExA1 - SKNP Vx
 internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
-    val vReg = (instruction and 0x0F00) shr 8
-    val keyIndex = registers.v[vReg].toInt()
-    val expectedKey = Keyboard.Keys.values()[keyIndex]
+    val x = (instruction and 0x0F00) shr 8
+    val keyIndex = registers.v[x].toInt()
+    val expectedKey = IKeyboard.Keys.values()[keyIndex]
 
     registers.pc += if (!keyboard.isPressed(expectedKey)) 4 else 2
 }
@@ -96,14 +96,14 @@ internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard)
 internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     // Execution is paused avoiding Program Counter update until a key
     // is released. This way, the same instruction (this one) is
-    // executed over and over until a key is pressed and then released.
-    // This behavior matches original COSMAC VIP emulator behavior
+    // executed over and over until a key is released.
+    // This behavior is the same as in original COSMAC VIP emulator:
     // https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
     if (keyboard.isCapturingNextKeyRelease) {
         return
     }
 
-    if (keyboard.capturedKeyRelease == Keyboard.Keys.NONE) {
+    if (keyboard.capturedKeyRelease == IKeyboard.Keys.NONE) {
         keyboard.captureNextKeyRelease()
         return
     }

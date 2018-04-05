@@ -3,7 +3,6 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IClockObserver
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.io.Keyboard
 
 internal class Cpu(
         private val memory: IMemory<Byte>,

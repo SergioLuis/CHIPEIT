@@ -7,7 +7,9 @@ import es.chipeit.lib.core.*
 import es.chipeit.lib.core.log.LoggedMemory
 import es.chipeit.lib.interfaces.hzToMs
 import es.chipeit.lib.io.ISwitchObserver
-import es.chipeit.lib.io.Keyboard
+import es.chipeit.lib.core.Keyboard
+import es.chipeit.lib.core.log.LoggedKeybard
+import es.chipeit.lib.io.IKeyboard
 
 internal fun byteArrayCopy(src: ByteArray, dst: ByteArray) {
     for(i in src.indices)
@@ -17,7 +19,6 @@ internal fun byteArrayCopy(src: ByteArray, dst: ByteArray) {
 class Chipeit(
         soundPlayer: ISwitchObserver,
         romContent: ByteArray,
-        keyboard: Keyboard,
         cpuClockRate: Short = 500,
         timersClockRate: Short = 60,
         private val sleeper: ISleeper
@@ -47,6 +48,12 @@ class Chipeit(
             "Stack memory",
             IntMemory(IntArray(16))
     )
+
+    private val keyboard = Keyboard()
+    private val loggedKeyboard = LoggedKeybard(keyboard)
+
+    val UserKeyboard: IKeyboard
+        get() = loggedKeyboard
 
     private val cpu = Cpu(memory, graphicMemory, registers, stack, keyboard)
     private val soundTimer = Timer(soundPlayer)
