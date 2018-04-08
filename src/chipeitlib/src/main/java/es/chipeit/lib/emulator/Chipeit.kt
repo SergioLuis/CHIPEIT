@@ -25,8 +25,8 @@ class Chipeit(
     val SCREEN_WIDTH = 64
     val SCREEN_HEIGHT = 32
 
-    private val _graphicsMemory = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
-    val PUBLIC_GRAPHICS_MEMORY = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
+    private val _graphicMemory = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
+    val PUBLIC_GRAPHIC_MEMORY = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
 
     @Volatile
     private var running: Boolean = false
@@ -36,7 +36,7 @@ class Chipeit(
     )
     private val graphicMemory = LoggedGraphicMemory(
             "Graphic memory",
-            GraphicMemory(_graphicsMemory)
+            GraphicMemory(_graphicMemory)
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",
@@ -78,7 +78,7 @@ class Chipeit(
             cpuClockDivider.trigger()
             timersClockDivider.trigger()
 
-            byteArrayCopy(_graphicsMemory, PUBLIC_GRAPHICS_MEMORY)
+            byteArrayCopy(_graphicMemory, PUBLIC_GRAPHIC_MEMORY)
 
             val timeToSleep =
                     max(0, min(

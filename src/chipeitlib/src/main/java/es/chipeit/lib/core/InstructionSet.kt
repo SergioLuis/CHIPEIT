@@ -1,11 +1,13 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.IGraphicMemory
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.interfaces.ITimer
 
 // 00E0 - CLS
-internal fun cls(registers: IRegisters, graphicsMemory: IMemory<Byte>) {
-    graphicsMemory.fill(0)
+internal fun cls(registers: IRegisters, graphicMemory: IGraphicMemory) {
+    graphicMemory.fill(0)
     registers.pc += 2
 }
 

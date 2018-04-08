@@ -8,7 +8,7 @@ internal class Cpu(
         private val soundTimer: ITimer,
         private val stack: IMemory<Short>,
         private val memory: IMemory<Byte>,
-        private val graphicsMemory: IGraphicMemory
+        private val graphicMemory: IGraphicMemory
 ) : IClockObserver {
     init {
         registers.pc = 0x200
@@ -27,12 +27,10 @@ internal class Cpu(
             // 0nnn - SYS addr
             // 00E0 - CLS
             // 00EE - RET
-            0x0000 -> {
-                when (instruction) {
-                    0x00E0 -> cls(registers, graphicsMemory)
-                    0x00EE -> ret(registers)
-                    else -> return // 0nnn - SYS addr (unused)
-                }
+            0x0000 -> when (instruction) {
+                0x00E0 -> cls(registers, graphicMemory)
+                0x00EE -> ret(registers)
+                else -> return // 0nnn - SYS addr (unused)
             }
 
             // 1nnn - JP addr
@@ -65,10 +63,18 @@ internal class Cpu(
             // 8xy6 - SHR Vx {, Vy}
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
-            0x8000 -> TODO("Instruction $instruction not implemented")
+            0x8000 -> when(instruction and 0xF00F) {
+                0x8004 -> addVxVy(instruction, registers)
+                0x8005 -> subVxVy(instruction, registers)
+                0x8007 -> subnVxVy(instruction, registers)
+                else -> TODO("Instruction $instruction not implemented")
+            }
 
             // 9xy0 - SNE Vx, Vy
-            0x9000 -> TODO("Instruction $instruction not implemented")
+            0x9000 -> when(instruction and 0xF00F) {
+                0x9000 -> sneVxVy(instruction, registers)
+                else -> TODO("Instruction $instruction not implemented")
+            }
 
             // Annn - LD I, addr
             0xA000 -> TODO("Instruction $instruction not implemented")
@@ -95,7 +101,15 @@ internal class Cpu(
             // Fx33 - LD B, Vx
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
-            0xF000 -> TODO("Instruction $instruction not implemented")
+            0xF000 -> when(instruction and 0xF0FF) {
+                0xF007 -> ldVxTimer(instruction, registers, delayTimer)
+                0xF015 -> ldTimerVx(instruction, registers, delayTimer)
+                0xF018 -> ldTimerVx(instruction, registers, soundTimer)
+                0xF029 -> ldFVx(instruction, registers)
+                0xF033 -> ldBVx(instruction, registers, memory)
+                else -> TODO("Instruction $instruction not implemented")
+            }
+
             else -> {
                 throw IllegalStateException(
                         "The instruction $instruction does not comply with " +
