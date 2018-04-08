@@ -32,7 +32,12 @@ class Chipeit(
     private var running: Boolean = false
     private val memory = LoggedMemory(
             "Main memory",
-            ByteMemory(TABLE + ByteArray(0x200 - TABLE.size) + romContent)
+            ByteMemory(
+                    TABLE +
+                            ByteArray(0x200 - TABLE.size) +
+                            romContent +
+                            ByteArray(0xFFF - romContent.size - 0x200)
+            )
     )
     private val graphicMemory = LoggedGraphicMemory(
             "Graphic memory",
