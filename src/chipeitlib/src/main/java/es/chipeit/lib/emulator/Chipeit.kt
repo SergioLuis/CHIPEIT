@@ -4,12 +4,14 @@ import kotlin.math.max
 import kotlin.math.min
 
 import es.chipeit.lib.core.*
+import es.chipeit.lib.core.hexfont.TABLE
+import es.chipeit.lib.core.log.LoggedGraphicMemory
 import es.chipeit.lib.core.log.LoggedMemory
 import es.chipeit.lib.interfaces.hzToMs
 import es.chipeit.lib.io.ISwitchObserver
 
 internal fun byteArrayCopy(src: ByteArray, dst: ByteArray) {
-    for(i in src.indices)
+    for (i in src.indices)
         dst[i] = src[i]
 }
 
@@ -30,12 +32,11 @@ class Chipeit(
     private var running: Boolean = false
     private val memory = LoggedMemory(
             "Main memory",
-            PaddedMemory(ByteMemory(romContent), 0x200)
+            ByteMemory(TABLE + ByteArray(0x200 - TABLE.size) + romContent)
     )
-
-    private val graphicMemory = LoggedMemory(
+    private val graphicMemory = LoggedGraphicMemory(
             "Graphic memory",
-            ByteMemory(_graphicsMemory)
+            GraphicMemory(_graphicsMemory)
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",
@@ -46,9 +47,16 @@ class Chipeit(
             ShortMemory(ShortArray(16))
     )
 
-    private val cpu = Cpu(memory, graphicMemory, registers, stack)
     private val soundTimer = Timer(soundPlayer)
     private val delayTimer = Timer()
+    private val cpu = Cpu(
+            registers,
+            delayTimer,
+            soundTimer,
+            stack,
+            memory,
+            graphicMemory
+    )
 
     private val chronometer = Chronometer(Clock())
 
@@ -73,10 +81,10 @@ class Chipeit(
             byteArrayCopy(_graphicsMemory, PUBLIC_GRAPHICS_MEMORY)
 
             val timeToSleep =
-                max(0, min(
-                    cpuClockDivider.msLeft,
-                    timersClockDivider.msLeft)
-                )
+                    max(0, min(
+                            cpuClockDivider.msLeft,
+                            timersClockDivider.msLeft)
+                    )
 
             sleeper.sleep(timeToSleep)
         }

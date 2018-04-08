@@ -1,16 +1,15 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.IClockObserver
-import es.chipeit.lib.interfaces.IMemory
-import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.interfaces.*
 
 internal class Cpu(
-        private val memory: IMemory<Byte>,
-        private val graphicsMemory: IMemory<Byte>,
         private val registers: IRegisters,
-        private val stack: IMemory<Short>
+        private val delayTimer: ITimer,
+        private val soundTimer: ITimer,
+        private val stack: IMemory<Short>,
+        private val memory: IMemory<Byte>,
+        private val graphicsMemory: IGraphicMemory
 ) : IClockObserver {
-
     init {
         registers.pc = 0x200
     }

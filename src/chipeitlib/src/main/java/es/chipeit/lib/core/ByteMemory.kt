@@ -2,7 +2,7 @@ package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IMemory
 
-internal class ByteMemory(private val memory: ByteArray): IMemory<Byte> {
+internal open class ByteMemory(protected val memory: ByteArray): IMemory<Byte> {
     override val size: Int
         get() = memory.size
 
@@ -12,9 +12,5 @@ internal class ByteMemory(private val memory: ByteArray): IMemory<Byte> {
 
     override fun set(index: Int, value: Byte) {
         memory[index] = value
-    }
-
-    override fun fill(element: Byte, fromIndex: Int, toIndex: Int) {
-        memory.fill(element, fromIndex, toIndex)
     }
 }
