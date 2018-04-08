@@ -7,9 +7,9 @@ import kotlin.test.assertTrue
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 
-
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.io.IKeyboard
 
 class InstructionSetTests {
     @Test
@@ -266,16 +266,16 @@ class InstructionSetTests {
 
     @Test
     fun skpVxTest() {
-        val vRegsMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(vRegsMock.size).thenReturn(16)
-        Mockito.`when`(vRegsMock[0xA]).thenReturn(3)
-        Mockito.`when`(vRegsMock[0xB]).thenReturn(8)
+        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(vMock.size).thenReturn(16)
+        Mockito.`when`(vMock[0xA]).thenReturn(3)
+        Mockito.`when`(vMock[0xB]).thenReturn(8)
 
         val keyboard = Keyboard()
-        keyboard.pressKey(Keyboard.Keys.KEY_3)
-        keyboard.releaseKey(Keyboard.Keys.KEY_8)
+        keyboard.pressKey(IKeyboard.Keys.KEY_3)
+        keyboard.releaseKey(IKeyboard.Keys.KEY_8)
 
-        val registersMock = Registers(vRegsMock)
+        val registersMock = Registers(vMock)
         registersMock.pc = 0x0200
 
         skpVx(0xEA9E, registersMock, keyboard)
@@ -283,7 +283,7 @@ class InstructionSetTests {
         // Next instruction was skipped
         assertEquals(0x0200 + 4, registersMock.pc)
         Mockito.verify(
-                vRegsMock,
+                vMock,
                 times(1)
         )[0xA]
 
@@ -292,23 +292,23 @@ class InstructionSetTests {
         // Next instruction was not skipped
         assertEquals(0x0204 + 2, registersMock.pc)
         Mockito.verify(
-                vRegsMock,
+                vMock,
                 times(1)
         )[0xB]
     }
 
     @Test
     fun sknpVxTest() {
-        val vRegsMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(vRegsMock.size).thenReturn(16)
-        Mockito.`when`(vRegsMock[0xA]).thenReturn(3)
-        Mockito.`when`(vRegsMock[0xB]).thenReturn(8)
+        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(vMock.size).thenReturn(16)
+        Mockito.`when`(vMock[0xA]).thenReturn(3)
+        Mockito.`when`(vMock[0xB]).thenReturn(8)
 
         val keyboard = Keyboard()
-        keyboard.releaseKey(Keyboard.Keys.KEY_3)
-        keyboard.pressKey(Keyboard.Keys.KEY_8)
+        keyboard.releaseKey(IKeyboard.Keys.KEY_3)
+        keyboard.pressKey(IKeyboard.Keys.KEY_8)
 
-        val registersMock = Registers(vRegsMock)
+        val registersMock = Registers(vMock)
         registersMock.pc = 0x0200
 
         sknpVx(0xEA9E, registersMock, keyboard)
@@ -316,7 +316,7 @@ class InstructionSetTests {
         // Next instruction was skipped
         assertEquals(0x0200 + 4, registersMock.pc)
         Mockito.verify(
-                vRegsMock,
+                vMock,
                 times(1)
         )[0xA]
 
@@ -325,7 +325,7 @@ class InstructionSetTests {
         // Next instruction was not skipped
         assertEquals(0x0204 + 2, registersMock.pc)
         Mockito.verify(
-                vRegsMock,
+                vMock,
                 times(1)
         )[0xB]
     }
@@ -346,57 +346,57 @@ class InstructionSetTests {
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
 
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
 
-        keyboard.pressKey(Keyboard.Keys.KEY_5)
-        keyboard.pressKey(Keyboard.Keys.KEY_8)
+        keyboard.pressKey(IKeyboard.Keys.KEY_8)
+        keyboard.pressKey(IKeyboard.Keys.KEY_5)
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
 
-        keyboard.releaseKey(Keyboard.Keys.KEY_5)
-        keyboard.releaseKey(Keyboard.Keys.KEY_8)
+        keyboard.releaseKey(IKeyboard.Keys.KEY_5)
+        keyboard.releaseKey(IKeyboard.Keys.KEY_8)
 
-        assertEquals(Keyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
 
         ldVxK(instruction, registers, keyboard)
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 2, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
-        )[7] = Keyboard.Keys.KEY_5.data.id
+        )[7] = IKeyboard.Keys.KEY_5.data.id
 
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 2, registers.pc)
 
-        keyboard.pressKey(Keyboard.Keys.KEY_8)
-        keyboard.pressKey(Keyboard.Keys.KEY_5)
-        keyboard.releaseKey(Keyboard.Keys.KEY_8)
-        keyboard.releaseKey(Keyboard.Keys.KEY_5)
+        keyboard.pressKey(IKeyboard.Keys.KEY_8)
+        keyboard.pressKey(IKeyboard.Keys.KEY_5)
+        keyboard.releaseKey(IKeyboard.Keys.KEY_8)
+        keyboard.releaseKey(IKeyboard.Keys.KEY_5)
 
         ldVxK(instruction, registers, keyboard)
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
-        assertEquals(Keyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 4, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
-        )[7] = Keyboard.Keys.KEY_8.data.id
+        )[7] = IKeyboard.Keys.KEY_8.data.id
     }
 }

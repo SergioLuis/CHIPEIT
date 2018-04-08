@@ -7,12 +7,14 @@ import es.chipeit.lib.io.IKeyboard
 // 00E0 - CLS
 internal fun cls(registers: IRegisters, graphicsMemory: IMemory<Byte>) {
     graphicsMemory.fill(0)
+
     registers.pc += 2
 }
 
 // 00EE - RET
 internal fun ret(registers: IRegisters, stack: IMemory<Int>) {
     registers.pc = stack[registers.sp]
+
     registers.sp -= 1
 }
 
@@ -25,6 +27,7 @@ internal fun jpAddr(instruction: Int, registers: IRegisters) {
 internal fun call(instruction: Int, registers: IRegisters, stack: IMemory<Int>) {
     registers.sp += 1
     stack[registers.sp] = registers.pc
+
     registers.pc = instruction and 0x0FFF
 }
 
@@ -36,9 +39,11 @@ internal fun call(instruction: Int, registers: IRegisters, stack: IMemory<Int>) 
 
 // 6xkk - LD Vx, byte
 internal fun ldVxByte(instruction: Int, registers: IRegisters) {
-    val register = (instruction and 0x0F00) shr 8
+    val x = instruction shr 2 * 4 and 0xF
     val byte = (instruction and 0x00FF).toByte()
-    registers.v[register] = byte
+
+    registers.v[x] = byte
+
     registers.pc += 2
 }
 
@@ -74,8 +79,9 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 
 // Ex9E - SKP Vx
 internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
-    val vReg = (instruction and 0x0F00) shr 8
-    val keyIndex = registers.v[vReg].toInt()
+    val x = instruction shr 2 * 4 and 0xF
+
+    val keyIndex = registers.v[x].toInt()
     val expectedKey = IKeyboard.Keys.values()[keyIndex]
 
     registers.pc += if (keyboard.isPressed(expectedKey)) 4 else 2
@@ -83,7 +89,8 @@ internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) 
 
 // ExA1 - SKNP Vx
 internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
-    val x = (instruction and 0x0F00) shr 8
+    val x = instruction shr 2 * 4 and 0xF
+
     val keyIndex = registers.v[x].toInt()
     val expectedKey = IKeyboard.Keys.values()[keyIndex]
 
