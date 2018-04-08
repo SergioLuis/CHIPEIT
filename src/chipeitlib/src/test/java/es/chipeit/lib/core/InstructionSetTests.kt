@@ -1,17 +1,19 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.IGraphicMemory
 import org.junit.Test
 import kotlin.test.assertEquals
 import org.mockito.Mockito
-import org.mockito.Mockito.times
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import org.junit.Ignore
+import org.mockito.Mockito.*
 
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val graphicMemory = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val graphicMemory = Mockito.mock(IGraphicMemory::class.java)
         val registers = Registers(ByteMemory(ByteArray(16)))
 
         registers.pc = 0x0200
