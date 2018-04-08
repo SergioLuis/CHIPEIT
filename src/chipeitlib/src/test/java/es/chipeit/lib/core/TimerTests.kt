@@ -14,7 +14,7 @@ class TimerTests {
         val timer: ITimer = Timer()
 
         // assertNotFails equivalent
-        timer.setRegister(1)
+        timer.t = 1
         timer.onClockTick()
     }
 
@@ -22,7 +22,7 @@ class TimerTests {
     fun isTimerActiveTest() {
         val timer: ITimer = Timer()
 
-        timer.setRegister(1)
+        timer.t = 1
         assertTrue(timer.isActive())
         timer.onClockTick()
         assertFalse(timer.isActive())
@@ -35,11 +35,14 @@ class TimerTests {
         val switchObserverMock = Mockito.mock(ISwitchObserver::class.java)
         val timer: ITimer = Timer(switchObserverMock)
 
-        timer.setRegister(1) // switchObserverMock.onEnable()
+        timer.t = 1 // switchObserverMock.onEnable()
+        timer.t = 2 // nothing
+        timer.onClockTick() // t = 1
         timer.onClockTick() // switchObserverMock.onDisable()
         timer.onClockTick() // nothing
-        timer.setRegister(1) // switchObserverMock.onEnable()
-        timer.setRegister(0) // switchObserverMock.onDisable()
+        timer.t = 0 //nothing
+        timer.t = 1 // switchObserverMock.onEnable()
+        timer.t = 0 // switchObserverMock.onDisable()
 
         Mockito.verify(
                 switchObserverMock,
