@@ -186,82 +186,82 @@ class InstructionSetTests {
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[0] = 0x11
+        )[0x0] = 0x11
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[1] = 0x22
+        )[0x1] = 0x22
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[2] = 0x33
+        )[0x2] = 0x33
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[3] = 0x44
+        )[0x3] = 0x44
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[4] = 0x55
+        )[0x4] = 0x55
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[5] = 0x66
+        )[0x5] = 0x66
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[6] = 0x77
+        )[0x6] = 0x77
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[7] = 0x88.toByte()
+        )[0x7] = 0x88.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[8] = 0x99.toByte()
+        )[0x8] = 0x99.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[9] = 0xAA.toByte()
+        )[0x9] = 0xAA.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[10] = 0xBB.toByte()
+        )[0xA] = 0xBB.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[11] = 0xCC.toByte()
+        )[0xB] = 0xCC.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[12] = 0xDD.toByte()
+        )[0xC] = 0xDD.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[13] = 0xEE.toByte()
+        )[0xD] = 0xEE.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[14] = 0xFF.toByte()
+        )[0xE] = 0xFF.toByte()
 
         Mockito.verify(
                 registersMemoryMock,
                 times(1)
-        )[15] = 0x00
+        )[0xF] = 0x00
     }
 
     @Test
@@ -376,7 +376,7 @@ class InstructionSetTests {
         Mockito.verify(
                 vRegsMock,
                 times(1)
-        )[7] = IKeyboard.Keys.KEY_5.data.id
+        )[0x7] = IKeyboard.Keys.KEY_5.data.id
 
         ldVxK(instruction, registers, keyboard)
 
@@ -397,6 +397,6 @@ class InstructionSetTests {
         Mockito.verify(
                 vRegsMock,
                 times(1)
-        )[7] = IKeyboard.Keys.KEY_8.data.id
+        )[0x7] = IKeyboard.Keys.KEY_8.data.id
     }
 }
