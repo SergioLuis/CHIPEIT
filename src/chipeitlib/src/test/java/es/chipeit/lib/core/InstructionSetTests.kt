@@ -7,9 +7,6 @@ import org.mockito.Mockito.times
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import kotlin.experimental.and
-import kotlin.experimental.or
-import kotlin.experimental.xor
 
 class InstructionSetTests {
     @Test
