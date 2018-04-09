@@ -55,18 +55,30 @@ internal class Cpu(
             0x6000 -> ldVxByte(instruction, registers)
 
             // 7xkk - ADD Vx, byte
-            0x7000 -> TODO("Instruction $instruction not implemented")
+            0x7000 -> addVxByte(instruction, registers)
 
             // 8xy0 - LD Vx, Vy
             // 8xy1 - OR Vx, Vy
             // 8xy2 - AND Vx, Vy
-            // 8xy3 - XOW Vx, Vy
+            // 8xy3 - XOR Vx, Vy
             // 8xy4 - ADD Vx, Vy
             // 8xy5 - SUB Vx, Vy
             // 8xy6 - SHR Vx {, Vy}
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
-            0x8000 -> TODO("Instruction $instruction not implemented")
+
+            0x8000 -> {
+                when (instruction) {
+                    0x8000 -> ldVxVy(instruction, registers)
+                    0x8001 -> orVxVy(instruction, registers)
+                    0x8002 -> andVxVy(instruction, registers)
+                    0x8003 -> xorVxVy(instruction, registers)
+                    0x8006 -> shrVxVy(instruction, registers)
+                    0x800E -> shlVxVy(instruction, registers)
+
+                    else -> return // 0nnn - SYS addr (unused)
+                }
+            }
 
             // 9xy0 - SNE Vx, Vy
             0x9000 -> TODO("Instruction $instruction not implemented")

@@ -36,24 +36,97 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 }
 
 // 7xkk - ADD Vx, byte
+internal fun addVxByte(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    val vx = registers.v[x].toInt() and 0xFF
+    val byte = instruction and 0x00FF
+
+    registers.v[x] = (vx + byte).toByte()
+
+    registers.pc += 2
+}
 
 // 8xy0 - LD Vx, Vy
+internal fun ldVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    registers.v[x] = registers.v[y]
+
+    registers.pc += 2
+}
 
 // 8xy1 - OR Vx, Vy
+internal fun orVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    val vx = registers.v[x].toInt()
+    val vy = registers.v[y].toInt()
+
+    registers.v[x] = (vx or vy).toByte()
+
+    registers.pc += 2
+}
 
 // 8xy2 - AND Vx, Vy
+internal fun andVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
 
-// 8xy3 - XOW Vx, Vy
+    val vx = registers.v[x].toInt()
+    val vy = registers.v[y].toInt()
+
+    registers.v[x] = (vx and vy).toByte()
+
+    registers.pc += 2
+}
+
+// 8xy3 - XOR Vx, Vy
+internal fun xorVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    val vx = registers.v[x].toInt()
+    val vy = registers.v[y].toInt()
+
+    registers.v[x] = (vx xor vy).toByte()
+
+    registers.pc += 2
+}
 
 // 8xy4 - ADD Vx, Vy
 
 // 8xy5 - SUB Vx, Vy
 
 // 8xy6 - SHR Vx {, Vy}
+internal fun shrVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    registers.v[0xF] = if (x and 0x1 != 0) 1 else 0
+
+    val vx = registers.v[x].toInt() and 0xFF
+
+    registers.v[x] = (vx / 2).toByte()
+
+    registers.pc += 2
+}
 
 // 8xy7 - SUBN Vx, Vy
 
 // 8xyE - SHL Vx {, Vy}
+internal fun shlVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    registers.v[0xF] = if (x and 0x8 != 0) 1 else 0
+
+    val vx = registers.v[x].toInt() and 0xFF
+
+    registers.v[x] = (vx * 2).toByte()
+
+    registers.pc += 2
+}
 
 // 9xy0 - SNE Vx, Vy
 
