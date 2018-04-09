@@ -104,7 +104,12 @@ internal class Cpu(
             // Fx33 - LD B, Vx
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
-            0xF000 -> TODO("Instruction $instruction not implemented")
+            0xF000 -> {
+                when (instruction and 0x00FF) {
+                    0x000A -> ldVxK(instruction, registers, keyboard)
+                    else -> TODO("Instruction $instruction not implemented")
+                }
+            }
             else -> haltAndCatchFire(instruction)
         }
     }
