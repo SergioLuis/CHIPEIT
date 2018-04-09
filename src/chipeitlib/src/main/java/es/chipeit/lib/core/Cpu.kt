@@ -67,16 +67,17 @@ internal class Cpu(
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
 
-            0x8000 -> {
-                when (instruction) {
-                    0x8000 -> ldVxVy(instruction, registers)
-                    0x8001 -> orVxVy(instruction, registers)
-                    0x8002 -> andVxVy(instruction, registers)
-                    0x8003 -> xorVxVy(instruction, registers)
-                    0x8006 -> shrVxVy(instruction, registers)
-                    0x800E -> shlVxVy(instruction, registers)
-
-                    else -> return // 0nnn - SYS addr (unused)
+            0x8000 -> when (instruction and 0xF00F) {
+                0x8000 -> ldVxVy(instruction, registers)
+                0x8001 -> orVxVy(instruction, registers)
+                0x8002 -> andVxVy(instruction, registers)
+                0x8003 -> xorVxVy(instruction, registers)
+                0x8006 -> shrVxVy(instruction, registers)
+                0x800E -> shlVxVy(instruction, registers)
+                else -> {
+                    throw IllegalStateException(
+                            "The instruction $instruction does not comply with " +
+                                    "the original CHIP-8 specification")
                 }
             }
 
