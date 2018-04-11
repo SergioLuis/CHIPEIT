@@ -103,11 +103,13 @@ internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard)
 
 // Fx0A - LD Vx, K
 internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
-    // Execution is paused avoiding Program Counter update until a key
-    // is released. This way, the same instruction (this one) is
-    // executed over and over until a key is released.
-    // This behavior is the same as in original COSMAC VIP emulator:
-    // https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
+    /*
+        Execution is paused avoiding Program Counter update until a key
+        is released. This way, the same instruction (this one) is
+        executed over and over until a key is released.
+        This behavior is the same as in original COSMAC VIP emulator:
+        https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
+    */
     if (keyboard.isCapturingNextKeyRelease) {
         return
     }
