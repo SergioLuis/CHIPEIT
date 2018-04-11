@@ -130,7 +130,7 @@ class InstructionSetTests {
     @Test
     fun ldVxByteTest() {
         val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(registersMemoryMock.size).thenAnswer { 16 }
+        Mockito.`when`(registersMemoryMock.size).thenReturn(16)
 
         val registersMock = Registers(registersMemoryMock)
         registersMock.pc = 0x200
