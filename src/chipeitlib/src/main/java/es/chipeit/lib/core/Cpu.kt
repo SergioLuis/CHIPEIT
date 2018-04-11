@@ -15,6 +15,11 @@ internal class Cpu(
     init {
         registers.pc = 0x200
         registers.sp = -1
+
+        if (stack.size < 16)
+            throw IllegalArgumentException(
+                    "Parameter stack has ${stack.size} elements, " +
+                            "at least 16 needed")
     }
 
     override fun onClockTick() {
