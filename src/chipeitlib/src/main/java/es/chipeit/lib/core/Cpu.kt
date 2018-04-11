@@ -90,9 +90,9 @@ internal class Cpu(
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx
-            0xE000 -> when (instruction and 0x00FF) {
-                0x009E -> skpVx(instruction, registers, keyboard)
-                0x00A1 -> sknpVx(instruction, registers, keyboard)
+            0xE000 -> when (instruction and 0xF0FF) {
+                0xE09E -> skpVx(instruction, registers, keyboard)
+                0xE0A1 -> sknpVx(instruction, registers, keyboard)
                 else -> haltAndCatchFire(instruction)
             }
 
@@ -105,8 +105,8 @@ internal class Cpu(
             // Fx33 - LD B, Vx
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
-            0xF000 -> when (instruction and 0x00FF) {
-                0x000A -> ldVxK(instruction, registers, keyboard)
+            0xF000 -> when (instruction and 0xF0FF) {
+                0xF00A -> ldVxK(instruction, registers, keyboard)
                 else -> TODO("Instruction $instruction not implemented")
             }
 
