@@ -35,12 +35,10 @@ internal class Cpu(
             // 0nnn - SYS addr
             // 00E0 - CLS
             // 00EE - RET
-            0x0000 -> {
-                when (instruction) {
-                    0x00E0 -> cls(registers, graphicsMemory)
-                    0x00EE -> ret(registers, stack)
-                    else -> return // 0nnn - SYS addr (unused)
-                }
+            0x0000 -> when (instruction) {
+                0x00E0 -> cls(registers, graphicsMemory)
+                0x00EE -> ret(registers, stack)
+                else -> return // 0nnn - SYS addr (unused)
             }
 
             // 1nnn - JP addr
@@ -92,12 +90,10 @@ internal class Cpu(
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx
-            0xE000 -> {
-                when (instruction and 0x00FF) {
-                    0x009E -> skpVx(instruction, registers, keyboard)
-                    0x00A1 -> sknpVx(instruction, registers, keyboard)
-                    else -> haltAndCatchFire(instruction)
-                }
+            0xE000 -> when (instruction and 0x00FF) {
+                0x009E -> skpVx(instruction, registers, keyboard)
+                0x00A1 -> sknpVx(instruction, registers, keyboard)
+                else -> haltAndCatchFire(instruction)
             }
 
             // Fx07 - LD Vx, DT
@@ -109,12 +105,11 @@ internal class Cpu(
             // Fx33 - LD B, Vx
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
-            0xF000 -> {
-                when (instruction and 0x00FF) {
-                    0x000A -> ldVxK(instruction, registers, keyboard)
-                    else -> TODO("Instruction $instruction not implemented")
-                }
+            0xF000 -> when (instruction and 0x00FF) {
+                0x000A -> ldVxK(instruction, registers, keyboard)
+                else -> TODO("Instruction $instruction not implemented")
             }
+
             else -> haltAndCatchFire(instruction)
         }
     }
