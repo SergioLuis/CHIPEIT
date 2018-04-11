@@ -81,8 +81,9 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val x = instruction shr 2 * 4 and 0xF
 
-    val keyIndex = registers.v[x].toInt()
-    val expectedKey = IKeyboard.Keys.values()[keyIndex]
+    val vx = registers.v[x].toInt()
+
+    val expectedKey = IKeyboard.Keys.values()[vx]
 
     registers.pc += if (keyboard.isPressed(expectedKey)) 4 else 2
 }
@@ -91,8 +92,9 @@ internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) 
 internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
     val x = instruction shr 2 * 4 and 0xF
 
-    val keyIndex = registers.v[x].toInt()
-    val expectedKey = IKeyboard.Keys.values()[keyIndex]
+    val vx = registers.v[x].toInt()
+
+    val expectedKey = IKeyboard.Keys.values()[vx]
 
     registers.pc += if (!keyboard.isPressed(expectedKey)) 4 else 2
 }
@@ -115,8 +117,10 @@ internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: Keyboard) 
         return
     }
 
-    val vReg = (instruction and 0x0F00) shr 8
-    registers.v[vReg] = keyboard.capturedKeyRelease.data.id
+    val x = instruction and 0x0F00 shr 8
+
+    registers.v[x] = keyboard.capturedKeyRelease.data.id
+
     keyboard.clearLastCapturedKeyRelease()
 
     registers.pc += 2
