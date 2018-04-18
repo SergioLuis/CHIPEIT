@@ -36,7 +36,7 @@ class Chipeit(
                     TABLE +
                             ByteArray(0x200 - TABLE.size) +
                             romContent +
-                            ByteArray(0xFFF - romContent.size - 0x200)
+                            ByteArray(0x1000 - romContent.size - 0x200)
             )
     )
     private val graphicMemory = LoggedGraphicMemory(
