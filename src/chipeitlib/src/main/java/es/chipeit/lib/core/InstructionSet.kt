@@ -1,8 +1,9 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.ICoreKeyboard
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.io.IKeyboard
+import es.chipeit.lib.io.IUserKeyboard
 
 // 00E0 - CLS
 internal fun cls(registers: IRegisters, graphicsMemory: IMemory<Byte>) {
@@ -78,46 +79,55 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 // Dxyn - RND Vx, byte
 
 // Ex9E - SKP Vx
-internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
+internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: ICoreKeyboard) {
     val x = instruction shr 2 * 4 and 0xF
 
     val vx = registers.v[x].toInt()
 
-    val expectedKey = IKeyboard.Keys.values()[vx]
+    val expectedKey = IUserKeyboard.Keys.values()[vx]
 
-    registers.pc += if (keyboard.isPressed(expectedKey)) 4 else 2
+    if (keyboard.isPressed(expectedKey))
+        registers.pc += 2
+
+    registers.pc += 2
 }
 
 // ExA1 - SKNP Vx
-internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
+internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: ICoreKeyboard) {
     val x = instruction shr 2 * 4 and 0xF
 
     val vx = registers.v[x].toInt()
 
-    val expectedKey = IKeyboard.Keys.values()[vx]
+    val expectedKey = IUserKeyboard.Keys.values()[vx]
 
-    registers.pc += if (!keyboard.isPressed(expectedKey)) 4 else 2
+    if (!keyboard.isPressed(expectedKey))
+        registers.pc += 2
+
+    registers.pc += 2
 }
 
 // Fx07 - LD Vx, DT
 
 // Fx0A - LD Vx, K
-internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: Keyboard) {
+internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: ICoreKeyboard) {
     /*
-        Execution is paused avoiding Program Counter update until a key
-        is released. This way, the same instruction (this one) is
-        executed over and over until a key is released.
+        Execution is paused avoiding the program counter to be updated until a key is released.
+        That way, this instruction is executed over and over until a key is released.
         This behavior is the same as in original COSMAC VIP emulator:
         https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
     */
     if (keyboard.isCapturingNextKeyRelease) {
+        keyboard.updateSoundTimerCounterIfNeeded()
         return
     }
 
-    if (keyboard.capturedKeyRelease == IKeyboard.Keys.NONE) {
+    if (keyboard.capturedKeyRelease == IUserKeyboard.Keys.NONE) {
         keyboard.captureNextKeyRelease()
         return
     }
+
+    if (keyboard.soundTimer.isActive())
+        return
 
     val x = instruction and 0x0F00 shr 8
 

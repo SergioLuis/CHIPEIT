@@ -5,11 +5,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import org.mockito.Mockito
+import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.io.IKeyboard
+import es.chipeit.lib.interfaces.ITimer
+import es.chipeit.lib.io.IUserKeyboard
 
 class InstructionSetTests {
     @Test
@@ -271,9 +273,11 @@ class InstructionSetTests {
         Mockito.`when`(vMock[0xA]).thenReturn(3)
         Mockito.`when`(vMock[0xB]).thenReturn(8)
 
-        val keyboard = Keyboard()
-        keyboard.pressKey(IKeyboard.Keys.KEY_3)
-        keyboard.releaseKey(IKeyboard.Keys.KEY_8)
+        val soundTimerMock = Mockito.mock(ITimer::class.java)
+
+        val keyboard = Keyboard(soundTimerMock)
+        keyboard.pressKey(IUserKeyboard.Keys.KEY_3)
+        keyboard.releaseKey(IUserKeyboard.Keys.KEY_8)
 
         val registersMock = Registers(vMock)
         registersMock.pc = 0x0200
@@ -304,9 +308,11 @@ class InstructionSetTests {
         Mockito.`when`(vMock[0xA]).thenReturn(3)
         Mockito.`when`(vMock[0xB]).thenReturn(8)
 
-        val keyboard = Keyboard()
-        keyboard.releaseKey(IKeyboard.Keys.KEY_3)
-        keyboard.pressKey(IKeyboard.Keys.KEY_8)
+        val soundTimerMock = Mockito.mock(ITimer::class.java)
+
+        val keyboard = Keyboard(soundTimerMock)
+        keyboard.releaseKey(IUserKeyboard.Keys.KEY_3)
+        keyboard.pressKey(IUserKeyboard.Keys.KEY_8)
 
         val registersMock = Registers(vMock)
         registersMock.pc = 0x0200
@@ -338,7 +344,12 @@ class InstructionSetTests {
         val registers = Registers(vRegsMock)
         registers.pc = 0x0200
 
-        val keyboard = Keyboard()
+        var isSoundTimerActive = true
+
+        val soundTimerMock = Mockito.mock(ITimer::class.java)
+        Mockito.`when`(soundTimerMock.isActive()).then { isSoundTimerActive }
+
+        val keyboard = Keyboard(soundTimerMock)
         val instruction = 0xF70A
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
@@ -346,57 +357,111 @@ class InstructionSetTests {
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
+        Mockito.verify(soundTimerMock, never()).setRegister(4)
+        Mockito.verify(soundTimerMock, never()).isActive()
 
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
+        Mockito.verify(soundTimerMock, never()).setRegister(4)
+        Mockito.verify(soundTimerMock, never()).isActive()
 
-        keyboard.pressKey(IKeyboard.Keys.KEY_8)
-        keyboard.pressKey(IKeyboard.Keys.KEY_5)
+        keyboard.pressKey(IUserKeyboard.Keys.KEY_8)
+        keyboard.pressKey(IUserKeyboard.Keys.KEY_5)
+        Mockito.verify(soundTimerMock, times(2)).setRegister(4)
+
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200, registers.pc)
+        Mockito.verify(soundTimerMock, times(3)).setRegister(4)
+        Mockito.verify(soundTimerMock, never()).isActive()
 
-        keyboard.releaseKey(IKeyboard.Keys.KEY_5)
-        keyboard.releaseKey(IKeyboard.Keys.KEY_8)
+        ldVxK(instruction, registers, keyboard)
 
-        assertEquals(IKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
+        assertTrue(keyboard.isCapturingNextKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(0x0200, registers.pc)
+        Mockito.verify(soundTimerMock, times(4)).setRegister(4)
+        Mockito.verify(soundTimerMock, never()).isActive()
+
+        keyboard.releaseKey(IUserKeyboard.Keys.KEY_5)
+        keyboard.releaseKey(IUserKeyboard.Keys.KEY_8)
+
+        assertEquals(IUserKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
 
         ldVxK(instruction, registers, keyboard)
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
-        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IUserKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
+        assertEquals(0x0200, registers.pc)
+        Mockito.verify(soundTimerMock, times(4)).setRegister(4)
+        Mockito.verify(soundTimerMock, times(1)).isActive()
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(IUserKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
+        assertEquals(0x0200, registers.pc)
+        Mockito.verify(soundTimerMock, times(4)).setRegister(4)
+        Mockito.verify(soundTimerMock, times(2)).isActive()
+
+        isSoundTimerActive = false
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 2, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
-        )[0x7] = IKeyboard.Keys.KEY_5.data.id
+        )[0x7] = IUserKeyboard.Keys.KEY_5.data.id
+        Mockito.verify(soundTimerMock, times(3)).isActive()
+
+        isSoundTimerActive = true
 
         ldVxK(instruction, registers, keyboard)
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
-        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 2, registers.pc)
+        Mockito.verify(soundTimerMock, times(4)).setRegister(4)
+        Mockito.verify(soundTimerMock, times(3)).isActive()
 
-        keyboard.pressKey(IKeyboard.Keys.KEY_8)
-        keyboard.pressKey(IKeyboard.Keys.KEY_5)
-        keyboard.releaseKey(IKeyboard.Keys.KEY_8)
-        keyboard.releaseKey(IKeyboard.Keys.KEY_5)
+        keyboard.pressKey(IUserKeyboard.Keys.KEY_8)
+        keyboard.pressKey(IUserKeyboard.Keys.KEY_5)
+        Mockito.verify(soundTimerMock, times(6)).setRegister(4)
+
+        keyboard.releaseKey(IUserKeyboard.Keys.KEY_8)
+        keyboard.releaseKey(IUserKeyboard.Keys.KEY_5)
+
+        assertEquals(IUserKeyboard.Keys.KEY_8, keyboard.capturedKeyRelease)
 
         ldVxK(instruction, registers, keyboard)
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
-        assertEquals(IKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
+        assertEquals(IUserKeyboard.Keys.KEY_8, keyboard.capturedKeyRelease)
+        assertEquals(0x0200 + 2, registers.pc)
+        Mockito.verify(soundTimerMock, times(6)).setRegister(4)
+        Mockito.verify(soundTimerMock, times(4)).isActive()
+
+        isSoundTimerActive = false
+
+        ldVxK(instruction, registers, keyboard)
+
+        assertFalse(keyboard.isCapturingNextKeyRelease)
+        assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
         assertEquals(0x0200 + 4, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
-        )[0x7] = IKeyboard.Keys.KEY_8.data.id
+        )[0x7] = IUserKeyboard.Keys.KEY_8.data.id
+        Mockito.verify(soundTimerMock, times(5)).isActive()
     }
 }
