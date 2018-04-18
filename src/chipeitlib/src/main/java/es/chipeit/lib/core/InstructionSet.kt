@@ -4,6 +4,7 @@ import es.chipeit.lib.interfaces.IGraphicMemory
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
+import java.lang.Math.random
 
 // 00E0 - CLS
 internal fun cls(registers: IRegisters, graphicMemory: IGraphicMemory) {
@@ -24,10 +25,37 @@ internal fun jpAddr(instruction: Int, registers: IRegisters) {
 // 2nnn - CALL addr
 
 // 3xkk - SE Vx, byte
+internal fun seVxByte(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val byte = (instruction and 0x00FF).toByte()
+
+    if (registers.v[x] == byte)
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // 4xkk - SNE Vx, byte
+internal fun sneVxByte(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val byte = (instruction and 0x00FF).toByte()
+
+    if (registers.v[x] != byte)
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // 5xy0 - SE Vx, Vy
+internal fun seVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    if (registers.v[x] == registers.v[y])
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // 6xkk - LD Vx, byte
 internal fun ldVxByte(instruction: Int, registers: IRegisters) {
@@ -60,10 +88,29 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 // 9xy0 - SNE Vx, Vy
 
 // Annn - LD I, addr
+internal fun ldIAddr(instruction: Int, registers: IRegisters) {
+    registers.i = (instruction and 0xFFF).toShort()
+
+    registers.pc += 2
+}
 
 // Bnnn - JP V0, addr
+internal fun jpV0Addr(instruction: Int, registers: IRegisters) {
+    val addr = instruction and 0xFFF
+
+    val v0 = registers.v[0].toInt() and 0xFF
+
+    registers.pc = addr + v0
+}
 
 // Cxkk - RND Vx, byte
+internal fun rndVxAddr(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    registers.v[x] = (random() % 255).toByte()
+
+    registers.pc += 2
+}
 
 // Dxyn - RND Vx, byte
 
@@ -80,11 +127,45 @@ internal fun ldVxByte(instruction: Int, registers: IRegisters) {
 // Fx18 - LD ST, Vx
 
 // Fx1E - ADD I, Vx
+internal fun addIVx(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    val vx = registers.v[x]
+    TODO("pasar de byte a entero y comprobar que no desborda 255 con una máscara")
+
+    registers.i = (registers.i + vx).toShort()
+
+    registers.pc += 2
+}
 
 // Fx29 - LD F, Vx
 
 // Fx33 - LD B, Vx
 
 // Fx55 - LD [I], Vx
+internal fun ldIVx(instruction: Int, registers: IRegisters, memory: ByteMemory) {
+    var addr = registers.i.toInt()
+
+    val x = instruction shr 2 * 4 and 0xF
+
+    for (i in 0..x) {
+        memory.set(addr, registers.v[i])
+        addr += 1
+    }
+
+    registers.pc += 2
+}
 
 // Fx65 - LD Vx, [I]
+internal fun ldVxI(instruction: Int, registers: IRegisters, memory: ByteMemory) {
+    var addr = registers.i.toInt()
+
+    val x = instruction shr 2 * 4 and 0xF
+
+    for (i in 0..x) {
+        registers.v[i] = memory.get(addr)
+        addr += 1
+    }
+
+    registers.pc +=2
+}
