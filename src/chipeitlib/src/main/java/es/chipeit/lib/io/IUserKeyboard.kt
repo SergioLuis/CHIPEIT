@@ -1,6 +1,6 @@
 package es.chipeit.lib.io
 
-interface IKeyboard {
+interface IUserKeyboard {
     class KeyData(val id: Byte, val flags: Int)
 
     enum class Keys(val data: KeyData) {
