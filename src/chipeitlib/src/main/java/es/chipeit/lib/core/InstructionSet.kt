@@ -101,6 +101,15 @@ internal fun subnVxVy(instruction: Int, registers: IRegisters) {
 // 8xyE - SHL Vx {, Vy}
 
 // 9xy0 - SNE Vx, Vy
+internal fun sneVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    if (registers.v[x] != registers.v[y])
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // Annn - LD I, addr
 
