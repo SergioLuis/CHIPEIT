@@ -911,4 +911,42 @@ class InstructionSetTests {
 
         assertEquals(0x200 + 4 * 0x2, registers.pc)
     }
+
+    @Test
+    fun ldTimerVxTest() {
+        val timerMock = Mockito.mock(ITimer::class.java)
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.pc = 0x200
+
+        assertEquals(0, registers.v[0x0])
+
+        ldTimerVx(0xF015, registers, timerMock)
+        assertEquals(0, registers.v[0x0])
+        Mockito.verify(
+                timerMock,
+                times(1)
+        ).t = 0
+
+        registers.v[0x0] = 50
+
+        ldTimerVx(0xF015, registers, timerMock)
+        assertEquals(50, registers.v[0x0])
+        Mockito.verify(
+                timerMock,
+                times(1)
+        ).t = 50
+
+        registers.v[0x1] = 80
+
+        ldTimerVx(0xF115, registers, timerMock)
+        assertEquals(50, registers.v[0x0])
+        assertEquals(80, registers.v[0x1])
+        Mockito.verify(
+                timerMock,
+                times(1)
+        ).t = 80
+
+        assertEquals(0x200 + 3 * 0x2, registers.pc)
+    }
 }

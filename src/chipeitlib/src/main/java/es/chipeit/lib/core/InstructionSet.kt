@@ -136,6 +136,13 @@ internal fun ldVxTimer(instruction: Int, registers: IRegisters, timer: ITimer) {
 
 // Fx15 - LD DT, Vx
 // Fx18 - LD ST, Vx
+internal fun ldTimerVx(instruction: Int, registers: IRegisters, timer: ITimer) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    timer.t = registers.v[x]
+
+    registers.pc += 2
+}
 
 // Fx1E - ADD I, Vx
 
