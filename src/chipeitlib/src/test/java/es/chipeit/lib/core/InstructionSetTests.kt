@@ -21,14 +21,14 @@ class InstructionSetTests {
         val graphicMemory = Mockito.mock(IGraphicMemory::class.java)
         val registers = Registers(ByteMemory(ByteArray(16)))
 
-        registers.pc = 0x0200
+        registers.pc = 0x200
 
         cls(registers, graphicMemory)
 
-        assertEquals(0x0200 + 2, registers.pc)
+        assertEquals(0x200 + 2, registers.pc)
         Mockito.verify(
-                 graphicMemory,
-                 times(1)
+                graphicMemory,
+                times(1)
         ).fill(0)
     }
 
