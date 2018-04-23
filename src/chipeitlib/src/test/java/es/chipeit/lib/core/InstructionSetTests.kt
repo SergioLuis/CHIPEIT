@@ -13,8 +13,6 @@ import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 
-import org.junit.Ignore
-
 class InstructionSetTests {
     @Test
     fun clsTest() {
