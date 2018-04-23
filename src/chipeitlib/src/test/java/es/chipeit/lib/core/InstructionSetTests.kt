@@ -949,4 +949,35 @@ class InstructionSetTests {
 
         assertEquals(0x200 + 3 * 0x2, registers.pc)
     }
+
+    @Test
+    fun ldFVxTest() {
+        var registerArray = ByteArray(16)
+
+        for (i in registerArray.indices)
+            registerArray[i] = i.toByte()
+
+        val registers = Registers(ByteMemory(registerArray))
+
+        registers.i = 0xFFF
+        registers.pc = 0x200
+
+        for (i in registerArray.indices) {
+            ldFVx(i shl 2 * 4 or 0xF029, registers)
+            assertEquals(i.toByte(), registers.v[i])
+
+            /*
+                The hex font table starts at 0x000.
+                Every character sprite has 5 bytes.
+            */
+            assertEquals(i * 5, registers.i)
+        }
+
+        for (i in 0x10..0xFF) {
+            registers.v[0x0] = i.toByte()
+            assertFailsWith<IllegalStateException> { ldFVx(0xF029, registers) }
+        }
+
+        assertEquals(0x200 + 16 * 0x2, registers.pc)
+    }
 }
