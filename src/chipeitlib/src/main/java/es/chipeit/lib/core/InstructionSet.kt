@@ -124,11 +124,17 @@ internal fun sneVxVy(instruction: Int, registers: IRegisters) {
 // ExA1 - SKNP Vx
 
 // Fx07 - LD Vx, DT
+internal fun ldVxTimer(instruction: Int, registers: IRegisters, timer: ITimer) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    registers.v[x] = timer.t
+
+    registers.pc += 2
+}
 
 // Fx0A - LD Vx, K
 
-// Fx15 - LD DR, Vx
-
+// Fx15 - LD DT, Vx
 // Fx18 - LD ST, Vx
 
 // Fx1E - ADD I, Vx

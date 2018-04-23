@@ -870,4 +870,45 @@ class InstructionSetTests {
         sneVxVy(0x9AB0, registers)
         assertEquals(0x200 + 9 * 0x2, registers.pc)
     }
+
+    @Test
+    fun ldVxTimerTest() {
+        val tAnswer = object : Answer<Byte> {
+            var t: Byte = 0
+
+            override fun answer(invocation: InvocationOnMock?): Byte {
+                return t
+            }
+        }
+
+        val timerMock = Mockito.mock(ITimer::class.java)
+        Mockito.`when`(timerMock.t).thenAnswer(tAnswer)
+
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.pc = 0x200
+
+        assertEquals(0, registers.v[0x0])
+
+        ldVxTimer(0xF007, registers, timerMock)
+        assertEquals(0, registers.v[0x0])
+
+        tAnswer.t = 50
+
+        ldVxTimer(0xF007, registers, timerMock)
+        assertEquals(50, registers.v[0x0])
+
+        tAnswer.t = 255.toByte()
+
+        ldVxTimer(0xF007, registers, timerMock)
+        assertEquals(255.toByte(), registers.v[0x0])
+
+        tAnswer.t = 128.toByte()
+
+        ldVxTimer(0xF107, registers, timerMock)
+        assertEquals(255.toByte(), registers.v[0x0])
+        assertEquals(128.toByte(), registers.v[0x1])
+
+        assertEquals(0x200 + 4 * 0x2, registers.pc)
+    }
 }
