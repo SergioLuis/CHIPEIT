@@ -167,6 +167,24 @@ internal fun ldFVx(instruction: Int, registers: IRegisters) {
 }
 
 // Fx33 - LD B, Vx
+internal fun ldBVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte>) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+
+    var address = registers.i + 2
+    var mod: Int
+    var a = 1
+
+    for (i in 1..3) {
+        mod = vx % (10 * a)
+        vx -= mod
+        memory[address--] = (mod / a).toByte()
+        a *= 10
+    }
+
+    registers.pc += 2
+}
 
 // Fx55 - LD [I], Vx
 
