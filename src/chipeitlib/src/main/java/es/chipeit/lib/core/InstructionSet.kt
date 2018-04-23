@@ -82,6 +82,21 @@ internal fun subVxVy(instruction: Int, registers: IRegisters) {
 // 8xy6 - SHR Vx {, Vy}
 
 // 8xy7 - SUBN Vx, Vy
+internal fun subnVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+    var vy = registers.v[y].toInt() and 0xFF
+
+    val add = vy - vx
+
+    registers.v[0xF] = if (add > 0) 1 else 0
+
+    registers.v[x] = add.toByte()
+
+    registers.pc += 2
+}
 
 // 8xyE - SHL Vx {, Vy}
 
