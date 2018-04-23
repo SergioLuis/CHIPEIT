@@ -3,12 +3,17 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IGraphicMemory
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import org.mockito.invocation.InvocationOnMock
 import org.mockito.Mockito
+import org.mockito.Mockito.*
+import org.mockito.stubbing.Answer
 
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.interfaces.ITimer
+
 import org.junit.Ignore
-import org.mockito.Mockito.*
 
 class InstructionSetTests {
     @Test
@@ -186,5 +191,183 @@ class InstructionSetTests {
                 registersMemoryMock,
                 times(1)
         )[15] = 0x00
+    }
+
+    @Test
+    fun addVxVyTest() {
+        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+
+        Mockito.`when`(vMock.size).thenReturn(16)
+
+        Mockito.`when`(vMock[0x0]).thenReturn(0)
+        Mockito.`when`(vMock[0x1]).thenReturn(127)
+
+        Mockito.`when`(vMock[0x2]).thenReturn(32)
+
+        Mockito.`when`(vMock[0x3]).thenReturn(1)
+        Mockito.`when`(vMock[0x4]).thenReturn(127)
+
+        Mockito.`when`(vMock[0x5]).thenReturn(0)
+        Mockito.`when`(vMock[0x6]).thenReturn(128.toByte())
+
+        Mockito.`when`(vMock[0x7]).thenReturn(255.toByte())
+        Mockito.`when`(vMock[0x8]).thenReturn(255.toByte())
+
+        Mockito.`when`(vMock[0x9]).thenReturn(255.toByte())
+        Mockito.`when`(vMock[0xA]).thenReturn(1)
+
+        val registers = Registers(vMock)
+        registers.pc = 0x200
+
+        addVxVy(0x8014, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x0] = 127
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x0]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x1]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0xF] = 0
+
+        addVxVy(0x8104, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x1] = 127
+
+        Mockito.verify(
+                vMock,
+                times(2)
+        )[0x0]
+
+        Mockito.verify(
+                vMock,
+                times(2)
+        )[0x1]
+
+        Mockito.verify(
+                vMock,
+                times(2)
+        )[0xF] = 0
+
+        addVxVy(0x8224, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x2] = 64
+
+        Mockito.verify(
+                vMock,
+                times(2)
+        )[0x2]
+
+        Mockito.verify(
+                vMock,
+                times(3)
+        )[0xF] = 0
+
+        addVxVy(0x8344, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x3] = 128.toByte()
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x3]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x4]
+
+        Mockito.verify(
+                vMock,
+                times(4)
+        )[0xF] = 0
+
+        addVxVy(0x8564, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x5] = 128.toByte()
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x5]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x6]
+
+        Mockito.verify(
+                vMock,
+                times(5)
+        )[0xF] = 0
+
+        addVxVy(0x8784, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x7] = 254.toByte()
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x7]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x8]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0xF] = 1
+
+        addVxVy(0x89A4, registers)
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x9] = 0
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0x9]
+
+        Mockito.verify(
+                vMock,
+                times(1)
+        )[0xA]
+
+        Mockito.verify(
+                vMock,
+                times(2)
+        )[0xF] = 1
+
+        assertEquals(0x200 + 7 * 0x2, registers.pc)
     }
 }
