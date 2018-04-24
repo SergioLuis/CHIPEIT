@@ -129,7 +129,7 @@ internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: ICoreKeybo
     if (keyboard.soundTimer.isActive())
         return
 
-    val x = instruction and 0x0F00 shr 8
+    val x = instruction and 0x0F00 shr 2 * 4
 
     registers.v[x] = keyboard.capturedKeyRelease.data.id
 
