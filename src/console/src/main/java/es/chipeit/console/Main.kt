@@ -5,7 +5,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 import es.chipeit.lib.emulator.Chipeit
-import es.chipeit.lib.core.Keyboard
 
 fun main(args: Array<String>) {
     if (args.size != 1) {
