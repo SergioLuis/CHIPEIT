@@ -4,6 +4,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.mockito.BDDMockito.*
 import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -19,11 +20,11 @@ class InstructionSetTests {
         val graphicMemory = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registers = Registers(ByteMemory(ByteArray(16)))
 
-        registers.pc = 0x0200
+        registers.pc = 0x200
 
         cls(registers, graphicMemory)
 
-        assertEquals(0x0200 + 2, registers.pc)
+        assertEquals(0x200 + 2, registers.pc)
         Mockito.verify(
                  graphicMemory,
                  times(1)
@@ -35,9 +36,9 @@ class InstructionSetTests {
         val registers = Registers(ByteMemory(ByteArray(16)))
         val stackMock = Mockito.mock(IMemory::class.java) as IMemory<Int>
 
-        Mockito.`when`(stackMock[2]).thenReturn(0x0222)
-        Mockito.`when`(stackMock[1]).thenReturn(0x0456)
-        Mockito.`when`(stackMock[0]).thenReturn(0x0789)
+        Mockito.`when`(stackMock[2]).thenReturn(0x222)
+        Mockito.`when`(stackMock[1]).thenReturn(0x456)
+        Mockito.`when`(stackMock[0]).thenReturn(0x789)
 
         registers.sp = 2
 
@@ -80,17 +81,17 @@ class InstructionSetTests {
         Mockito.verify(
                 registersMock,
                 times(1)
-        ).pc = 0x0225
+        ).pc = 0x225
 
         Mockito.verify(
                 registersMock,
                 times(1)
-        ).pc = 0x0512
+        ).pc = 0x512
 
         Mockito.verify(
                 registersMock,
                 times(1)
-        ).pc = 0x0FFF
+        ).pc = 0xFFF
     }
 
     @Test
@@ -138,52 +139,52 @@ class InstructionSetTests {
         registersMock.pc = 0x200
 
         ldVxByte(0x6011, registersMock)
-        assertEquals(0x0200 + 2, registersMock.pc)
+        assertEquals(0x200 + 2, registersMock.pc)
 
         ldVxByte(0x6122, registersMock)
-        assertEquals(0x0200 + 4, registersMock.pc)
+        assertEquals(0x200 + 4, registersMock.pc)
 
         ldVxByte(0x6233, registersMock)
-        assertEquals(0x0200 + 6, registersMock.pc)
+        assertEquals(0x200 + 6, registersMock.pc)
 
         ldVxByte(0x6344, registersMock)
-        assertEquals(0x0200 + 8, registersMock.pc)
+        assertEquals(0x200 + 8, registersMock.pc)
 
         ldVxByte(0x6455, registersMock)
-        assertEquals(0x0200 + 10, registersMock.pc)
+        assertEquals(0x200 + 10, registersMock.pc)
 
         ldVxByte(0x6566, registersMock)
-        assertEquals(0x0200 + 12, registersMock.pc)
+        assertEquals(0x200 + 12, registersMock.pc)
 
         ldVxByte(0x6677, registersMock)
-        assertEquals(0x0200 + 14, registersMock.pc)
+        assertEquals(0x200 + 14, registersMock.pc)
 
         ldVxByte(0x6788, registersMock)
-        assertEquals(0x0200 + 16, registersMock.pc)
+        assertEquals(0x200 + 16, registersMock.pc)
 
         ldVxByte(0x6899, registersMock)
-        assertEquals(0x0200 + 18, registersMock.pc)
+        assertEquals(0x200 + 18, registersMock.pc)
 
         ldVxByte(0x69AA, registersMock)
-        assertEquals(0x0200 + 20, registersMock.pc)
+        assertEquals(0x200 + 20, registersMock.pc)
 
         ldVxByte(0x6ABB, registersMock)
-        assertEquals(0x0200 + 22, registersMock.pc)
+        assertEquals(0x200 + 22, registersMock.pc)
 
         ldVxByte(0x6BCC, registersMock)
-        assertEquals(0x0200 + 24, registersMock.pc)
+        assertEquals(0x200 + 24, registersMock.pc)
 
         ldVxByte(0x6CDD, registersMock)
-        assertEquals(0x0200 + 26, registersMock.pc)
+        assertEquals(0x200 + 26, registersMock.pc)
 
         ldVxByte(0x6DEE, registersMock)
-        assertEquals(0x0200 + 28, registersMock.pc)
+        assertEquals(0x200 + 28, registersMock.pc)
 
         ldVxByte(0x6EFF, registersMock)
-        assertEquals(0x0200 + 30, registersMock.pc)
+        assertEquals(0x200 + 30, registersMock.pc)
 
         ldVxByte(0x6F00, registersMock)
-        assertEquals(0x0200 + 32, registersMock.pc)
+        assertEquals(0x200 + 32, registersMock.pc)
 
         Mockito.verify(
                 registersMemoryMock,
@@ -280,12 +281,12 @@ class InstructionSetTests {
         keyboard.releaseKey(IUserKeyboard.Keys.KEY_8)
 
         val registersMock = Registers(vMock)
-        registersMock.pc = 0x0200
+        registersMock.pc = 0x200
 
         skpVx(0xEA9E, registersMock, keyboard)
 
         // Next instruction was skipped
-        assertEquals(0x0200 + 4, registersMock.pc)
+        assertEquals(0x200 + 4, registersMock.pc)
         Mockito.verify(
                 vMock,
                 times(1)
@@ -294,7 +295,7 @@ class InstructionSetTests {
         skpVx(0xEB9E, registersMock, keyboard)
 
         // Next instruction was not skipped
-        assertEquals(0x0204 + 2, registersMock.pc)
+        assertEquals(0x204 + 2, registersMock.pc)
         Mockito.verify(
                 vMock,
                 times(1)
@@ -315,12 +316,12 @@ class InstructionSetTests {
         keyboard.pressKey(IUserKeyboard.Keys.KEY_8)
 
         val registersMock = Registers(vMock)
-        registersMock.pc = 0x0200
+        registersMock.pc = 0x200
 
         sknpVx(0xEA9E, registersMock, keyboard)
 
         // Next instruction was skipped
-        assertEquals(0x0200 + 4, registersMock.pc)
+        assertEquals(0x200 + 4, registersMock.pc)
         Mockito.verify(
                 vMock,
                 times(1)
@@ -329,7 +330,7 @@ class InstructionSetTests {
         sknpVx(0xEB9E, registersMock, keyboard)
 
         // Next instruction was not skipped
-        assertEquals(0x0204 + 2, registersMock.pc)
+        assertEquals(0x204 + 2, registersMock.pc)
         Mockito.verify(
                 vMock,
                 times(1)
@@ -342,7 +343,7 @@ class InstructionSetTests {
         Mockito.`when`(vRegsMock.size).thenReturn(16)
 
         val registers = Registers(vRegsMock)
-        registers.pc = 0x0200
+        registers.pc = 0x200
 
         var isSoundTimerActive = true
 
@@ -358,7 +359,7 @@ class InstructionSetTests {
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200, registers.pc)
+        assertEquals(0x200, registers.pc)
         Mockito.verify(soundTimerMock, never()).setRegister(4)
         Mockito.verify(soundTimerMock, never()).isActive()
 
@@ -366,7 +367,7 @@ class InstructionSetTests {
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200, registers.pc)
+        assertEquals(0x200, registers.pc)
         Mockito.verify(soundTimerMock, never()).setRegister(4)
         Mockito.verify(soundTimerMock, never()).isActive()
 
@@ -378,7 +379,7 @@ class InstructionSetTests {
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200, registers.pc)
+        assertEquals(0x200, registers.pc)
         Mockito.verify(soundTimerMock, times(3)).setRegister(4)
         Mockito.verify(soundTimerMock, never()).isActive()
 
@@ -386,7 +387,7 @@ class InstructionSetTests {
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200, registers.pc)
+        assertEquals(0x200, registers.pc)
         Mockito.verify(soundTimerMock, times(4)).setRegister(4)
         Mockito.verify(soundTimerMock, never()).isActive()
 
@@ -399,7 +400,7 @@ class InstructionSetTests {
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
-        assertEquals(0x0200, registers.pc)
+        assertEquals(0x200, registers.pc)
         Mockito.verify(soundTimerMock, times(4)).setRegister(4)
         Mockito.verify(soundTimerMock, times(1)).isActive()
 
@@ -407,7 +408,7 @@ class InstructionSetTests {
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.KEY_5, keyboard.capturedKeyRelease)
-        assertEquals(0x0200, registers.pc)
+        assertEquals(0x200, registers.pc)
         Mockito.verify(soundTimerMock, times(4)).setRegister(4)
         Mockito.verify(soundTimerMock, times(2)).isActive()
 
@@ -417,7 +418,7 @@ class InstructionSetTests {
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200 + 2, registers.pc)
+        assertEquals(0x200 + 2, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
@@ -430,7 +431,7 @@ class InstructionSetTests {
 
         assertTrue(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200 + 2, registers.pc)
+        assertEquals(0x200 + 2, registers.pc)
         Mockito.verify(soundTimerMock, times(4)).setRegister(4)
         Mockito.verify(soundTimerMock, times(3)).isActive()
 
@@ -447,7 +448,7 @@ class InstructionSetTests {
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.KEY_8, keyboard.capturedKeyRelease)
-        assertEquals(0x0200 + 2, registers.pc)
+        assertEquals(0x200 + 2, registers.pc)
         Mockito.verify(soundTimerMock, times(6)).setRegister(4)
         Mockito.verify(soundTimerMock, times(4)).isActive()
 
@@ -457,7 +458,7 @@ class InstructionSetTests {
 
         assertFalse(keyboard.isCapturingNextKeyRelease)
         assertEquals(IUserKeyboard.Keys.NONE, keyboard.capturedKeyRelease)
-        assertEquals(0x0200 + 4, registers.pc)
+        assertEquals(0x200 + 4, registers.pc)
         Mockito.verify(
                 vRegsMock,
                 times(1)
