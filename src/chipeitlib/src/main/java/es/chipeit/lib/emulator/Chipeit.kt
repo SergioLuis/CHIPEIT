@@ -5,7 +5,6 @@ import kotlin.math.min
 
 import es.chipeit.lib.core.*
 import es.chipeit.lib.core.hexfont.TABLE
-import es.chipeit.lib.core.log.LoggedGraphicMemory
 import es.chipeit.lib.core.log.LoggedMemory
 import es.chipeit.lib.interfaces.hzToMs
 import es.chipeit.lib.io.ISwitchObserver
@@ -39,9 +38,9 @@ class Chipeit(
                             ByteArray(0x1000 - romContent.size - 0x200)
             )
     )
-    private val graphicMemory = LoggedGraphicMemory(
+    private val graphicMemory = LoggedMemory(
             "Graphic memory",
-            GraphicMemory(_graphicMemory)
+            ByteMemory(_graphicMemory)
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",

@@ -1,12 +1,11 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.IGraphicMemory
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 
 // 00E0 - CLS
-internal fun cls(registers: IRegisters, graphicMemory: IGraphicMemory) {
+internal fun cls(registers: IRegisters, graphicMemory: IMemory<Byte>) {
     graphicMemory.fill(0)
     registers.pc += 2
 }
@@ -117,7 +116,7 @@ internal fun sneVxVy(instruction: Int, registers: IRegisters) {
 
 // Cxkk - RND Vx, byte
 
-// Dxyn - RND Vx, byte
+// Dxyn - DRW Vx, Vy, byte
 
 // Ex9E - SKP Vx
 

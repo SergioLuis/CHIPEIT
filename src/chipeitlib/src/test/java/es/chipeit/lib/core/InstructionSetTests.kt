@@ -1,6 +1,5 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.IGraphicMemory
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -16,7 +15,7 @@ import es.chipeit.lib.interfaces.ITimer
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val graphicMemory = Mockito.mock(IGraphicMemory::class.java)
+        val graphicMemory = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registers = Registers(ByteMemory(ByteArray(16)))
 
         registers.pc = 0x200
