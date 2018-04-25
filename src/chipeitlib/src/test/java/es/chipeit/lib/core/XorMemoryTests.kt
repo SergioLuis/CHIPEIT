@@ -6,27 +6,29 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class XorMemoryTests {
-    internal fun switchTestFrom(memory: IMemory<Byte>, index: Int, with: Byte, to: Byte): Byte {
-        val from: Byte = memory[index]
+    companion object {
+        internal fun switchTestFrom(memory: IMemory<Byte>, index: Int, with: Byte, to: Byte): Byte {
+            val from: Byte = memory[index]
 
-        assertNotEquals(from, to)
+            assertNotEquals(from, to)
 
-        memory[index] = with
-        assertEquals(to, memory[index])
+            memory[index] = with
+            assertEquals(to, memory[index])
 
-        memory[index] = with
-        assertEquals(from, memory[index])
+            memory[index] = with
+            assertEquals(from, memory[index])
 
-        return from
-    }
+            return from
+        }
 
-    internal fun noSwitchTestFrom(memory: IMemory<Byte>, index: Int, with: Byte): Byte {
-        val from: Byte = memory[index]
+        internal fun noSwitchTestFrom(memory: IMemory<Byte>, index: Int, with: Byte): Byte {
+            val from: Byte = memory[index]
 
-        memory[index] = with
-        assertEquals(from, memory[index])
+            memory[index] = with
+            assertEquals(from, memory[index])
 
-        return from
+            return from
+        }
     }
 
     @Test
