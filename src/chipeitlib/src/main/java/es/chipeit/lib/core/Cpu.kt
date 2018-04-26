@@ -78,7 +78,7 @@ internal class Cpu(
             0xB000 -> jpV0Addr(instruction, registers)
 
             // Cxkk - RND Vx, byte
-            0xC000 -> rndVxAddr(instruction, registers)
+            0xC000 -> rndVxByte(instruction, registers)
 
             // Dxyn - DRW Vx, Vy, nibble
             0xD000 -> TODO("Instruction $instruction not implemented")

@@ -106,7 +106,7 @@ internal fun jpV0Addr(instruction: Int, registers: IRegisters) {
 }
 
 // Cxkk - RND Vx, byte
-internal fun rndVxAddr(instruction: Int, registers: IRegisters) {
+internal fun rndVxByte(instruction: Int, registers: IRegisters) {
     val x = instruction shr 2 * 4 and 0xF
     val kk = (random() * 255).toInt()
 
