@@ -66,13 +66,13 @@ class WrappedGraphicMemoryTests {
         graphicMemory[1, 0] = ones;
         checkFootprint(graphicMemory, 1, 0, ones)
 
-        graphicMemory[WIDTH + 1, HEIGHT] = 0x00;
+        graphicMemory[- WIDTH + 1, - HEIGHT] = 0x00;
         checkCleanMemory(graphicMemory)
 
         graphicMemory[0, 1] = ones;
         checkFootprint(graphicMemory, 0, 1, ones)
 
-        graphicMemory[WIDTH, HEIGHT + 1] = 0x00;
+        graphicMemory[- WIDTH, - HEIGHT + 1] = 0x00;
         checkCleanMemory(graphicMemory)
     }
 }
