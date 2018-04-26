@@ -117,6 +117,14 @@ internal fun sneVxVy(instruction: Int, registers: IRegisters) {
 // Cxkk - RND Vx, byte
 
 // Dxyn - DRW Vx, Vy, byte
+internal fun drwVxVyByte(
+        instruction: Int,
+        registers: IRegisters,
+        memory: IMemory<Byte>,
+        graphicMemory: WrappedGraphicMemory
+) {
+    // I can do not do a thing, but just can't do nothing.
+}
 
 // Ex9E - SKP Vx
 

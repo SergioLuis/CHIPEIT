@@ -11,6 +11,8 @@ import org.mockito.stubbing.Answer
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
+import kotlin.test.assertNotEquals
+import es.chipeit.lib.core.WrappedGraphicMemoryTests.Companion.checkCleanMemory
 
 class InstructionSetTests {
     @Test
@@ -56,7 +58,7 @@ class InstructionSetTests {
     @Test
     fun ldVxByteTest() {
         val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(registersMemoryMock.size).thenAnswer { 16 }
+        Mockito.`when`(registersMemoryMock.size).thenReturn(16)
 
         val registersMock = Registers(registersMemoryMock)
         registersMock.pc = 0x200
@@ -869,6 +871,248 @@ class InstructionSetTests {
     }
 
     @Test
+    fun drwVxVyByteIllegalMemoryTest() {
+        val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(registersMemoryMock.size).thenReturn(16)
+        Mockito.`when`(registersMemoryMock[0]).thenReturn(0x00) // I don't care the value.
+
+        val registers = Registers(registersMemoryMock)
+        val memory = ByteMemory(ByteArray(0x1000))
+
+        /*
+            I don't care about the graphic memory size
+            as long it can contain the tallest of the sprites.
+
+            Sprites may be up to 15 bytes, and the width is fixed to 8 bits.
+        */
+        val graphicMemory = WrappedGraphicMemory(1, ByteMemory(ByteArray(15)));
+
+        /*
+            The hex font table starts at 0x000.
+            Every character sprite has 5 bytes.
+
+            Between the table and 0x200 there is a gap of illegal addresses.
+            This limits begins 15 bytes ahead.
+        */
+        registers.i = 17 * 5 - 15;
+
+        for (offset in 0..15) {
+            for (size in 0..15 - offset) // assertNotFails
+                drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+
+            for (size in 15 - offset + 1..15) {
+                assertNotEquals(0, size) // With size equals zero is a no-op!
+                assertFailsWith<IllegalStateException> {
+                    drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                }
+            }
+
+            registers.i++
+        }
+
+        registers.i++
+        for (skips in registers.i..0x200 - 15) {
+            // assertNotFails
+            // With size equals zero is a no-op!
+            drwVxVyByte(0xD000 or 0, registers, memory, graphicMemory);
+
+            for (size in 1..15) {
+                assertFailsWith<IllegalStateException> {
+                    drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                }
+            }
+
+            registers.i++
+        }
+
+        for (offset in 0..15) {
+            // assertNotFails
+            // With size equals zero is a no-op!
+            drwVxVyByte(0xD000 or 0, registers, memory, graphicMemory);
+
+            for (size in 1..15 - offset) {
+                assertNotEquals(15, offset) // FIXME: Remove after use.
+                assertFailsWith<IllegalStateException> {
+                    drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                }
+            }
+
+            for (size in 15 - offset + 1..15) // assertNotFails
+                drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+
+            registers.i++
+        }
+    }
+
+    /*
+        It's necessary the graphic memory size be enough to contain the tallest of the sprites.
+
+        The width is fixed to 8 bits,
+        and two bytes for checking wrapping would be enough to test.
+
+        However it's probable that the stupid tired programmer duplicated the implementation
+        (aligned to byte vs not aligned).
+
+        Measures must be taken to check both implementations.
+    */
+    @Test
+    fun drwVxVyTallestSpriteTest() {
+        val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(registersMemoryMock.size).thenReturn(16)
+        Mockito.`when`(registersMemoryMock[0]).thenReturn(0)
+        Mockito.`when`(registersMemoryMock[1]).thenReturn(1)
+        Mockito.`when`(registersMemoryMock[2]).thenReturn(2)
+        Mockito.`when`(registersMemoryMock[3]).thenReturn(3)
+        Mockito.`when`(registersMemoryMock[4]).thenReturn(10)
+
+        val registers = Registers(registersMemoryMock)
+        val memory = ByteMemory(ByteArray(2))
+        val graphicMemory = WrappedGraphicMemory(1, ByteMemory(ByteArray(2)));
+
+        /*
+            1111 0000b
+            0000 1111b
+        */
+        memory[0] = 0xF0.toByte()
+        memory[1] = 0x0F
+
+        checkCleanMemory(graphicMemory)
+
+        drwVxVyByte(0xD002, registers, memory, graphicMemory)
+        assertEquals(0xF0.toByte(), graphicMemory[0, 0])
+        assertEquals(0x0F, graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        drwVxVyByte(0xD022, registers, memory, graphicMemory)
+        assertEquals(0xF0.toByte(), graphicMemory[0, 0])
+        assertEquals(0x0F, graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        /* With size equals zero is a no-op! */
+
+        drwVxVyByte(0xD000, registers, memory, graphicMemory)
+        checkCleanMemory(graphicMemory)
+
+        /*
+            0000 1111b
+            1111 0000b
+        */
+        drwVxVyByte(0xD012, registers, memory, graphicMemory)
+        assertEquals(0x0F, graphicMemory[0, 0])
+        assertEquals(0xFF.toByte(), graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        drwVxVyByte(0xD032, registers, memory, graphicMemory)
+        assertEquals(0x0F, graphicMemory[0, 0])
+        assertEquals(0xFF.toByte(), graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        /*
+            0011 1100b
+            1100 0011b
+        */
+        drwVxVyByte(0xD202, registers, memory, graphicMemory)
+        assertEquals(0x3C, graphicMemory[0, 0])
+        assertEquals(0xC3.toByte(), graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        drwVxVyByte(0xD402, registers, memory, graphicMemory)
+        assertEquals(0x3C, graphicMemory[0, 0])
+        assertEquals(0xC3.toByte(), graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        /*
+            1100 0011b
+            0011 1100b
+        */
+        drwVxVyByte(0xD212, registers, memory, graphicMemory)
+        assertEquals(0xC3.toByte(), graphicMemory[0, 0])
+        assertEquals(0x3C, graphicMemory[0, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        drwVxVyByte(0xD422, registers, memory, graphicMemory)
+        assertEquals(0xC3.toByte(), graphicMemory[0, 0])
+        assertEquals(0x3C, graphicMemory[0, 1])
+    }
+
+    /*
+        This test uses a two-byte width to ensure
+        a special implementation for alignment takes care of the position.
+    */
+    @Test
+    fun drwVxVyAlignedExtraTest() {
+        val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        Mockito.`when`(registersMemoryMock.size).thenReturn(16)
+        Mockito.`when`(registersMemoryMock[0]).thenReturn(0)
+        Mockito.`when`(registersMemoryMock[1]).thenReturn(1)
+        Mockito.`when`(registersMemoryMock[2]).thenReturn(8)
+
+        val registers = Registers(registersMemoryMock)
+        val memory = ByteMemory(ByteArray(2))
+
+        val graphicMemory = WrappedGraphicMemory(2, ByteMemory(ByteArray(4)));
+
+        /*
+            1111 0000b
+            0000 1111b
+        */
+        memory[0] = 0xF0.toByte()
+        memory[1] = 0x0F
+
+        checkCleanMemory(graphicMemory)
+
+        /*
+            0000 1111 0000 0000b
+            1111 0000 0000 0000b
+        */
+        drwVxVyByte(0xD012, registers, memory, graphicMemory)
+        assertEquals(0x0F, graphicMemory[0, 0])
+        assertEquals(0xF0.toByte(), graphicMemory[0, 1])
+        assertEquals(0x00, graphicMemory[1, 0])
+        assertEquals(0x00, graphicMemory[1, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        /*
+            0000 0000 1111 0000b
+            0000 0000 0000 1111b
+        */
+        drwVxVyByte(0xD202, registers, memory, graphicMemory)
+        assertEquals(0x00, graphicMemory[0, 0])
+        assertEquals(0x00, graphicMemory[0, 1])
+        assertEquals(0xF0.toByte(), graphicMemory[1, 0])
+        assertEquals(0x0F, graphicMemory[1, 1])
+
+        graphicMemory.fill(0)
+        checkCleanMemory(graphicMemory)
+
+        /*
+            0000 0000 0000 1111b
+            0000 0000 1111 0000b
+        */
+        drwVxVyByte(0xD212, registers, memory, graphicMemory)
+        assertEquals(0x00, graphicMemory[0, 0])
+        assertEquals(0x00, graphicMemory[0, 1])
+        assertEquals(0x0F, graphicMemory[1, 0])
+        assertEquals(0xF0.toByte(), graphicMemory[1, 1])
+    }
+
+    @Test
     fun ldVxTimerTest() {
         val tAnswer = object : Answer<Byte> {
             var t: Byte = 0
@@ -1004,7 +1248,7 @@ class InstructionSetTests {
                 assertEquals(0x00, memory[0x100 + i * 3 + j])
             }
 
-        for(i in 0x0..0x7) {
+        for (i in 0x0..0x7) {
             ldBVx(i shl 2 * 4 or 0xF033, registers, memory)
             registers.i += 3
         }
