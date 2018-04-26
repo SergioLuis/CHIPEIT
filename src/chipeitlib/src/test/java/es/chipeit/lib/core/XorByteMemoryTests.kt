@@ -5,7 +5,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class XorMemoryTests {
+class XorByteMemoryTests {
     companion object {
         internal fun switchTestFrom(memory: IMemory<Byte>, index: Int, with: Byte, to: Byte): Byte {
             val from: Byte = memory[index]
@@ -36,7 +36,7 @@ class XorMemoryTests {
         val ones: Byte = 0xFF.toByte()
 
         var memory = ByteMemory(ByteArray(6))
-        var xorMemory = XorMemory(memory)
+        var xorByteMemory = XorByteMemory(memory)
 
         for (index in 0..memory.size - 1)
             assertEquals(0x00, memory[index])
@@ -44,41 +44,41 @@ class XorMemoryTests {
         // No switch from zeros with zeros
         assertEquals(
                 0x00,
-                noSwitchTestFrom(xorMemory, 0, 0x00)
+                noSwitchTestFrom(xorByteMemory, 0, 0x00)
         )
 
         // Switch from zeros with ones to ones
         assertEquals(
                 0x00,
-                switchTestFrom(xorMemory, 1, ones, ones)
+                switchTestFrom(xorByteMemory, 1, ones, ones)
         )
 
         // No switch from ones with zeros
         memory[2] = ones
         assertEquals(
                 ones,
-                noSwitchTestFrom(xorMemory, 2, 0x00)
+                noSwitchTestFrom(xorByteMemory, 2, 0x00)
         )
 
         // Switch from ones with ones to zeros
         memory[3] = ones
         assertEquals(
                 ones,
-                switchTestFrom(xorMemory, 3, ones, 0x00)
+                switchTestFrom(xorByteMemory, 3, ones, 0x00)
         )
 
         // Nibble switch
         memory[4] = 0x0F
         assertEquals(
                 0x0F,
-                switchTestFrom(xorMemory, 4, 0xFF.toByte(), 0xF0.toByte())
+                switchTestFrom(xorByteMemory, 4, 0xFF.toByte(), 0xF0.toByte())
         )
 
         // Half nibble switch
         memory[5] = 0x3C
         assertEquals(
                 0x3C,
-                switchTestFrom(xorMemory, 5, 0xFF.toByte(), 0xC3.toByte())
+                switchTestFrom(xorByteMemory, 5, 0xFF.toByte(), 0xC3.toByte())
         )
     }
 }

@@ -3,7 +3,7 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.IMemory
 import kotlin.experimental.xor
 
-internal class XorMemory(private val memory: IMemory<Byte>) : IMemory<Byte> {
+internal class XorByteMemory(private val memory: IMemory<Byte>) : IMemory<Byte> {
     override val size: Int
         get() = memory.size
 
