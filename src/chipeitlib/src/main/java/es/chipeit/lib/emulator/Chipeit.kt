@@ -21,11 +21,12 @@ class Chipeit(
         timersClockRate: Short = 60,
         private val sleeper: ISleeper
 ) {
-    val SCREEN_WIDTH = 64
+    private val SCREEN_WIDTH_DIV_8 = 64 / 8
+    val SCREEN_WIDTH = SCREEN_WIDTH_DIV_8 * 8
     val SCREEN_HEIGHT = 32
 
-    private val _graphicMemory = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
-    val PUBLIC_GRAPHIC_MEMORY = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
+    private val _graphicMemory = ByteArray(SCREEN_WIDTH_DIV_8 * SCREEN_HEIGHT)
+    val PUBLIC_GRAPHIC_MEMORY = ByteArray(SCREEN_WIDTH_DIV_8 * SCREEN_HEIGHT)
 
     @Volatile
     private var running: Boolean = false
