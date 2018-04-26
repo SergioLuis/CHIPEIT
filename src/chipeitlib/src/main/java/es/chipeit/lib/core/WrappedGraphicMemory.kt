@@ -15,18 +15,19 @@ internal class WrappedGraphicMemory(override val width: Int, private val memory:
 
     override val height: Int = memory.size / width
 
-    override operator fun get(x: Int, y: Int): Byte {
+    private fun getIndex(x: Int, y: Int): Int {
         val column = x.nonNegativeRem(width)
         val row = y.nonNegativeRem(height)
 
-        return memory[width * row + column]
+        return width * row + column
+    }
+
+    override operator fun get(x: Int, y: Int): Byte {
+        return memory[getIndex(x, y)]
     }
 
     override operator fun set(x: Int, y: Int, value: Byte) {
-        val column = x.nonNegativeRem(width)
-        val row = y.nonNegativeRem(height)
-
-        memory[width * row + column] = value
+        memory[getIndex(x, y)] = value
     }
 
     override fun fill(element: Byte, fromIndex: Int, toIndex: Int) {
