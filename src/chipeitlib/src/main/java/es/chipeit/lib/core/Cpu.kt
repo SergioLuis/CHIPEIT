@@ -40,13 +40,16 @@ internal class Cpu(
             0x2000 -> TODO("Instruction $instruction not implemented")
 
             // 3xkk - SE Vx, byte
-            0x3000 -> TODO("Instruction $instruction not implemented")
+            0x3000 -> seVxByte(instruction, registers)
 
             // 4xkk - SNE Vx, byte
-            0x4000 -> TODO("Instruction $instruction not implemented")
+            0x4000 -> sneVxByte(instruction, registers)
 
             // 5xy0 - SE Vx, Vy
-            0x5000 -> TODO("Instruction $instruction not implemented")
+            0x5000 -> when (instruction and 0xF00F) {
+                0x5000 -> seVxVy(instruction, registers)
+                else -> throw IllegalStateException() // FIXME: integration branch
+            }
 
             // 6xkk - LD Vx, byte
             0x6000 -> ldVxByte(instruction, registers)
@@ -63,27 +66,19 @@ internal class Cpu(
             // 8xy6 - SHR Vx {, Vy}
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
-            0x8000 -> when(instruction and 0xF00F) {
-                0x8004 -> addVxVy(instruction, registers)
-                0x8005 -> subVxVy(instruction, registers)
-                0x8007 -> subnVxVy(instruction, registers)
-                else -> TODO("Instruction $instruction not implemented")
-            }
+            0x8000 -> TODO("Instruction $instruction not implemented")
 
             // 9xy0 - SNE Vx, Vy
-            0x9000 -> when(instruction and 0xF00F) {
-                0x9000 -> sneVxVy(instruction, registers)
-                else -> TODO("Instruction $instruction not implemented")
-            }
+            0x9000 -> TODO("Instruction $instruction not implemented")
 
             // Annn - LD I, addr
-            0xA000 -> TODO("Instruction $instruction not implemented")
+            0xA000 -> ldIAddr(instruction, registers)
 
             // Bnnn - JP V0, addr
-            0xB000 -> TODO("Instruction $instruction not implemented")
+            0xB000 -> jpV0Addr(instruction, registers)
 
             // Cxkk - RND Vx, byte
-            0xC000 -> TODO("Instruction $instruction not implemented")
+            0xC000 -> rndVxAddr(instruction, registers)
 
             // Dxyn - DRW Vx, Vy, nibble
             0xD000 -> TODO("Instruction $instruction not implemented")
@@ -102,11 +97,9 @@ internal class Cpu(
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
             0xF000 -> when(instruction and 0xF0FF) {
-                0xF007 -> ldVxTimer(instruction, registers, delayTimer)
-                0xF015 -> ldTimerVx(instruction, registers, delayTimer)
-                0xF018 -> ldTimerVx(instruction, registers, soundTimer)
-                0xF029 -> ldFVx(instruction, registers)
-                0xF033 -> ldBVx(instruction, registers, memory)
+                0xF01E -> addIVx(instruction, registers)
+                0xF055 -> ldIVx(instruction, registers, memory)
+                0xF065 -> ldVxI(instruction, registers, memory)
                 else -> TODO("Instruction $instruction not implemented")
             }
 
