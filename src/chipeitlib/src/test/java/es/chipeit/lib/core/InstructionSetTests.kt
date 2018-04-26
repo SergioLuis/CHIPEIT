@@ -1,14 +1,14 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.IGraphicMemory
 import org.junit.Test
-import kotlin.test.assertEquals
 import org.mockito.Mockito
+import org.mockito.Mockito.*
+import kotlin.test.assertEquals
 
+import es.chipeit.lib.interfaces.IGraphicMemory
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
-import org.junit.Ignore
-import org.mockito.Mockito.*
+
 
 class InstructionSetTests {
     @Test
@@ -49,6 +49,21 @@ class InstructionSetTests {
                 registersMock,
                 times(1)
         ).pc = 0x0FFF
+    }
+
+    @Test
+    fun seVxByteTest() {
+
+    }
+
+    @Test
+    fun sneVxByteTest() {
+
+    }
+
+    @Test
+    fun seVxVyTest() {
+
     }
 
     @Test
@@ -186,5 +201,35 @@ class InstructionSetTests {
                 registersMemoryMock,
                 times(1)
         )[15] = 0x00
+    }
+
+    @Test
+    fun ldIAddrTest() {
+
+    }
+
+    @Test
+    fun jpV0AddrTest() {
+
+    }
+
+    @Test
+    fun rndVxByteTest() {
+
+    }
+
+    @Test
+    fun addIVxTest() {
+
+    }
+
+    @Test
+    fun ldIVxTest() {
+
+    }
+
+    @Test
+    fun ldVxITest() {
+
     }
 }
