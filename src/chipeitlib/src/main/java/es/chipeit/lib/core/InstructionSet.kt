@@ -116,8 +116,8 @@ internal fun sneVxVy(instruction: Int, registers: IRegisters) {
 
 // Cxkk - RND Vx, byte
 
-// Dxyn - DRW Vx, Vy, byte
-internal fun drwVxVyByte(
+// Dxyn - DRW Vx, Vy, Nibble
+internal fun drwVxVyNibble(
         instruction: Int,
         registers: IRegisters,
         memory: IMemory<Byte>,

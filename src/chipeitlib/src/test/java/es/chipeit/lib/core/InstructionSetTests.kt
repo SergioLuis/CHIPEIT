@@ -871,12 +871,14 @@ class InstructionSetTests {
     }
 
     @Test
-    fun drwVxVyByteIllegalMemoryTest() {
+    fun drwVxVyNibbleIllegalMemoryTest() {
         val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         Mockito.`when`(registersMemoryMock.size).thenReturn(16)
         Mockito.`when`(registersMemoryMock[0]).thenReturn(0x00) // I don't care the value.
 
         val registers = Registers(registersMemoryMock)
+        registers.pc = 0x200
+
         val memory = ByteMemory(ByteArray(0x1000))
 
         /*
@@ -898,12 +900,12 @@ class InstructionSetTests {
 
         for (offset in 0..15) {
             for (size in 0..15 - offset) // assertNotFails
-                drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
 
             for (size in 15 - offset + 1..15) {
                 assertNotEquals(0, size) // With size equals zero is a no-op!
                 assertFailsWith<IllegalStateException> {
-                    drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                    drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
                 }
             }
 
@@ -914,11 +916,11 @@ class InstructionSetTests {
         for (skips in registers.i..0x200 - 15) {
             // assertNotFails
             // With size equals zero is a no-op!
-            drwVxVyByte(0xD000 or 0, registers, memory, graphicMemory);
+            drwVxVyNibble(0xD000 or 0, registers, memory, graphicMemory);
 
             for (size in 1..15) {
                 assertFailsWith<IllegalStateException> {
-                    drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                    drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
                 }
             }
 
@@ -928,20 +930,22 @@ class InstructionSetTests {
         for (offset in 0..15) {
             // assertNotFails
             // With size equals zero is a no-op!
-            drwVxVyByte(0xD000 or 0, registers, memory, graphicMemory);
+            drwVxVyNibble(0xD000 or 0, registers, memory, graphicMemory);
 
             for (size in 1..15 - offset) {
                 assertNotEquals(15, offset) // FIXME: Remove after use.
                 assertFailsWith<IllegalStateException> {
-                    drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                    drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
                 }
             }
 
             for (size in 15 - offset + 1..15) // assertNotFails
-                drwVxVyByte(0xD000 or size, registers, memory, graphicMemory);
+                drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
 
             registers.i++
         }
+
+        assertEquals(0x0, registers.pc)
     }
 
     /*
@@ -956,7 +960,7 @@ class InstructionSetTests {
         Measures must be taken to check both implementations.
     */
     @Test
-    fun drwVxVyTallestSpriteTest() {
+    fun drwVxVyNibbleTallestSpriteTest() {
         val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         Mockito.`when`(registersMemoryMock.size).thenReturn(16)
         Mockito.`when`(registersMemoryMock[0]).thenReturn(0)
@@ -966,6 +970,8 @@ class InstructionSetTests {
         Mockito.`when`(registersMemoryMock[4]).thenReturn(10)
 
         val registers = Registers(registersMemoryMock)
+        registers.pc = 0x200
+
         val memory = ByteMemory(ByteArray(2))
         val graphicMemory = WrappedGraphicMemory(1, ByteMemory(ByteArray(2)));
 
@@ -978,14 +984,14 @@ class InstructionSetTests {
 
         checkCleanMemory(graphicMemory)
 
-        drwVxVyByte(0xD002, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD002, registers, memory, graphicMemory)
         assertEquals(0xF0.toByte(), graphicMemory[0, 0])
         assertEquals(0x0F, graphicMemory[0, 1])
 
         graphicMemory.fill(0)
         checkCleanMemory(graphicMemory)
 
-        drwVxVyByte(0xD022, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD022, registers, memory, graphicMemory)
         assertEquals(0xF0.toByte(), graphicMemory[0, 0])
         assertEquals(0x0F, graphicMemory[0, 1])
 
@@ -994,21 +1000,21 @@ class InstructionSetTests {
 
         /* With size equals zero is a no-op! */
 
-        drwVxVyByte(0xD000, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD000, registers, memory, graphicMemory)
         checkCleanMemory(graphicMemory)
 
         /*
             0000 1111b
             1111 0000b
         */
-        drwVxVyByte(0xD012, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
         assertEquals(0x0F, graphicMemory[0, 0])
         assertEquals(0xFF.toByte(), graphicMemory[0, 1])
 
         graphicMemory.fill(0)
         checkCleanMemory(graphicMemory)
 
-        drwVxVyByte(0xD032, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD032, registers, memory, graphicMemory)
         assertEquals(0x0F, graphicMemory[0, 0])
         assertEquals(0xFF.toByte(), graphicMemory[0, 1])
 
@@ -1019,14 +1025,14 @@ class InstructionSetTests {
             0011 1100b
             1100 0011b
         */
-        drwVxVyByte(0xD202, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD202, registers, memory, graphicMemory)
         assertEquals(0x3C, graphicMemory[0, 0])
         assertEquals(0xC3.toByte(), graphicMemory[0, 1])
 
         graphicMemory.fill(0)
         checkCleanMemory(graphicMemory)
 
-        drwVxVyByte(0xD402, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD402, registers, memory, graphicMemory)
         assertEquals(0x3C, graphicMemory[0, 0])
         assertEquals(0xC3.toByte(), graphicMemory[0, 1])
 
@@ -1037,16 +1043,18 @@ class InstructionSetTests {
             1100 0011b
             0011 1100b
         */
-        drwVxVyByte(0xD212, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD212, registers, memory, graphicMemory)
         assertEquals(0xC3.toByte(), graphicMemory[0, 0])
         assertEquals(0x3C, graphicMemory[0, 1])
 
         graphicMemory.fill(0)
         checkCleanMemory(graphicMemory)
 
-        drwVxVyByte(0xD422, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD422, registers, memory, graphicMemory)
         assertEquals(0xC3.toByte(), graphicMemory[0, 0])
         assertEquals(0x3C, graphicMemory[0, 1])
+
+        assertEquals(0x200 + 9 * 0x2, registers.pc)
     }
 
     /*
@@ -1054,7 +1062,7 @@ class InstructionSetTests {
         a special implementation for alignment takes care of the position.
     */
     @Test
-    fun drwVxVyAlignedExtraTest() {
+    fun drwVxVyNibbleAlignedExtraTest() {
         val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         Mockito.`when`(registersMemoryMock.size).thenReturn(16)
         Mockito.`when`(registersMemoryMock[0]).thenReturn(0)
@@ -1062,6 +1070,8 @@ class InstructionSetTests {
         Mockito.`when`(registersMemoryMock[2]).thenReturn(8)
 
         val registers = Registers(registersMemoryMock)
+        registers.pc = 0x200
+
         val memory = ByteMemory(ByteArray(2))
 
         val graphicMemory = WrappedGraphicMemory(2, ByteMemory(ByteArray(4)));
@@ -1079,7 +1089,7 @@ class InstructionSetTests {
             0000 1111 0000 0000b
             1111 0000 0000 0000b
         */
-        drwVxVyByte(0xD012, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
         assertEquals(0x0F, graphicMemory[0, 0])
         assertEquals(0xF0.toByte(), graphicMemory[0, 1])
         assertEquals(0x00, graphicMemory[1, 0])
@@ -1092,7 +1102,7 @@ class InstructionSetTests {
             0000 0000 1111 0000b
             0000 0000 0000 1111b
         */
-        drwVxVyByte(0xD202, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD202, registers, memory, graphicMemory)
         assertEquals(0x00, graphicMemory[0, 0])
         assertEquals(0x00, graphicMemory[0, 1])
         assertEquals(0xF0.toByte(), graphicMemory[1, 0])
@@ -1105,11 +1115,13 @@ class InstructionSetTests {
             0000 0000 0000 1111b
             0000 0000 1111 0000b
         */
-        drwVxVyByte(0xD212, registers, memory, graphicMemory)
+        drwVxVyNibble(0xD212, registers, memory, graphicMemory)
         assertEquals(0x00, graphicMemory[0, 0])
         assertEquals(0x00, graphicMemory[0, 1])
         assertEquals(0x0F, graphicMemory[1, 0])
         assertEquals(0xF0.toByte(), graphicMemory[1, 1])
+
+        assertEquals(0x200 + 3 * 0x2, registers.pc)
     }
 
     @Test
