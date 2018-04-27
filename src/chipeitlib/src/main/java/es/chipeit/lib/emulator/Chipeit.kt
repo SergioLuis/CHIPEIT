@@ -7,12 +7,8 @@ import es.chipeit.lib.core.*
 import es.chipeit.lib.core.hexfont.TABLE
 import es.chipeit.lib.core.log.LoggedMemory
 import es.chipeit.lib.interfaces.hzToMs
+import es.chipeit.lib.io.IGraphicMemory
 import es.chipeit.lib.io.ISwitchObserver
-
-internal fun byteArrayCopy(src: ByteArray, dst: ByteArray) {
-    for (i in src.indices)
-        dst[i] = src[i]
-}
 
 class Chipeit(
         soundPlayer: ISwitchObserver,
@@ -21,12 +17,11 @@ class Chipeit(
         timersClockRate: Short = 60,
         private val sleeper: ISleeper
 ) {
-    private val SCREEN_WIDTH_DIV_8 = 64 / 8
-    val SCREEN_WIDTH = SCREEN_WIDTH_DIV_8 * 8
+    val SCREEN_WIDTH = 64
     val SCREEN_HEIGHT = 32
 
-    private val _graphicMemory = ByteArray(SCREEN_WIDTH_DIV_8 * SCREEN_HEIGHT)
-    val PUBLIC_GRAPHIC_MEMORY = ByteArray(SCREEN_WIDTH_DIV_8 * SCREEN_HEIGHT)
+    private val _graphicMemory = GraphicMemory(Array(SCREEN_WIDTH) { Array(SCREEN_HEIGHT) { false } })
+    val graphicMemory: IGraphicMemory = _graphicMemory
 
     @Volatile
     private var running: Boolean = false
@@ -38,10 +33,6 @@ class Chipeit(
                             romContent +
                             ByteArray(0x1000 - romContent.size - 0x200)
             )
-    )
-    private val graphicMemory = LoggedMemory(
-            "Graphic memory",
-            ByteMemory(_graphicMemory)
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",
@@ -60,7 +51,7 @@ class Chipeit(
             soundTimer,
             stack,
             memory,
-            graphicMemory
+            _graphicMemory
     )
 
     private val chronometer = Chronometer(Clock())
@@ -82,8 +73,6 @@ class Chipeit(
 
             cpuClockDivider.trigger()
             timersClockDivider.trigger()
-
-            byteArrayCopy(_graphicMemory, PUBLIC_GRAPHIC_MEMORY)
 
             val timeToSleep =
                     max(0, min(

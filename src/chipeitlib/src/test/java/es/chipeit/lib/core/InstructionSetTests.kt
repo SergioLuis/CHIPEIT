@@ -1,5 +1,6 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.ICoreGraphicMemory
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -12,12 +13,11 @@ import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 import kotlin.test.assertNotEquals
-import es.chipeit.lib.core.WrappedGraphicMemoryTests.Companion.checkCleanMemory
 
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val graphicMemory = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val graphicMemory = Mockito.mock(ICoreGraphicMemory::class.java)
         val registers = Registers(ByteMemory(ByteArray(16)))
 
         registers.pc = 0x200
@@ -28,7 +28,7 @@ class InstructionSetTests {
         Mockito.verify(
                 graphicMemory,
                 times(1)
-        ).fill(0)
+        ).clear()
     }
 
     @Test
@@ -868,263 +868,6 @@ class InstructionSetTests {
 
         sneVxVy(0x9AB0, registers)
         assertEquals(0x200 + 9 * 0x2, registers.pc)
-    }
-
-    @Test
-    fun drwVxVyNibbleIllegalMemoryTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
-        // I don't care the values of Vn.
-        registers.pc = 0x200
-
-        val memory = ByteMemory(ByteArray(0x1000))
-
-        /*
-            I don't care about the graphic memory size
-            as long it can contain the tallest of the sprites.
-
-            Sprites may be up to 15 bytes, and the width is fixed to 8 bits.
-        */
-        val graphicMemory = WrappedGraphicMemory(1, ByteMemory(ByteArray(15)));
-
-        /*
-            The hex font table starts at 0x000.
-            Every character sprite has 5 bytes.
-
-            Between the table and 0x200 there is a gap of illegal addresses.
-            This limits begins 15 bytes ahead.
-        */
-        registers.i = 17 * 5 - 15;
-
-        for (offset in 0..15) {
-            for (size in 0..15 - offset) // assertNotFails
-                drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
-
-            for (size in 15 - offset + 1..15) {
-                assertNotEquals(0, size) // If the loop is rightfully written...
-                assertFailsWith<IllegalStateException> {
-                    drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
-                }
-            }
-
-            registers.i++
-        }
-
-        registers.i++
-        for (skips in registers.i..0x200 - 15) {
-            for (size in 0..15) {
-                assertFailsWith<IllegalStateException> {
-                    drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
-                }
-            }
-
-            registers.i++
-        }
-
-        for (offset in 0..15) {
-            for (size in 0..15 - offset) {
-                assertNotEquals(15, offset) // If the loop is rightfully written...
-                assertFailsWith<IllegalStateException> {
-                    drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
-                }
-            }
-
-            for (size in 15 - offset + 1..15) // assertNotFails
-                drwVxVyNibble(0xD000 or size, registers, memory, graphicMemory);
-
-            registers.i++
-        }
-
-        assertEquals(0x0, registers.pc)
-    }
-
-    /*
-        It's necessary the graphic memory size be enough to contain the tallest of the sprites.
-
-        The width is fixed to 8 bits,
-        and two bytes for checking wrapping would be enough to test.
-
-        However it's probable that the stupid tired programmer duplicated the implementation
-        (aligned to byte vs not aligned).
-
-        Measures must be taken to check both implementations.
-    */
-    @Test
-    fun drwVxVyNibbleTallestSpriteTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
-        registers.v[0x0] = 0
-        registers.v[0x1] = 1
-        registers.v[0x2] = 2
-        registers.v[0x3] = 3
-        registers.v[0x4] = 10
-        registers.pc = 0x200
-
-        val memory = ByteMemory(ByteArray(2))
-        val graphicMemory = WrappedGraphicMemory(1, ByteMemory(ByteArray(2)));
-
-        /*
-            1111 0000b
-            0000 1111b
-        */
-        memory[0] = 0xF0.toByte()
-        memory[1] = 0x0F
-
-        checkCleanMemory(graphicMemory)
-        graphicMemory[0, 0] = 0x01 // Will be cleared.
-
-        registers.v[0xF] = 0
-        drwVxVyNibble(0xD002, registers, memory, graphicMemory)
-        assertEquals(0xF0.toByte(), graphicMemory[0, 0])
-        assertEquals(0x0F, graphicMemory[0, 1])
-        assertEquals(1, registers.v[0xF])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        // With size equals zero it just sets VF!
-
-        assertEquals(1, registers.v[0xF])
-        drwVxVyNibble(0xD000, registers, memory, graphicMemory)
-        checkCleanMemory(graphicMemory)
-        assertEquals(0, registers.v[0xF])
-
-        // Wrapping test
-
-        registers.v[0xF] = 1
-        drwVxVyNibble(0xD022, registers, memory, graphicMemory)
-        assertEquals(0xF0.toByte(), graphicMemory[0, 0])
-        assertEquals(0x0F, graphicMemory[0, 1])
-        assertEquals(0, registers.v[0xF])
-
-        // Don't clean!
-
-        /*
-            0000 1111b
-            1111 0000b
-        */
-        assertEquals(0, registers.v[0xF])
-        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
-        assertEquals(0x0F, graphicMemory[0, 0])
-        assertEquals(0xFF.toByte(), graphicMemory[0, 1])
-        assertEquals(1, registers.v[0xF])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        assertEquals(1, registers.v[0xF])
-        drwVxVyNibble(0xD032, registers, memory, graphicMemory)
-        assertEquals(0x0F, graphicMemory[0, 0])
-        assertEquals(0xFF.toByte(), graphicMemory[0, 1])
-        assertEquals(0, registers.v[0xF])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        /*
-            0011 1100b
-            1100 0011b
-        */
-        assertEquals(0, registers.v[0xF])
-        drwVxVyNibble(0xD202, registers, memory, graphicMemory)
-        assertEquals(0x3C, graphicMemory[0, 0])
-        assertEquals(0xC3.toByte(), graphicMemory[0, 1])
-        assertEquals(1, registers.v[0xF])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        assertEquals(1, registers.v[0xF])
-        drwVxVyNibble(0xD402, registers, memory, graphicMemory)
-        assertEquals(0x3C, graphicMemory[0, 0])
-        assertEquals(0xC3.toByte(), graphicMemory[0, 1])
-        assertEquals(0, registers.v[0xF])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        /*
-            1100 0011b
-            0011 1100b
-        */
-        assertEquals(0, registers.v[0xF])
-        drwVxVyNibble(0xD212, registers, memory, graphicMemory)
-        assertEquals(0xC3.toByte(), graphicMemory[0, 0])
-        assertEquals(0x3C, graphicMemory[0, 1])
-        assertEquals(1, registers.v[0xF])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        assertEquals(1, registers.v[0xF])
-        drwVxVyNibble(0xD422, registers, memory, graphicMemory)
-        assertEquals(0xC3.toByte(), graphicMemory[0, 0])
-        assertEquals(0x3C, graphicMemory[0, 1])
-        assertEquals(0, registers.v[0xF])
-
-        assertEquals(0x200 + 9 * 0x2, registers.pc)
-    }
-
-    /*
-        This test uses a two-byte width to ensure
-        a special implementation for alignment takes care of the position.
-    */
-    @Test
-    fun drwVxVyNibbleAlignedExtraTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
-        registers.v[0x0] = 0
-        registers.v[0x1] = 1
-        registers.v[0x2] = 8
-        registers.pc = 0x200
-
-        val memory = ByteMemory(ByteArray(2))
-
-        val graphicMemory = WrappedGraphicMemory(2, ByteMemory(ByteArray(4)));
-
-        /*
-            1111 0000b
-            0000 1111b
-        */
-        memory[0] = 0xF0.toByte()
-        memory[1] = 0x0F
-
-        checkCleanMemory(graphicMemory)
-
-        /*
-            0000 1111 0000 0000b
-            1111 0000 0000 0000b
-        */
-        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
-        assertEquals(0x0F, graphicMemory[0, 0])
-        assertEquals(0xF0.toByte(), graphicMemory[0, 1])
-        assertEquals(0x00, graphicMemory[1, 0])
-        assertEquals(0x00, graphicMemory[1, 1])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        /*
-            0000 0000 1111 0000b
-            0000 0000 0000 1111b
-        */
-        drwVxVyNibble(0xD202, registers, memory, graphicMemory)
-        assertEquals(0x00, graphicMemory[0, 0])
-        assertEquals(0x00, graphicMemory[0, 1])
-        assertEquals(0xF0.toByte(), graphicMemory[1, 0])
-        assertEquals(0x0F, graphicMemory[1, 1])
-
-        graphicMemory.fill(0)
-        checkCleanMemory(graphicMemory)
-
-        /*
-            0000 0000 0000 1111b
-            0000 0000 1111 0000b
-        */
-        drwVxVyNibble(0xD212, registers, memory, graphicMemory)
-        assertEquals(0x00, graphicMemory[0, 0])
-        assertEquals(0x00, graphicMemory[0, 1])
-        assertEquals(0x0F, graphicMemory[1, 0])
-        assertEquals(0xF0.toByte(), graphicMemory[1, 1])
-
-        assertEquals(0x200 + 3 * 0x2, registers.pc)
     }
 
     @Test

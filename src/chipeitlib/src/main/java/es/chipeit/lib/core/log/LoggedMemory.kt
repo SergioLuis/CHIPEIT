@@ -21,8 +21,4 @@ internal class LoggedMemory<T>(
         // TODO add log
         memory[index] = value
     }
-
-    override fun fill(element: T, fromIndex: Int, toIndex: Int) {
-        memory.fill(element, fromIndex, toIndex)
-    }
 }

@@ -13,8 +13,4 @@ internal class ShortMemory(private val memory: ShortArray): IMemory<Short> {
     override fun set(index: Int, value: Short) {
         memory[index] = value
     }
-
-    override fun fill(element: Short, fromIndex: Int, toIndex: Int) {
-        memory.fill(element, fromIndex, toIndex)
-    }
 }

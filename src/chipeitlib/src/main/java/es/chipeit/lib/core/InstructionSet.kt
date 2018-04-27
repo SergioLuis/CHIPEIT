@@ -1,12 +1,13 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.ICoreGraphicMemory
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 
 // 00E0 - CLS
-internal fun cls(registers: IRegisters, graphicMemory: IMemory<Byte>) {
-    graphicMemory.fill(0)
+internal fun cls(registers: IRegisters, graphicMemory: ICoreGraphicMemory) {
+    graphicMemory.clear()
     registers.pc += 2
 }
 
@@ -121,7 +122,7 @@ internal fun drwVxVyNibble(
         instruction: Int,
         registers: IRegisters,
         memory: IMemory<Byte>,
-        graphicMemory: WrappedGraphicMemory
+        graphicMemory: ICoreGraphicMemory
 ) {
     // I can do not do a thing, but just can't do nothing.
 }

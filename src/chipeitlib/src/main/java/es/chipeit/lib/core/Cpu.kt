@@ -8,7 +8,7 @@ internal class Cpu(
         private val soundTimer: ITimer,
         private val stack: IMemory<Short>,
         private val memory: IMemory<Byte>,
-        private val graphicMemory: IMemory<Byte>
+        private val graphicMemory: ICoreGraphicMemory
 ) : IClockObserver {
     init {
         registers.pc = 0x200
