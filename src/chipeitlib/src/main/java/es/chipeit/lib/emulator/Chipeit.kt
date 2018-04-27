@@ -20,7 +20,7 @@ class Chipeit(
     val SCREEN_WIDTH = 64
     val SCREEN_HEIGHT = 32
 
-    private val _graphicMemory = GraphicMemory(Array(SCREEN_WIDTH) { Array(SCREEN_HEIGHT) { false } })
+    private val _graphicMemory = GraphicMemory(Array(SCREEN_HEIGHT) { Array(SCREEN_WIDTH) { false } })
     val graphicMemory: IGraphicMemory = _graphicMemory
 
     @Volatile

@@ -124,7 +124,12 @@ internal fun drwVxVyNibble(
         memory: IMemory<Byte>,
         graphicMemory: ICoreGraphicMemory
 ) {
-    // I can do not do a thing, but just can't do nothing.
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+    val height = instruction and 0xF
+
+    val vx = registers.v[x].toInt() and 0xFF
+    val vy = registers.v[y].toInt() and 0xFF
 }
 
 // Ex9E - SKP Vx
