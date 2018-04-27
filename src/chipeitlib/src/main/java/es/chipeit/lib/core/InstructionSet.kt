@@ -130,6 +130,15 @@ internal fun drwVxVyNibble(
 
     val vx = registers.v[x].toInt() and 0xFF
     val vy = registers.v[y].toInt() and 0xFF
+
+    var pixelCleared = false
+    for (i in 0 until height) {
+        val spriteRow = memory[registers.i + i]
+
+        pixelCleared = graphicMemory.drawLine(x, y + i, spriteRow)
+    }
+
+    registers.pc += 2
 }
 
 // Ex9E - SKP Vx
