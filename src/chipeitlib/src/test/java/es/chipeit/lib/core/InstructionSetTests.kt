@@ -12,7 +12,6 @@ import org.mockito.stubbing.Answer
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
-import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class InstructionSetTests {
@@ -894,6 +893,11 @@ class InstructionSetTests {
         val rawMatrix = Array(4) { Array(8) { false } }
         val graphicMemory = GraphicMemory(rawMatrix)
 
+        drwVxVyNibble(0xD010, registers, memory, graphicMemory)
+        for (column in rawMatrix)
+            for (cell in column)
+                assertEquals(false, cell)
+
         /*
             1110 1111b = 0xEF
             0000 0000b
@@ -910,7 +914,84 @@ class InstructionSetTests {
         drwVxVyNibble(0xD012, registers, memory, graphicMemory)
         assertTrue { rawMatrix contentDeepEquals expectedMatrix }
 
-        registers.pc += 2
+        assertEquals(0x200 + 2 * 0x2, registers.pc)
+    }
+
+    @Test
+    fun drwVxVyNibbleWithoutClearTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.v[0] = 0
+        registers.v[1] = 0
+
+        registers.pc = 0x200
+        registers.i = 0x00
+
+        val memory = ByteMemory(byteArrayOf(
+                0x00,
+                0x00,
+                0xFF.toByte()
+        ))
+
+        val rawMatrix = Array(memory.size) { Array(8) { false } }
+        val graphicMemory = GraphicMemory(rawMatrix)
+
+        // Drawing a zero-height sprite will not clear a pixel.
+        registers.v[0xF] = 1
+        drwVxVyNibble(0xD010, registers, memory, graphicMemory)
+        assertEquals(0x00, registers.v[0xF])
+
+        /*
+            If no pixel is cleared, VF must be set to zero. (Don't use 0xFF xor 0xFF!)
+            Graphic memory xor sprite notation.
+            0x00 xor 0x00 -> 0x00
+            0xFF xor 0x00 -> 0xFF
+            0x00 xor 0xFF -> 0xFF
+         */
+        for (column in rawMatrix)
+            for (cell in column)
+                assertEquals(false, cell)
+
+        val j = 1
+        for (i in 0 until rawMatrix[j].size)
+            rawMatrix[j][i] = true
+
+        registers.v[0xF] = 1
+        drwVxVyNibble(0xD010 or memory.size, registers, memory, graphicMemory)
+        assertEquals(0x00, registers.v[0xF])
+    }
+
+    @Test
+    fun drwVxVyNibbleWithClearTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.v[0] = 0
+        registers.v[1] = 0
+
+        registers.pc = 0x200
+        registers.i = 0x00
+
+        val memory = ByteMemory(byteArrayOf(
+                0xFF.toByte(),
+                0x00
+        ))
+
+        val rawMatrix = Array(memory.size) { Array(8) { false } }
+        val graphicMemory = GraphicMemory(rawMatrix)
+
+        /*
+            If a pixel is cleared, VF must be set to one even if it was not in the last row.
+            Graphic memory xor sprite notation.
+            0xFF xor 0xFF -> 0x00
+            0x00 xor 0x00 -> 0x00
+         */
+        val j = 0
+        for (i in 0 until rawMatrix[j].size)
+            rawMatrix[j][i] = true
+
+        registers.v[0xF] = 0
+        drwVxVyNibble(0xD010 or memory.size, registers, memory, graphicMemory)
+        assertEquals(0x01, registers.v[0xF])
     }
 
     @Test
