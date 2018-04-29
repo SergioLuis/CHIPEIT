@@ -10,28 +10,34 @@ internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreG
     override val height: Int
         get() = memory.size
 
+    init {
+        if(height <= 0 || width <= 0)
+            throw IllegalArgumentException("matrix dimensions must be greater than zero")
+
+        if(width < 8)
+            throw IllegalArgumentException("width must be greater than eight")
+    }
+
     override fun get(x: Int, y: Int): Boolean {
         return memory[y][x]
     }
 
-    private operator fun set(x: Int, y: Int, value: Boolean): Boolean {
-        val column = x.nonNegativeRem(width)
+    override fun drawRow(x: Int, y: Int, bitline: Byte): Boolean {
+        val leftmostColumn = x.nonNegativeRem(width)
         val row = y.nonNegativeRem(height)
-
-        val pixelState = memory[row][column]
-        memory[row][column] = memory[row][column] xor value
-
-        // Check if the pixel was cleared.
-        return pixelState && !memory[row][column]
-    }
-
-    override fun drawLine(x: Int, y: Int, value: Byte): Boolean {
-        @SuppressWarnings
-        val value: Int = value.toInt() and 0xFF
+        @SuppressWarnings val bitline: Int = bitline.toInt() and 0xFF
 
         var pixelCleared = false
-        for (i in 7 downTo 0)
-            pixelCleared = pixelCleared or set(x, y, (value shr i and 0x1) == 0x1)
+
+        for (i in 0..7) {
+            val column = leftmostColumn + i
+
+            val previousState = memory[row][column]
+            memory[row][column] = previousState xor ((bitline shr (7 - i) and 0x1) == 0x1)
+
+            if (previousState && !memory[row][column])
+                pixelCleared = true
+        }
 
         return pixelCleared
     }
