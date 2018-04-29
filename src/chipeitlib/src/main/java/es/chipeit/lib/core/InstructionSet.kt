@@ -135,8 +135,10 @@ internal fun drwVxVyNibble(
     for (i in 0 until height) {
         val spriteRow = memory[registers.i + i]
 
-        pixelCleared = graphicMemory.drawRow(vx, vy + i, spriteRow)
+        if (graphicMemory.drawRow(vx, vy + i, spriteRow))
+            pixelCleared = true
     }
+    registers.v[0xF] = if (pixelCleared) 1 else 0
 
     registers.pc += 2
 }
