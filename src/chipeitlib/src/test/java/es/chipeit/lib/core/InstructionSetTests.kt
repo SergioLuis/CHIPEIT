@@ -13,6 +13,7 @@ import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class InstructionSetTests {
     @Test
@@ -868,6 +869,48 @@ class InstructionSetTests {
 
         sneVxVy(0x9AB0, registers)
         assertEquals(0x200 + 9 * 0x2, registers.pc)
+    }
+
+    @Test
+    fun drwVxVyNibbleTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.v[0] = 4
+        registers.v[1] = 3
+
+        registers.pc = 0x200
+        registers.i = 0x02
+
+        val memory = ByteMemory(ByteArray(4))
+
+        // Not use.
+        memory[0] = 0xAA.toByte() // 1010 1010b
+        memory[1] = 0xAA.toByte() // 1010 1010b
+
+        // Sprite from here.
+        memory[2] = 0x7F.toByte() // 0111 1111b
+        memory[3] = 0xFE.toByte() // 1111 1110b
+
+        val rawMatrix = Array(4) { Array(8) { false } }
+        val graphicMemory = GraphicMemory(rawMatrix)
+
+        /*
+            1110 1111b = 0xEF
+            0000 0000b
+            0000 0000b
+            1111 0111b = 0xF7
+        */
+        val expectedMatrix = arrayOf(
+                arrayOf(true, true, true, false, true, true, true, true),
+                arrayOf(false, false, false, false, false, false, false, false),
+                arrayOf(false, false, false, false, false, false, false, false),
+                arrayOf(true, true, true, true, false, true, true, true)
+        )
+
+        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
+        assertTrue { rawMatrix contentDeepEquals expectedMatrix }
+
+        registers.pc += 2
     }
 
     @Test
