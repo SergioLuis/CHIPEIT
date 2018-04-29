@@ -6,24 +6,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class GraphicMemoryTests {
-    companion object {
-        private fun compare(l: Array<Array<Boolean>>, r: Array<Array<Boolean>>): Boolean {
-            if (l.size != r.size)
-                throw IllegalArgumentException("Matrix sizes must match")
-
-            for (j in 0 until l.size) {
-                if (l[j].size != r[j].size)
-                    throw IllegalArgumentException("Matrix sizes must match")
-
-                for (i in 0 until l[j].size)
-                    if (l[j][i] != r[j][i])
-                        return false
-            }
-
-            return true
-        }
-    }
-
     @Test
     fun illegalSizesTest() {
         var halfBakedMatrix = emptyArray<Array<Boolean>>()
@@ -70,13 +52,13 @@ class GraphicMemoryTests {
         )
 
         graphicMemory.drawRow(0, 0, 0x00)
-        assertTrue { compare(rawMatrix, originalMatrix) }
+        assertTrue { rawMatrix contentDeepEquals originalMatrix }
 
         graphicMemory.drawRow(0, 0, 0xFF.toByte())
-        assertTrue { compare(rawMatrix, negativeMatrix) }
+        assertTrue { rawMatrix contentDeepEquals negativeMatrix }
 
         graphicMemory.drawRow(0, 0, 0xFF.toByte())
-        assertTrue { compare(rawMatrix, originalMatrix) }
+        assertTrue { rawMatrix contentDeepEquals originalMatrix }
     }
 
     @Test
@@ -107,15 +89,15 @@ class GraphicMemoryTests {
         val graphicMemory = GraphicMemory(rawMatrix)
 
         graphicMemory.drawRow(0, 0, 0xF0.toByte())
-        assertTrue { compare(rawMatrix, drawedAtOrigin) }
+        assertTrue { rawMatrix contentDeepEquals drawedAtOrigin }
         graphicMemory.clear()
 
         graphicMemory.drawRow(-2, 0, 0xF0.toByte())
-        assertTrue { compare(rawMatrix, leftShifted) }
+        assertTrue { rawMatrix contentDeepEquals leftShifted }
         graphicMemory.clear()
 
         graphicMemory.drawRow(0, -1, 0xF0.toByte())
-        assertTrue { compare(rawMatrix, upShifted) }
+        assertTrue { rawMatrix contentDeepEquals upShifted }
         graphicMemory.clear()
     }
 }
