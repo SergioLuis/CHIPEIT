@@ -23,14 +23,13 @@ internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreG
     }
 
     override fun drawRow(x: Int, y: Int, bitline: Byte): Boolean {
-        val leftmostColumn = x
         val row = y.nonNegativeRem(height)
         @SuppressWarnings val bitline: Int = bitline.toInt() and 0xFF
 
         var pixelCleared = false
 
         for (i in 0..7) {
-            val column = (leftmostColumn + i).nonNegativeRem(width)
+            val column = (x + i).nonNegativeRem(width)
 
             val previousState = memory[row][column]
             memory[row][column] = previousState xor ((bitline shr (7 - i) and 0x1) == 0x1)
