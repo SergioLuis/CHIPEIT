@@ -225,9 +225,7 @@ internal fun drwVxVyNibble(
     var pixelCleared = false
     for (i in 0 until height) {
         val spriteRow = memory[registers.i + i]
-
-        if (graphicMemory.drawRow(vx, vy + i, spriteRow))
-            pixelCleared = true
+        pixelCleared = pixelCleared || graphicMemory.drawLine(vx, vy + i, spriteRow)
     }
     registers.v[0xF] = if (pixelCleared) 1 else 0
 
