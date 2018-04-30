@@ -24,21 +24,21 @@ class Chipeit(
     private var running: Boolean = false
     private val registers = Registers(LoggedMemory(
             "Registers memory",
-            ByteMemory(ByteArray(16)))
+            ByteMemory(ByteArray(Constants.VRegistersCount)))
     )
     private val delayTimer = Timer()
     private val soundTimer = Timer(soundPlayer)
     private val stack = LoggedMemory(
             "Stack memory",
-            IntMemory(IntArray(16))
+            IntMemory(IntArray(Constants.StackDepth))
     )
     private val memory = LoggedMemory(
             "Main memory",
             ByteMemory(
                     TABLE +
-                            ByteArray(0x200 - TABLE.size) +
+                            ByteArray(Constants.ProtectedMemorySize - TABLE.size) +
                             romContent +
-                            ByteArray(0x1000 - romContent.size - 0x200)
+                            ByteArray(Constants.MemorySize - romContent.size - Constants.ProtectedMemorySize)
             )
     )
 

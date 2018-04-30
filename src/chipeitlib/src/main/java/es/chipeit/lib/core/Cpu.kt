@@ -12,19 +12,19 @@ internal class Cpu(
         private val keyboard: ICoreKeyboard
 ) : IClockObserver {
     init {
-        registers.pc = 0x200
+        registers.pc = Constants.CodeStartAddress
         registers.sp = -1
 
-        if (stack.size < 16)
+        if (stack.size < Constants.StackDepth)
             throw IllegalArgumentException(
                     "Parameter stack has ${stack.size} elements, " +
                             "at least 16 needed")
     }
 
     override fun onClockTick() {
-        val higherBytes = memory[registers.pc].toInt()
-        val lowerBytes = memory[registers.pc + 1].toInt()
-        val instruction = (higherBytes shl 8) or lowerBytes
+        val higherBytes = memory[registers.pc].toInt() and 0xFF
+        val lowerBytes = memory[registers.pc + 1].toInt() and 0xFF
+        val instruction = higherBytes shl 2 * 4 or lowerBytes
 
         decodeAndExecute(instruction)
     }
