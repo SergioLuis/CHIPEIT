@@ -80,17 +80,13 @@ internal class Cpu(
                 0x8006 -> shrVxVy(instruction, registers)
                 0x8007 -> subnVxVy(instruction, registers)
                 0x800E -> shlVxVy(instruction, registers)
-                else -> {
-                    throw IllegalStateException(
-                            "The instruction $instruction does not comply with " +
-                                    "the original CHIP-8 specification")
-                }
+                else -> haltAndCatchFire(instruction)
             }
 
             // 9xy0 - SNE Vx, Vy
             0x9000 -> when(instruction and 0xF00F) {
                 0x9000 -> sneVxVy(instruction, registers)
-                else -> TODO("Instruction $instruction not implemented")
+                else -> haltAndCatchFire(instruction)
             }
 
             // Annn - LD I, addr
@@ -134,6 +130,8 @@ internal class Cpu(
                 0xF065 -> TODO("Instruction $instruction not implemented")
                 else -> haltAndCatchFire(instruction)
             }
+
+            else -> haltAndCatchFire(instruction)
         }
     }
 
