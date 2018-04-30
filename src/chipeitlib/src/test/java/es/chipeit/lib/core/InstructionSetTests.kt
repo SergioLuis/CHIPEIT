@@ -931,229 +931,29 @@ class InstructionSetTests {
 
     @Test
     fun subnVxVyTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        Mockito.`when`(vMock.size).thenReturn(16)
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(254.toByte())
+        given(vRegMock[0x1]).willReturn(255.toByte())
 
-        Mockito.`when`(vMock[0x0]).thenReturn(16)
-        Mockito.`when`(vMock[0x1]).thenReturn(32)
+        subnVxVy(0x8017, registersMock)
 
-        Mockito.`when`(vMock[0x2]).thenReturn(33)
-        Mockito.`when`(vMock[0x3]).thenReturn(32)
+        then(vRegMock).should()[0x0] = 1
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x200 + 2
 
-        Mockito.`when`(vMock[0x4]).thenReturn(32)
-        Mockito.`when`(vMock[0x5]).thenReturn(32)
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(255.toByte())
+        given(vRegMock[0x3]).willReturn(254.toByte())
 
-        Mockito.`when`(vMock[0x6]).thenReturn(32)
+        subnVxVy(0x8237, registersMock)
 
-        Mockito.`when`(vMock[0x7]).thenReturn(128.toByte())
-        Mockito.`when`(vMock[0x8]).thenReturn(255.toByte())
-        Mockito.`when`(vMock[0x9]).thenReturn(0)
-        Mockito.`when`(vMock[0xA]).thenReturn(1)
-
-        val registers = Registers(vMock)
-        registers.pc = 0x200
-
-        subnVxVy(0x8017, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x0] = 16
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x0]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x1]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xF] = 1
-
-        subnVxVy(0x8237, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x2] = 255.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x2]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x3]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xF] = 0
-
-        subnVxVy(0x8457, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x4] = 0
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x4]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x5]
-
-        Mockito.verify(
-                vMock,
-                times(2)
-        )[0xF] = 0
-
-        subnVxVy(0x8667, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x6] = 0
-
-        Mockito.verify(
-                vMock,
-                times(2)
-        )[0x6]
-
-        Mockito.verify(
-                vMock,
-                times(3)
-        )[0xF] = 0
-
-        subnVxVy(0x8797, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x7] = 128.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(4)
-        )[0xF] = 0
-
-        subnVxVy(0x8977, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x9] = 128.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(2)
-        )[0xF] = 1
-
-        subnVxVy(0x87A7, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x7] = 129.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(5)
-        )[0xF] = 0
-
-        subnVxVy(0x8A77, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xA] = 127
-
-        Mockito.verify(
-                vMock,
-                times(3)
-        )[0xF] = 1
-
-        subnVxVy(0x8897, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x8] = 1
-
-        Mockito.verify(
-                vMock,
-                times(6)
-        )[0xF] = 0
-
-        subnVxVy(0x8987, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x9] = 255.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(4)
-        )[0xF] = 1
-
-        subnVxVy(0x88A7, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x8] = 2
-
-        Mockito.verify(
-                vMock,
-                times(7)
-        )[0xF] = 0
-
-        subnVxVy(0x8A87, registers)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xA] = 254.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(5)
-        )[0xF] = 1
-
-        Mockito.verify(
-                vMock,
-                times(4)
-        )[0x7]
-
-        Mockito.verify(
-                vMock,
-                times(4)
-        )[0x8]
-
-        Mockito.verify(
-                vMock,
-                times(4)
-        )[0x9]
-
-        Mockito.verify(
-                vMock,
-                times(4)
-        )[0xA]
-
-        assertEquals(0x200 + 12 * 0x2, registers.pc)
+        then(vRegMock).should()[0x2] = 255.toByte()
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x202 + 2
     }
 
     @Test
