@@ -317,18 +317,9 @@ internal fun ldTimerVx(instruction: Int, registers: IRegisters, timer: ITimer) {
 internal fun ldFVx(instruction: Int, registers: IRegisters) {
     val x = instruction shr 2 * 4 and 0xF
 
-    var vx = registers.v[x].toInt() and 0xFF
+    val vx = registers.v[x].toInt() and 0xFF
 
-    if (vx > 0xF)
-        throw IllegalStateException(
-                "V%X must be in the range 0h-Fh but the variable value is %Xh".format(x, vx)
-        )
-
-    /*
-        The hex font table starts at 0x000.
-        Every character sprite has 5 bytes.
-    */
-    registers.i = vx * 5
+    registers.i = Constants.HexFontStart + vx * Constants.CharacterSpriteLength
 
     registers.pc += 2
 }
