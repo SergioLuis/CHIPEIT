@@ -495,134 +495,17 @@ class InstructionSetTests {
 
     @Test
     fun ldVxVyTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(vMock.size).thenReturn(16)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        val registers = Registers(vMock)
-        registers.pc = 0x200
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x1]).willReturn(255.toByte())
 
-        ldVxVy(0x8010, registers)
-        assertEquals(0x200 + 2, registers.pc)
+        ldVxVy(0x8010, registersMock)
 
-        ldVxVy(0x8120, registers)
-        assertEquals(0x200 + 4, registers.pc)
-
-        ldVxVy(0x8230, registers)
-        assertEquals(0x200 + 6, registers.pc)
-
-        ldVxVy(0x8340, registers)
-        assertEquals(0x200 + 8, registers.pc)
-
-        ldVxVy(0x8450, registers)
-        assertEquals(0x200 + 10, registers.pc)
-
-        ldVxVy(0x8560, registers)
-        assertEquals(0x200 + 12, registers.pc)
-
-        ldVxVy(0x8670, registers)
-        assertEquals(0x200 + 14, registers.pc)
-
-        ldVxVy(0x8780, registers)
-        assertEquals(0x200 + 16, registers.pc)
-
-        ldVxVy(0x8890, registers)
-        assertEquals(0x200 + 18, registers.pc)
-
-        ldVxVy(0x89A0, registers)
-        assertEquals(0x200 + 20, registers.pc)
-
-        ldVxVy(0x8AB0, registers)
-        assertEquals(0x200 + 22, registers.pc)
-
-        ldVxVy(0x8BC0, registers)
-        assertEquals(0x200 + 24, registers.pc)
-
-        ldVxVy(0x8CD0, registers)
-        assertEquals(0x200 + 26, registers.pc)
-
-        ldVxVy(0x8DE0, registers)
-        assertEquals(0x200 + 28, registers.pc)
-
-        ldVxVy(0x8EF0, registers)
-        assertEquals(0x200 + 30, registers.pc)
-
-        ldVxVy(0x8F00, registers)
-        assertEquals(0x200 + 32, registers.pc)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x0] = vMock[1]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x1] = vMock[2]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x2] = vMock[3]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x3] = vMock[4]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x4] = vMock[5]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x5] = vMock[6]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x6] = vMock[7]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x7] = vMock[8]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x8] = vMock[9]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xA] = vMock[11]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xB] = vMock[12]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xC] = vMock[13]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xD] = vMock[14]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xE] = vMock[15]
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xF] = vMock[0]
+        then(vRegMock).should()[0x0] = 255.toByte()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
