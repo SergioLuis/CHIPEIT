@@ -7,6 +7,11 @@ import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 import es.chipeit.lib.io.IUserKeyboard
 
+// 0nnn - SYS addr
+internal fun sysAddr(registers: IRegisters) {
+    registers.pc += 2
+}
+
 // 00E0 - CLS
 internal fun cls(registers: IRegisters, graphicMemory: ICoreGraphicMemory) {
     graphicMemory.clear()

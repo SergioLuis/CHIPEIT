@@ -37,7 +37,7 @@ internal class Cpu(
             0x0000 -> when (instruction) {
                 0x00E0 -> cls(registers, graphicMemory)
                 0x00EE -> ret(registers, stack)
-                else -> return // 0nnn - SYS addr (unused)
+                else -> sysAddr(registers)
             }
 
             // 1nnn - JP addr
