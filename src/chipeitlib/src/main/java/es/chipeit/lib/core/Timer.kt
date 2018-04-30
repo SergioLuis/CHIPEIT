@@ -3,12 +3,12 @@ package es.chipeit.lib.core
 import es.chipeit.lib.interfaces.ITimer
 import es.chipeit.lib.io.ISwitchObserver
 
-internal class Timer(observer: ISwitchObserver = NullSwitchObserver()) : ITimer {
-    private val observer: ISwitchObserver = observer
+internal class Timer(private val observer: ISwitchObserver = NullSwitchObserver()) : ITimer {
     override var t: Byte = 0x0
-        set(value: Byte) {
+        set(value) {
             val wasActive = isActive()
             field = value
+
             if (isActive() && !wasActive)
                 observer.onEnable()
             else if(!isActive() && wasActive)
