@@ -1433,68 +1433,35 @@ class InstructionSetTests {
 
     @Test
     fun ldBVxTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
 
-        Mockito.`when`(vMock.size).thenReturn(16)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        Mockito.`when`(vMock[0x0]).thenReturn(0)
-        Mockito.`when`(vMock[0x1]).thenReturn(1)
-        Mockito.`when`(vMock[0x2]).thenReturn(89)
-        Mockito.`when`(vMock[0x3]).thenReturn(100)
-        Mockito.`when`(vMock[0x4]).thenReturn(123)
-        Mockito.`when`(vMock[0x5]).thenReturn(127)
-        Mockito.`when`(vMock[0x6]).thenReturn(128.toByte())
-        Mockito.`when`(vMock[0x7]).thenReturn(255.toByte())
+        given(registersMock.pc).willReturn(0x200)
+        given(registersMock.i).willReturn(0x300)
 
-        val registers = Registers(vMock)
-        registers.pc = 0x200
-        registers.i = 0x100
+        given(vRegMock[0]).willReturn(123.toByte())
 
-        val memory = ByteMemory(ByteArray(0x1000))
+        ldBVx(0xF033, registersMock, memoryMock)
 
-        for (i in 0x0..0xF)
-            for (j in 0..2) {
-                assertEquals(0x00, memory[0x100 + i * 3 + j])
-            }
+        then(memoryMock).should()[0x300] = 1
+        then(memoryMock).should()[0x301] = 2
+        then(memoryMock).should()[0x302] = 3
+        then(registersMock).should(times(1)).pc = 0x200 + 2
 
-        for (i in 0x0..0x7) {
-            ldBVx(i shl 2 * 4 or 0xF033, registers, memory)
-            registers.i += 3
-        }
+        given(registersMock.pc).willReturn(0x202)
+        given(registersMock.i).willReturn(0x400)
 
-        assertEquals(0x200 + 8 * 0x2, registers.pc)
+        given(vRegMock[1]).willReturn(255.toByte())
 
-        assertEquals(0, memory[0x100 + 0 * 3 + 0x0])
-        assertEquals(0, memory[0x100 + 0 * 3 + 0x1])
-        assertEquals(0, memory[0x100 + 0 * 3 + 0x2])
+        ldBVx(0xF133, registersMock, memoryMock)
 
-        assertEquals(0, memory[0x100 + 1 * 3 + 0x0])
-        assertEquals(0, memory[0x100 + 1 * 3 + 0x1])
-        assertEquals(1, memory[0x100 + 1 * 3 + 0x2])
-
-        assertEquals(0, memory[0x100 + 2 * 3 + 0x0])
-        assertEquals(8, memory[0x100 + 2 * 3 + 0x1])
-        assertEquals(9, memory[0x100 + 2 * 3 + 0x2])
-
-        assertEquals(1, memory[0x100 + 3 * 3 + 0x0])
-        assertEquals(0, memory[0x100 + 3 * 3 + 0x1])
-        assertEquals(0, memory[0x100 + 3 * 3 + 0x2])
-
-        assertEquals(1, memory[0x100 + 4 * 3 + 0x0])
-        assertEquals(2, memory[0x100 + 4 * 3 + 0x1])
-        assertEquals(3, memory[0x100 + 4 * 3 + 0x2])
-
-        assertEquals(1, memory[0x100 + 5 * 3 + 0x0])
-        assertEquals(2, memory[0x100 + 5 * 3 + 0x1])
-        assertEquals(7, memory[0x100 + 5 * 3 + 0x2])
-
-        assertEquals(1, memory[0x100 + 6 * 3 + 0x0])
-        assertEquals(2, memory[0x100 + 6 * 3 + 0x1])
-        assertEquals(8, memory[0x100 + 6 * 3 + 0x2])
-
-        assertEquals(2, memory[0x100 + 7 * 3 + 0x0])
-        assertEquals(5, memory[0x100 + 7 * 3 + 0x1])
-        assertEquals(5, memory[0x100 + 7 * 3 + 0x2])
+        then(memoryMock).should()[0x400] = 2
+        then(memoryMock).should()[0x401] = 5
+        then(memoryMock).should()[0x402] = 5
+        then(registersMock).should(times(1)).pc = 0x202 + 2
     }
 
     @Test
