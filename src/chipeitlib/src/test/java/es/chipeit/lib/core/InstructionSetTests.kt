@@ -2,15 +2,14 @@ package es.chipeit.lib.core
 
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.Mockito
-import org.mockito.Mockito.*
+import org.mockito.BDDMockito.*
+import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.times
 import org.mockito.Mockito.never
-import org.mockito.Mockito.times
 import org.mockito.stubbing.Answer
 
 import es.chipeit.lib.interfaces.ICoreGraphicMemory
@@ -2195,312 +2194,51 @@ class InstructionSetTests {
 
     @Test
     fun shrVxVyTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(vMock.size).thenReturn(16)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        Mockito.`when`(vMock[0x0]).thenReturn(0)
-        Mockito.`when`(vMock[0x1]).thenReturn(8)
-        Mockito.`when`(vMock[0x2]).thenReturn(7)
-        Mockito.`when`(vMock[0x3]).thenReturn(24)
-        Mockito.`when`(vMock[0x4]).thenReturn(32)
-        Mockito.`when`(vMock[0x5]).thenReturn(33)
-        Mockito.`when`(vMock[0x6]).thenReturn(48)
-        Mockito.`when`(vMock[0x7]).thenReturn(27)
-        Mockito.`when`(vMock[0x8]).thenReturn(72)
-        Mockito.`when`(vMock[0x9]).thenReturn(88)
-        Mockito.`when`(vMock[0xA]).thenReturn(123)
-        Mockito.`when`(vMock[0xB]).thenReturn(111)
-        Mockito.`when`(vMock[0xC]).thenReturn(108)
-        Mockito.`when`(vMock[0xD]).thenReturn(128.toByte())
-        Mockito.`when`(vMock[0xE]).thenReturn(130.toByte())
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x1]).willReturn(0x02)
 
-        val registers = Registers(vMock)
-        registers.pc = 0x200
+        shrVxVy(0x801E, registersMock)
 
-        shrVxVy(0x8016, registers)
-        assertEquals(0x200 + 2, registers.pc)
+        then(vRegMock).should()[0x0] = 1
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should().pc = 0x200 + 2
 
-        shrVxVy(0x8126, registers)
-        assertEquals(0x200 + 4, registers.pc)
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x3]).willReturn(0x03)
 
-        shrVxVy(0x8236, registers)
-        assertEquals(0x200 + 6, registers.pc)
+        shrVxVy(0x823E, registersMock)
 
-        shrVxVy(0x8346, registers)
-        assertEquals(0x200 + 8, registers.pc)
-
-        shrVxVy(0x8456, registers)
-        assertEquals(0x200 + 10, registers.pc)
-
-        shrVxVy(0x8566, registers)
-        assertEquals(0x200 + 12, registers.pc)
-
-        shrVxVy(0x8676, registers)
-        assertEquals(0x200 + 14, registers.pc)
-
-        shrVxVy(0x8786, registers)
-        assertEquals(0x200 + 16, registers.pc)
-
-        shrVxVy(0x8896, registers)
-        assertEquals(0x200 + 18, registers.pc)
-
-        shrVxVy(0x89A6, registers)
-        assertEquals(0x200 + 20, registers.pc)
-
-        shrVxVy(0x8AB6, registers)
-        assertEquals(0x200 + 22, registers.pc)
-
-        shrVxVy(0x8BC6, registers)
-        assertEquals(0x200 + 24, registers.pc)
-
-        shrVxVy(0x8CD6, registers)
-        assertEquals(0x200 + 26, registers.pc)
-
-        shrVxVy(0x8DE6, registers)
-        assertEquals(0x200 + 28, registers.pc)
-
-        shrVxVy(0x8EF6, registers)
-        assertEquals(0x200 + 30, registers.pc)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x0] = 0
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x1] = 4
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x2] = 3
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x3] = 12
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x4] = 16
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x5] = 16
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x6] = 24
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x7] = 13
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x8] = 36
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x9] = 44
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xA] = 61
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xB] = 55
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xC] = 54
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xD] = 64
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xE] = 65
-
-        Mockito.verify(
-                vMock,
-                times(7)
-        )[0xF] = 1
-
-        Mockito.verify(
-                vMock,
-                times(8)
-        )[0xF] = 0
+        then(vRegMock).should()[0x2] = 1
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should().pc = 0x202 + 2
     }
 
     @Test
     fun shlVxVyTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(vMock.size).thenReturn(16)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        Mockito.`when`(vMock[0x0]).thenReturn(0)
-        Mockito.`when`(vMock[0x1]).thenReturn(8)
-        Mockito.`when`(vMock[0x2]).thenReturn(7)
-        Mockito.`when`(vMock[0x3]).thenReturn(24)
-        Mockito.`when`(vMock[0x4]).thenReturn(32)
-        Mockito.`when`(vMock[0x5]).thenReturn(33)
-        Mockito.`when`(vMock[0x6]).thenReturn(48)
-        Mockito.`when`(vMock[0x7]).thenReturn(27)
-        Mockito.`when`(vMock[0x8]).thenReturn(72)
-        Mockito.`when`(vMock[0x9]).thenReturn(88)
-        Mockito.`when`(vMock[0xA]).thenReturn(123)
-        Mockito.`when`(vMock[0xB]).thenReturn(111)
-        Mockito.`when`(vMock[0xC]).thenReturn(108)
-        Mockito.`when`(vMock[0xD]).thenReturn(128.toByte())
-        Mockito.`when`(vMock[0xE]).thenReturn(130.toByte())
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x1]).willReturn(0x01)
 
-        val registers = Registers(vMock)
-        registers.pc = 0x200
+        shlVxVy(0x801E, registersMock)
 
-        shlVxVy(0x801E, registers)
-        assertEquals(0x200 + 2, registers.pc)
+        then(vRegMock).should()[0x0] = 2
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should().pc = 0x200 + 2
 
-        shlVxVy(0x812E, registers)
-        assertEquals(0x200 + 4, registers.pc)
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x3]).willReturn(0x80.toByte())
 
-        shlVxVy(0x823E, registers)
-        assertEquals(0x200 + 6, registers.pc)
+        shlVxVy(0x823E, registersMock)
 
-        shlVxVy(0x834E, registers)
-        assertEquals(0x200 + 8, registers.pc)
-
-        shlVxVy(0x845E, registers)
-        assertEquals(0x200 + 10, registers.pc)
-
-        shlVxVy(0x856E, registers)
-        assertEquals(0x200 + 12, registers.pc)
-
-        shlVxVy(0x867E, registers)
-        assertEquals(0x200 + 14, registers.pc)
-
-        shlVxVy(0x878E, registers)
-        assertEquals(0x200 + 16, registers.pc)
-
-        shlVxVy(0x889E, registers)
-        assertEquals(0x200 + 18, registers.pc)
-
-        shlVxVy(0x89AE, registers)
-        assertEquals(0x200 + 20, registers.pc)
-
-        shlVxVy(0x8ABE, registers)
-        assertEquals(0x200 + 22, registers.pc)
-
-        shlVxVy(0x8BCE, registers)
-        assertEquals(0x200 + 24, registers.pc)
-
-        shlVxVy(0x8CDE, registers)
-        assertEquals(0x200 + 26, registers.pc)
-
-        shlVxVy(0x8DEE, registers)
-        assertEquals(0x200 + 28, registers.pc)
-
-        shlVxVy(0x8EFE, registers)
-        assertEquals(0x200 + 30, registers.pc)
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x0] = 0
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x1] = 16
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x2] = 14
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x3] = 48
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x4] = 64
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x5] = 66
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x6] = 96
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x7] = 54
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x8] = 144.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0x9] = 176.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xA] = 246.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xB] = 222.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xC] = 216.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xD] = 256.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xE] = 260.toByte()
-
-        Mockito.verify(
-                vMock,
-                times(7)
-        )[0xF] = 1
-
-        Mockito.verify(
-                vMock,
-                times(8)
-        )[0xF] = 0
+        then(vRegMock).should()[0x2] = 0
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should().pc = 0x200 + 2
     }
-
 }

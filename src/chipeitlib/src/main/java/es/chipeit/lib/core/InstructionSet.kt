@@ -151,12 +151,12 @@ internal fun subVxVy(instruction: Int, registers: IRegisters) {
 // 8xy6 - SHR Vx {, Vy}
 internal fun shrVxVy(instruction: Int, registers: IRegisters) {
     val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
 
-    registers.v[0xF] = if (x and 0x1 != 0) 1 else 0
+    val vy = registers.v[y].toInt() and 0xFF
 
-    val vx = registers.v[x].toInt() and 0xFF
-
-    registers.v[x] = (vx / 2).toByte()
+    registers.v[0xF] = (vy and 0x1).toByte()
+    registers.v[x] = (vy shr 1).toByte()
 
     registers.pc += 2
 }
@@ -181,12 +181,12 @@ internal fun subnVxVy(instruction: Int, registers: IRegisters) {
 // 8xyE - SHL Vx {, Vy}
 internal fun shlVxVy(instruction: Int, registers: IRegisters) {
     val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
 
-    registers.v[0xF] = if (x and 0x8 != 0) 1 else 0
+    val vy = registers.v[y].toInt() and 0xFF
 
-    val vx = registers.v[x].toInt() and 0xFF
-
-    registers.v[x] = (vx * 2).toByte()
+    registers.v[0xF] = (vy shr 7 and 0x1).toByte()
+    registers.v[x] = (vy shl 1).toByte()
 
     registers.pc += 2
 }
