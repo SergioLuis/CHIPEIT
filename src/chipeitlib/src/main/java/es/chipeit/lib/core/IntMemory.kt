@@ -13,8 +13,4 @@ internal class IntMemory(private val memory: IntArray): IMemory<Int> {
     override fun set(index: Int, value: Int) {
         memory[index] = value
     }
-
-    override fun fill(element: Int, fromIndex: Int, toIndex: Int) {
-        memory.fill(element, fromIndex, toIndex)
-    }
 }

@@ -1,13 +1,15 @@
 package es.chipeit.lib.core
 
+import es.chipeit.lib.interfaces.ICoreGraphicMemory
 import es.chipeit.lib.interfaces.ICoreKeyboard
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.interfaces.ITimer
 import es.chipeit.lib.io.IUserKeyboard
 
 // 00E0 - CLS
-internal fun cls(registers: IRegisters, graphicsMemory: IMemory<Byte>) {
-    graphicsMemory.fill(0)
+internal fun cls(registers: IRegisters, graphicMemory: ICoreGraphicMemory) {
+    graphicMemory.clear()
 
     registers.pc += 2
 }
@@ -110,8 +112,36 @@ internal fun xorVxVy(instruction: Int, registers: IRegisters) {
 }
 
 // 8xy4 - ADD Vx, Vy
+internal fun addVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+    var vy = registers.v[y].toInt() and 0xFF
+
+    val add = vx + vy
+
+    registers.v[0xF] = (add shr 8).toByte()
+    registers.v[x] = add.toByte()
+
+    registers.pc += 2
+}
 
 // 8xy5 - SUB Vx, Vy
+internal fun subVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+    var vy = registers.v[y].toInt() and 0xFF
+
+    val add = vx - vy
+
+    registers.v[x] = add.toByte()
+    registers.v[0xF] = if (add > 0) 1 else 0
+
+    registers.pc += 2
+}
 
 // 8xy6 - SHR Vx {, Vy}
 internal fun shrVxVy(instruction: Int, registers: IRegisters) {
@@ -127,6 +157,21 @@ internal fun shrVxVy(instruction: Int, registers: IRegisters) {
 }
 
 // 8xy7 - SUBN Vx, Vy
+internal fun subnVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+    var vy = registers.v[y].toInt() and 0xFF
+
+    val add = vy - vx
+
+    registers.v[0xF] = if (add > 0) 1 else 0
+
+    registers.v[x] = add.toByte()
+
+    registers.pc += 2
+}
 
 // 8xyE - SHL Vx {, Vy}
 internal fun shlVxVy(instruction: Int, registers: IRegisters) {
@@ -142,6 +187,15 @@ internal fun shlVxVy(instruction: Int, registers: IRegisters) {
 }
 
 // 9xy0 - SNE Vx, Vy
+internal fun sneVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    if (registers.v[x] != registers.v[y])
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // Annn - LD I, addr
 
@@ -149,7 +203,31 @@ internal fun shlVxVy(instruction: Int, registers: IRegisters) {
 
 // Cxkk - RND Vx, byte
 
-// Dxyn - RND Vx, byte
+// Dxyn - DRW Vx, Vy, Nibble
+internal fun drwVxVyNibble(
+        instruction: Int,
+        registers: IRegisters,
+        memory: IMemory<Byte>,
+        graphicMemory: ICoreGraphicMemory
+) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+    val height = instruction and 0xF
+
+    val vx = registers.v[x].toInt() and 0xFF
+    val vy = registers.v[y].toInt() and 0xFF
+
+    var pixelCleared = false
+    for (i in 0 until height) {
+        val spriteRow = memory[registers.i + i]
+
+        if (graphicMemory.drawRow(vx, vy + i, spriteRow))
+            pixelCleared = true
+    }
+    registers.v[0xF] = if (pixelCleared) 1 else 0
+
+    registers.pc += 2
+}
 
 // Ex9E - SKP Vx
 internal fun skpVx(instruction: Int, registers: IRegisters, keyboard: ICoreKeyboard) {
@@ -180,6 +258,13 @@ internal fun sknpVx(instruction: Int, registers: IRegisters, keyboard: ICoreKeyb
 }
 
 // Fx07 - LD Vx, DT
+internal fun ldVxTimer(instruction: Int, registers: IRegisters, timer: ITimer) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    registers.v[x] = timer.t
+
+    registers.pc += 2
+}
 
 // Fx0A - LD Vx, K
 internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: ICoreKeyboard) {
@@ -211,15 +296,57 @@ internal fun ldVxK(instruction: Int, registers: IRegisters, keyboard: ICoreKeybo
     registers.pc += 2
 }
 
-// Fx15 - LD DR, Vx
-
+// Fx15 - LD DT, Vx
 // Fx18 - LD ST, Vx
+internal fun ldTimerVx(instruction: Int, registers: IRegisters, timer: ITimer) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    timer.t = registers.v[x]
+
+    registers.pc += 2
+}
 
 // Fx1E - ADD I, Vx
 
 // Fx29 - LD F, Vx
+internal fun ldFVx(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+
+    if (vx > 0xF)
+        throw IllegalStateException(
+                "V%X must be in the range 0h-Fh but the variable value is %Xh".format(x, vx)
+        )
+
+    /*
+        The hex font table starts at 0x000.
+        Every character sprite has 5 bytes.
+    */
+    registers.i = vx * 5
+
+    registers.pc += 2
+}
 
 // Fx33 - LD B, Vx
+internal fun ldBVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte>) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    var vx = registers.v[x].toInt() and 0xFF
+
+    var address = registers.i + 2
+    var mod: Int
+    var a = 1
+
+    for (i in 1..3) {
+        mod = vx % (10 * a)
+        vx -= mod
+        memory[address--] = (mod / a).toByte()
+        a *= 10
+    }
+
+    registers.pc += 2
+}
 
 // Fx55 - LD [I], Vx
 

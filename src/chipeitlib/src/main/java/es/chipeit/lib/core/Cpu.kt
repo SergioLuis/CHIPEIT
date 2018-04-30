@@ -1,17 +1,16 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.IClockObserver
-import es.chipeit.lib.interfaces.IMemory
-import es.chipeit.lib.interfaces.IRegisters
+import es.chipeit.lib.interfaces.*
 
 internal class Cpu(
-        private val memory: IMemory<Byte>,
-        private val graphicsMemory: IMemory<Byte>,
         private val registers: IRegisters,
+        private val delayTimer: ITimer,
+        private val soundTimer: ITimer,
         private val stack: IMemory<Int>,
+        private val memory: IMemory<Byte>,
+        private val graphicMemory: ICoreGraphicMemory,
         private val keyboard: Keyboard
 ) : IClockObserver {
-
     init {
         registers.pc = 0x200
         registers.sp = -1
@@ -36,7 +35,7 @@ internal class Cpu(
             // 00E0 - CLS
             // 00EE - RET
             0x0000 -> when (instruction) {
-                0x00E0 -> cls(registers, graphicsMemory)
+                0x00E0 -> cls(registers, graphicMemory)
                 0x00EE -> ret(registers, stack)
                 else -> return // 0nnn - SYS addr (unused)
             }
@@ -71,13 +70,15 @@ internal class Cpu(
             // 8xy6 - SHR Vx {, Vy}
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
-
-            0x8000 -> when (instruction and 0xF00F) {
+            0x8000 -> when(instruction and 0xF00F) {
                 0x8000 -> ldVxVy(instruction, registers)
                 0x8001 -> orVxVy(instruction, registers)
                 0x8002 -> andVxVy(instruction, registers)
                 0x8003 -> xorVxVy(instruction, registers)
+                0x8004 -> addVxVy(instruction, registers)
+                0x8005 -> subVxVy(instruction, registers)
                 0x8006 -> shrVxVy(instruction, registers)
+                0x8007 -> subnVxVy(instruction, registers)
                 0x800E -> shlVxVy(instruction, registers)
                 else -> {
                     throw IllegalStateException(
@@ -87,7 +88,10 @@ internal class Cpu(
             }
 
             // 9xy0 - SNE Vx, Vy
-            0x9000 -> TODO("Instruction $instruction not implemented")
+            0x9000 -> when(instruction and 0xF00F) {
+                0x9000 -> sneVxVy(instruction, registers)
+                else -> TODO("Instruction $instruction not implemented")
+            }
 
             // Annn - LD I, addr
             0xA000 -> TODO("Instruction $instruction not implemented")
@@ -118,12 +122,18 @@ internal class Cpu(
             // Fx33 - LD B, Vx
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
-            0xF000 -> when (instruction and 0xF0FF) {
+            0xF000 -> when(instruction and 0xF0FF) {
+                0xF007 -> ldVxTimer(instruction, registers, delayTimer)
                 0xF00A -> ldVxK(instruction, registers, keyboard)
-                else -> TODO("Instruction $instruction not implemented")
+                0xF015 -> ldTimerVx(instruction, registers, delayTimer)
+                0xF018 -> ldTimerVx(instruction, registers, soundTimer)
+                0xF01E -> TODO("Instruction $instruction not implemented")
+                0xF029 -> ldFVx(instruction, registers)
+                0xF033 -> ldBVx(instruction, registers, memory)
+                0xF055 -> TODO("Instruction $instruction not implemented")
+                0xF065 -> TODO("Instruction $instruction not implemented")
+                else -> haltAndCatchFire(instruction)
             }
-
-            else -> haltAndCatchFire(instruction)
         }
     }
 

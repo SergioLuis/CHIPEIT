@@ -4,17 +4,14 @@ import kotlin.math.max
 import kotlin.math.min
 
 import es.chipeit.lib.core.*
+import es.chipeit.lib.core.hexfont.TABLE
 import es.chipeit.lib.core.log.LoggedMemory
 import es.chipeit.lib.interfaces.hzToMs
+import es.chipeit.lib.io.IGraphicMemory
 import es.chipeit.lib.io.ISwitchObserver
 import es.chipeit.lib.core.Keyboard
 import es.chipeit.lib.core.log.LoggedKeyboard
 import es.chipeit.lib.io.IUserKeyboard
-
-internal fun byteArrayCopy(src: ByteArray, dst: ByteArray) {
-    for(i in src.indices)
-        dst[i] = src[i]
-}
 
 class Chipeit(
         soundPlayer: ISwitchObserver,
@@ -26,19 +23,19 @@ class Chipeit(
     val SCREEN_WIDTH = 64
     val SCREEN_HEIGHT = 32
 
-    private val _graphicsMemory = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
-    val PUBLIC_GRAPHICS_MEMORY = ByteArray(SCREEN_WIDTH * SCREEN_HEIGHT)
+    private val _graphicMemory = GraphicMemory(Array(SCREEN_HEIGHT) { Array(SCREEN_WIDTH) { false } })
+    val graphicMemory: IGraphicMemory = _graphicMemory
 
     @Volatile
     private var running: Boolean = false
     private val memory = LoggedMemory(
             "Main memory",
-            PaddedMemory(ByteMemory(romContent), 0x200)
-    )
-
-    private val graphicMemory = LoggedMemory(
-            "Graphic memory",
-            ByteMemory(_graphicsMemory)
+            ByteMemory(
+                    TABLE +
+                            ByteArray(0x200 - TABLE.size) +
+                            romContent +
+                            ByteArray(0x1000 - romContent.size - 0x200)
+            )
     )
     private val registers = Registers(LoggedMemory(
             "Registers memory",
@@ -55,10 +52,17 @@ class Chipeit(
     private val keyboard = Keyboard(soundTimer)
     private val loggedKeyboard = LoggedKeyboard(keyboard)
 
-    val UserKeyboard: IUserKeyboard
-        get() = loggedKeyboard
+    val UserKeyboard: IUserKeyboard = loggedKeyboard
 
-    private val cpu = Cpu(memory, graphicMemory, registers, stack, keyboard)
+    private val cpu = Cpu(
+            registers,
+            delayTimer,
+            soundTimer,
+            stack,
+            memory,
+            _graphicMemory,
+            keyboard
+    )
 
     private val chronometer = Chronometer(Clock())
 
@@ -80,13 +84,11 @@ class Chipeit(
             cpuClockDivider.trigger()
             timersClockDivider.trigger()
 
-            byteArrayCopy(_graphicsMemory, PUBLIC_GRAPHICS_MEMORY)
-
             val timeToSleep =
-                max(0, min(
-                    cpuClockDivider.msLeft,
-                    timersClockDivider.msLeft)
-                )
+                    max(0, min(
+                            cpuClockDivider.msLeft,
+                            timersClockDivider.msLeft)
+                    )
 
             sleeper.sleep(timeToSleep)
         }

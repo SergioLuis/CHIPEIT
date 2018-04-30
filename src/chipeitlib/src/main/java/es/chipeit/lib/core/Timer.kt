@@ -6,25 +6,22 @@ import es.chipeit.lib.extensions.*
 
 internal class Timer(observer: ISwitchObserver = NullSwitchObserver()) : ITimer {
     private val observer: ISwitchObserver = observer
-    private var t: Byte = 0x0
+    override var t: Byte = 0x0
+        set(value: Byte) {
+            val wasActive = isActive()
+            field = value
+            if (isActive() && !wasActive)
+                observer.onEnable()
+            else if(!isActive() && wasActive)
+                observer.onDisable()
+        }
 
     override fun isActive(): Boolean = t != Byte.ZERO
-
-    override fun setRegister(value: Byte) {
-        t = value
-        if (isActive()) {
-            observer.onEnable()
-        } else {
-            observer.onDisable()
-        }
-    }
 
     override fun onClockTick() {
         if (!isActive())
             return
 
         t--
-        if(!isActive())
-            observer.onDisable()
     }
 }

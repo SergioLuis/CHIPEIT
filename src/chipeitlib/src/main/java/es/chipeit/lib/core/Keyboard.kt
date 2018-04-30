@@ -19,7 +19,7 @@ internal class Keyboard(override val soundTimer: ITimer) : IUserKeyboard, ICoreK
         _isCapturingNextKeyRelease = true
 
         if (pressedKeys != 0)
-            soundTimer.setRegister(4)
+            soundTimer.t = 4
     }
 
     override fun clearLastCapturedKeyRelease() {
@@ -28,7 +28,7 @@ internal class Keyboard(override val soundTimer: ITimer) : IUserKeyboard, ICoreK
 
     override fun updateSoundTimerCounterIfNeeded() {
         if (isCapturingNextKeyRelease && pressedKeys != 0)
-            soundTimer.setRegister(4)
+            soundTimer.t = 4
     }
 
     override fun isPressed(key: IUserKeyboard.Keys): Boolean {
@@ -37,7 +37,7 @@ internal class Keyboard(override val soundTimer: ITimer) : IUserKeyboard, ICoreK
 
     override fun pressKey(key: IUserKeyboard.Keys) {
         pressedKeys = pressedKeys or key.data.flags
-        soundTimer.setRegister(4)
+        soundTimer.t = 4
     }
 
     override fun releaseKey(key: IUserKeyboard.Keys) {
