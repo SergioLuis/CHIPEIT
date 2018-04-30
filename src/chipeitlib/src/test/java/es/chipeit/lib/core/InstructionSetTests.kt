@@ -1328,43 +1328,18 @@ class InstructionSetTests {
 
     @Test
     fun ldVxTimerTest() {
-        val tAnswer = object : Answer<Byte> {
-            var t: Byte = 0
-
-            override fun answer(invocation: InvocationOnMock?): Byte {
-                return t
-            }
-        }
-
         val timerMock = Mockito.mock(ITimer::class.java)
-        Mockito.`when`(timerMock.t).thenAnswer(tAnswer)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        val registers = Registers(ByteMemory(ByteArray(16)))
+        given(registersMock.pc).willReturn(0x200)
+        given(timerMock.t).willReturn(4)
 
-        registers.pc = 0x200
+        ldVxTimer(0xF007, registersMock, timerMock)
 
-        assertEquals(0, registers.v[0x0])
-
-        ldVxTimer(0xF007, registers, timerMock)
-        assertEquals(0, registers.v[0x0])
-
-        tAnswer.t = 50
-
-        ldVxTimer(0xF007, registers, timerMock)
-        assertEquals(50, registers.v[0x0])
-
-        tAnswer.t = 255.toByte()
-
-        ldVxTimer(0xF007, registers, timerMock)
-        assertEquals(255.toByte(), registers.v[0x0])
-
-        tAnswer.t = 128.toByte()
-
-        ldVxTimer(0xF107, registers, timerMock)
-        assertEquals(255.toByte(), registers.v[0x0])
-        assertEquals(128.toByte(), registers.v[0x1])
-
-        assertEquals(0x200 + 4 * 0x2, registers.pc)
+        then(vRegMock).should()[0x0] = 4
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
