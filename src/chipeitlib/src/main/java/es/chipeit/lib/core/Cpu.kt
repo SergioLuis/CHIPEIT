@@ -9,7 +9,7 @@ internal class Cpu(
         private val stack: IMemory<Int>,
         private val memory: IMemory<Byte>,
         private val graphicMemory: ICoreGraphicMemory,
-        private val keyboard: Keyboard
+        private val keyboard: ICoreKeyboard
 ) : IClockObserver {
     init {
         registers.pc = 0x200

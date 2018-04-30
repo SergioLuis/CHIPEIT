@@ -20,14 +20,18 @@ class Chipeit(
         timersClockRate: Short = 60,
         private val sleeper: ISleeper
 ) {
-    val SCREEN_WIDTH = 64
-    val SCREEN_HEIGHT = 32
-
-    private val _graphicMemory = GraphicMemory(Array(SCREEN_HEIGHT) { Array(SCREEN_WIDTH) { false } })
-    val graphicMemory: IGraphicMemory = _graphicMemory
-
     @Volatile
     private var running: Boolean = false
+    private val registers = Registers(LoggedMemory(
+            "Registers memory",
+            ByteMemory(ByteArray(16)))
+    )
+    private val delayTimer = Timer()
+    private val soundTimer = Timer(soundPlayer)
+    private val stack = LoggedMemory(
+            "Stack memory",
+            IntMemory(IntArray(16))
+    )
     private val memory = LoggedMemory(
             "Main memory",
             ByteMemory(
@@ -37,22 +41,11 @@ class Chipeit(
                             ByteArray(0x1000 - romContent.size - 0x200)
             )
     )
-    private val registers = Registers(LoggedMemory(
-            "Registers memory",
-            ByteMemory(ByteArray(16)))
-    )
-    private val stack = LoggedMemory(
-            "Stack memory",
-            IntMemory(IntArray(16))
-    )
 
-    private val soundTimer = Timer(soundPlayer)
-    private val delayTimer = Timer()
+    private val _graphicMemory = GraphicMemory(
+            Array(Constants.ScreenHeight) { Array(Constants.ScreenWidth) { false } })
 
-    private val keyboard = Keyboard(soundTimer)
-    private val loggedKeyboard = LoggedKeyboard(keyboard)
-
-    val UserKeyboard: IUserKeyboard = loggedKeyboard
+    private val _keyboard = LoggedKeyboard(Keyboard(soundTimer))
 
     private val cpu = Cpu(
             registers,
@@ -61,8 +54,11 @@ class Chipeit(
             stack,
             memory,
             _graphicMemory,
-            keyboard
+            _keyboard
     )
+
+    val UserKeyboard: IUserKeyboard = _keyboard
+    val GraphicMemory: IGraphicMemory = _graphicMemory
 
     private val chronometer = Chronometer(Clock())
 
