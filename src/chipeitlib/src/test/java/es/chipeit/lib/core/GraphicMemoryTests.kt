@@ -51,13 +51,13 @@ class GraphicMemoryTests {
                         true, true, true, true)
         )
 
-        graphicMemory.drawRow(0, 0, 0x00)
+        graphicMemory.drawLine(0, 0, 0x00)
         assertTrue { rawMatrix contentDeepEquals originalMatrix }
 
-        graphicMemory.drawRow(0, 0, 0xFF.toByte())
+        graphicMemory.drawLine(0, 0, 0xFF.toByte())
         assertTrue { rawMatrix contentDeepEquals negativeMatrix }
 
-        graphicMemory.drawRow(0, 0, 0xFF.toByte())
+        graphicMemory.drawLine(0, 0, 0xFF.toByte())
         assertTrue { rawMatrix contentDeepEquals originalMatrix }
     }
 
@@ -88,15 +88,15 @@ class GraphicMemoryTests {
 
         val graphicMemory = GraphicMemory(rawMatrix)
 
-        graphicMemory.drawRow(0, 0, 0xF0.toByte())
+        graphicMemory.drawLine(0, 0, 0xF0.toByte())
         assertTrue { rawMatrix contentDeepEquals drawedAtOrigin }
         graphicMemory.clear()
 
-        graphicMemory.drawRow(-2, 0, 0xF0.toByte())
+        graphicMemory.drawLine(-2, 0, 0xF0.toByte())
         assertTrue { rawMatrix contentDeepEquals leftShifted }
         graphicMemory.clear()
 
-        graphicMemory.drawRow(0, -1, 0xF0.toByte())
+        graphicMemory.drawLine(0, -1, 0xF0.toByte())
         assertTrue { rawMatrix contentDeepEquals upShifted }
         graphicMemory.clear()
     }

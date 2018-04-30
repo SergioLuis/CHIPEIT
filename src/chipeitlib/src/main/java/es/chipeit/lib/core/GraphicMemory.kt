@@ -10,31 +10,29 @@ internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreG
         get() = memory.size
 
     init {
-        if(height <= 0 || width <= 0)
-            throw IllegalArgumentException("matrix dimensions must be greater than zero")
+        if (height <= 0 || width <= 0)
+            throw IllegalArgumentException("Matrix dimensions must be greater than zero")
 
-        if(width < 8)
-            throw IllegalArgumentException("width must be greater than eight")
+        if (width < 8)
+            throw IllegalArgumentException("Width must be greater than eight")
     }
 
     override fun get(x: Int, y: Int): Boolean {
         return memory[y][x]
     }
 
-    override fun drawRow(x: Int, y: Int, bitline: Byte): Boolean {
-        val row = getCircularIndex(y, height)
-        @SuppressWarnings val bitline: Int = bitline.toInt() and 0xFF
+    override fun drawLine(x: Int, y: Int, line: Byte): Boolean {
+        val row = memory[getCircularIndex(y, height)]
+        val pixels: Int = line.toInt() and 0xFF
 
         var pixelCleared = false
 
         for (i in 0..7) {
             val column = getCircularIndex(x + i, width)
+            val previousState = row[column]
 
-            val previousState = memory[row][column]
-            memory[row][column] = previousState xor ((bitline shr (7 - i) and 0x1) == 0x1)
-
-            if (previousState && !memory[row][column])
-                pixelCleared = true
+            row[column] = previousState xor ((pixels shr (7 - i) and 0x1) == 0x1)
+            pixelCleared = pixelCleared || (previousState && !row[column])
         }
 
         return pixelCleared
