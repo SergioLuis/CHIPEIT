@@ -1815,11 +1815,6 @@ class InstructionSetTests {
             assertEquals(i * 5, registers.i)
         }
 
-        for (i in 0x10..0xFF) {
-            registers.v[0x0] = i.toByte()
-            assertFailsWith<IllegalStateException> { ldFVx(0xF029, registers) }
-        }
-
         assertEquals(0x200 + 16 * 0x2, registers.pc)
     }
 
