@@ -1,7 +1,6 @@
 package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.ICoreGraphicMemory
-import es.chipeit.lib.extensions.nonNegativeRem
 
 internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreGraphicMemory {
     override val width: Int
@@ -23,13 +22,13 @@ internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreG
     }
 
     override fun drawRow(x: Int, y: Int, bitline: Byte): Boolean {
-        val row = y.nonNegativeRem(height)
+        val row = getCircularIndex(y, height)
         @SuppressWarnings val bitline: Int = bitline.toInt() and 0xFF
 
         var pixelCleared = false
 
         for (i in 0..7) {
-            val column = (x + i).nonNegativeRem(width)
+            val column = getCircularIndex(x + i, width)
 
             val previousState = memory[row][column]
             memory[row][column] = previousState xor ((bitline shr (7 - i) and 0x1) == 0x1)
@@ -44,5 +43,12 @@ internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreG
     override fun clear() {
         for (column in memory)
             column.fill(false)
+    }
+
+    companion object {
+        private fun getCircularIndex(index: Int, size: Int): Int{
+            val rem = index % size
+            return if (rem < 0) rem + size else rem
+        }
     }
 }
