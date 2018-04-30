@@ -140,10 +140,10 @@ internal fun subVxVy(instruction: Int, registers: IRegisters) {
     val vx = registers.v[x].toInt() and 0xFF
     val vy = registers.v[y].toInt() and 0xFF
 
-    val add = vx - vy
+    val sub = vx - vy
 
-    registers.v[x] = add.toByte()
-    registers.v[0xF] = if (add > 0) 1 else 0
+    registers.v[0xF] = if (sub > 0) 1 else 0
+    registers.v[x] = sub.toByte()
 
     registers.pc += 2
 }
@@ -169,11 +169,10 @@ internal fun subnVxVy(instruction: Int, registers: IRegisters) {
     val vx = registers.v[x].toInt() and 0xFF
     val vy = registers.v[y].toInt() and 0xFF
 
-    val add = vy - vx
+    val sub = vy - vx
 
-    registers.v[0xF] = if (add > 0) 1 else 0
-
-    registers.v[x] = add.toByte()
+    registers.v[0xF] = if (sub > 0) 1 else 0
+    registers.v[x] = sub.toByte()
 
     registers.pc += 2
 }
