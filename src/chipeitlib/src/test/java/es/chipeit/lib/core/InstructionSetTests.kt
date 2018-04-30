@@ -1407,28 +1407,21 @@ class InstructionSetTests {
 
     @Test
     fun ldFVxTest() {
-        var registerArray = ByteArray(16)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        for (i in registerArray.indices)
-            registerArray[i] = i.toByte()
+        given(registersMock.pc).willReturn(0x200)
 
-        val registers = Registers(ByteMemory(registerArray))
+        for (i in 0x0..0xF) {
+            given(vRegMock[i]).willReturn(i.toByte())
 
-        registers.i = 0xFFF
-        registers.pc = 0x200
+            ldFVx(0xF029 or (i shl 2 * 4), registersMock)
 
-        for (i in registerArray.indices) {
-            ldFVx(i shl 2 * 4 or 0xF029, registers)
-            assertEquals(i.toByte(), registers.v[i])
-
-            /*
-                The hex font table starts at 0x000.
-                Every character sprite has 5 bytes.
-            */
-            assertEquals(i * 5, registers.i)
+            then(registersMock).should().i =
+                    Constants.HexFontStart + i * Constants.CharacterSpriteLength
+            then(registersMock).should(times(i + 1)).pc = 0x200 + 2
         }
-
-        assertEquals(0x200 + 16 * 0x2, registers.pc)
     }
 
     @Test
