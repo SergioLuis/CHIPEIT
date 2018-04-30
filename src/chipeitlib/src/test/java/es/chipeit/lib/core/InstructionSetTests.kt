@@ -1158,48 +1158,25 @@ class InstructionSetTests {
 
     @Test
     fun sneVxVyTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        Mockito.`when`(vMock.size).thenReturn(16)
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(5)
+        given(vRegMock[0x1]).willReturn(5)
 
-        Mockito.`when`(vMock[0x0]).thenReturn(0)
-        Mockito.`when`(vMock[0x1]).thenReturn(0)
+        sneVxVy(0x9010, registersMock)
 
-        Mockito.`when`(vMock[0x2]).thenReturn(32)
-        Mockito.`when`(vMock[0x3]).thenReturn(32)
+        then(registersMock).should(times(1)).pc = 0x200 + 2
 
-        Mockito.`when`(vMock[0x4]).thenReturn(64)
-        Mockito.`when`(vMock[0x5]).thenReturn(32)
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(5)
+        given(vRegMock[0x3]).willReturn(4)
 
-        Mockito.`when`(vMock[0x6]).thenReturn(128.toByte())
-        Mockito.`when`(vMock[0x7]).thenReturn(128.toByte())
+        sneVxVy(0x9230, registersMock)
 
-        Mockito.`when`(vMock[0x8]).thenReturn(128.toByte())
-        Mockito.`when`(vMock[0x9]).thenReturn(129.toByte())
-
-        Mockito.`when`(vMock[0xA]).thenReturn(2)
-        Mockito.`when`(vMock[0xB]).thenReturn(128.toByte())
-
-        val registers = Registers(vMock)
-        registers.pc = 0x200
-
-        sneVxVy(0x9010, registers)
-        assertEquals(0x200 + 1 * 0x2, registers.pc)
-
-        sneVxVy(0x9230, registers)
-        assertEquals(0x200 + 2 * 0x2, registers.pc)
-
-        sneVxVy(0x9450, registers)
-        assertEquals(0x200 + 4 * 0x2, registers.pc)
-
-        sneVxVy(0x9670, registers)
-        assertEquals(0x200 + 5 * 0x2, registers.pc)
-
-        sneVxVy(0x9890, registers)
-        assertEquals(0x200 + 7 * 0x2, registers.pc)
-
-        sneVxVy(0x9AB0, registers)
-        assertEquals(0x200 + 9 * 0x2, registers.pc)
+        then(registersMock).should(times(2)).pc = 0x202 + 2
     }
 
     @Test
