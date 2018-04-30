@@ -5,5 +5,5 @@ internal interface IRegisters {
     var i: Short
     var pc: Int
 
-    var sp: Byte
+    var sp: Int
 }
