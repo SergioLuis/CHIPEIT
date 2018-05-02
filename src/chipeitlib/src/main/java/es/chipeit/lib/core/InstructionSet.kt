@@ -1,12 +1,13 @@
 package es.chipeit.lib.core
 
+import java.lang.Math.random
+
 import es.chipeit.lib.interfaces.ICoreGraphicMemory
 import es.chipeit.lib.interfaces.ICoreKeyboard
 import es.chipeit.lib.interfaces.IMemory
 import es.chipeit.lib.interfaces.IRegisters
 import es.chipeit.lib.interfaces.ITimer
 import es.chipeit.lib.io.IUserKeyboard
-import java.lang.Math.random
 
 // 0nnn - SYS addr
 internal fun sysAddr(registers: IRegisters) {
