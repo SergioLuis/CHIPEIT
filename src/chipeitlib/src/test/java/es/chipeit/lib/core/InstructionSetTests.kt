@@ -67,7 +67,15 @@ class InstructionSetTests {
 
     @Test
     fun jpAddrTest() {
+        val registersMock = Mockito.mock(IRegisters::class.java)
 
+        jpAddr(0x1345, registersMock)
+
+        then(registersMock).should(times(1)).pc = 0x345
+
+        jpAddr(0x1FFF, registersMock)
+
+        then(registersMock).should(times(1)).pc = 0xFFF
     }
 
     @Test
