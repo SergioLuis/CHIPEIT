@@ -270,37 +270,27 @@ class InstructionSetTests {
 
     @Test
     fun skpVxTest() {
-        val vMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(vMock.size).thenReturn(16)
-        Mockito.`when`(vMock[0xA]).thenReturn(3)
-        Mockito.`when`(vMock[0xB]).thenReturn(8)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        val keyboardMock = Mockito.mock(ICoreKeyboard::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        val soundTimerMock = Mockito.mock(ITimer::class.java)
+        given(registersMock.pc).willReturn(0x200)
+        given(keyboardMock.isPressed(IUserKeyboard.Keys.KEY_5)).willReturn(true)
+        given(vRegMock[0x0]).willReturn(5)
 
-        val keyboard = Keyboard(soundTimerMock)
-        keyboard.pressKey(IUserKeyboard.Keys.KEY_3)
-        keyboard.releaseKey(IUserKeyboard.Keys.KEY_8)
+        sknpVx(0xE0A1, registersMock, keyboardMock)
 
-        val registersMock = Registers(vMock)
-        registersMock.pc = 0x200
+        // Next instruction NOT SKIPPED
+        then(registersMock).should(times(1)).pc += 2
 
-        skpVx(0xEA9E, registersMock, keyboard)
+        given(keyboardMock.isPressed(IUserKeyboard.Keys.KEY_A)).willReturn(false)
+        given(vRegMock[0x1]).willReturn(0xA)
 
-        // Next instruction was skipped
-        assertEquals(0x200 + 4, registersMock.pc)
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xA]
+        sknpVx(0xE1A1, registersMock, keyboardMock)
 
-        skpVx(0xEB9E, registersMock, keyboard)
-
-        // Next instruction was not skipped
-        assertEquals(0x204 + 2, registersMock.pc)
-        Mockito.verify(
-                vMock,
-                times(1)
-        )[0xB]
+        // Next instruction SKIPPED
+        then(registersMock).should(times(3)).pc += 2
     }
 
     @Test
