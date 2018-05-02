@@ -366,7 +366,14 @@ class InstructionSetTests {
 
     @Test
     fun ldIAddrTest() {
+        val registersMock = Mockito.mock(IRegisters::class.java)
 
+        given(registersMock.pc).willReturn(0x200)
+
+        ldIAddr(0xA345, registersMock)
+
+        then(registersMock).should(times(1)).i = 0x345
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
