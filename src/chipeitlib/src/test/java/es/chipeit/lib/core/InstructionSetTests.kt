@@ -378,7 +378,16 @@ class InstructionSetTests {
 
     @Test
     fun jpV0AddrTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x20)
+
+        jpV0Addr(0xB400, registersMock)
+
+        then(registersMock).should(times(1)).pc = 0x20 + 0x400
     }
 
     @Test
