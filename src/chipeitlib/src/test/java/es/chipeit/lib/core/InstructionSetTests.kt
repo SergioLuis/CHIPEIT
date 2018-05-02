@@ -781,11 +781,53 @@ class InstructionSetTests {
 
     @Test
     fun ldIVxTest() {
+        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
 
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(registersMock.i).willReturn(0x300)
+
+        given(vRegMock[0x0]).willReturn(15)
+        given(vRegMock[0x1]).willReturn(16)
+        given(vRegMock[0x2]).willReturn(17)
+        given(vRegMock[0x3]).willReturn(18)
+        given(vRegMock[0x4]).willReturn(19)
+        given(vRegMock[0x5]).willReturn(20)
+        given(vRegMock[0x6]).willReturn(21)
+        given(vRegMock[0x7]).willReturn(22)
+        given(vRegMock[0x8]).willReturn(23)
+        given(vRegMock[0x9]).willReturn(24)
+        given(vRegMock[0xA]).willReturn(25)
+        given(vRegMock[0xB]).willReturn(26)
+        given(vRegMock[0xC]).willReturn(27)
+        given(vRegMock[0xD]).willReturn(28)
+        given(vRegMock[0xE]).willReturn(29)
+
+        ldIVx(0xFE55, registersMock, memoryMock)
+
+        then(memoryMock).should(times(1))[0x300 + 0x0] = 15
+        then(memoryMock).should(times(1))[0x300 + 0x1] = 16
+        then(memoryMock).should(times(1))[0x300 + 0x2] = 17
+        then(memoryMock).should(times(1))[0x300 + 0x3] = 18
+        then(memoryMock).should(times(1))[0x300 + 0x4] = 19
+        then(memoryMock).should(times(1))[0x300 + 0x5] = 20
+        then(memoryMock).should(times(1))[0x300 + 0x6] = 21
+        then(memoryMock).should(times(1))[0x300 + 0x7] = 22
+        then(memoryMock).should(times(1))[0x300 + 0x8] = 23
+        then(memoryMock).should(times(1))[0x300 + 0x9] = 24
+        then(memoryMock).should(times(1))[0x300 + 0xA] = 25
+        then(memoryMock).should(times(1))[0x300 + 0xB] = 26
+        then(memoryMock).should(times(1))[0x300 + 0xC] = 27
+        then(memoryMock).should(times(1))[0x300 + 0xD] = 28
+        then(memoryMock).should(times(1))[0x300 + 0xE] = 29
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
     fun ldVxITest() {
-        
+
     }
 }
