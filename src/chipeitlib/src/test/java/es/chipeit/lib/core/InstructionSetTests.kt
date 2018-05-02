@@ -392,7 +392,19 @@ class InstructionSetTests {
 
     @Test
     fun rndVxByteTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
+        val randomMock = Mockito.mock(IRandomNumber::class.java)
+        given(randomMock.nextInt(0, 255)).willReturn(0x94) // 1001 0100
+
+        given(registersMock.pc).willReturn(0x200)
+
+        rndVxByte(0xCD84, registersMock, randomMock)       // 1000 0100
+
+        then(vRegMock).should()[0xD] = 0x84.toByte()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
