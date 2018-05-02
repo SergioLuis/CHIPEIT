@@ -133,139 +133,23 @@ class InstructionSetTests {
 
     @Test
     fun ldVxByteTest() {
-        val registersMemoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        Mockito.`when`(registersMemoryMock.size).thenReturn(16)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
-        val registersMock = Registers(registersMemoryMock)
-        registersMock.pc = 0x200
+        given(registersMock.pc).willReturn(0x200)
 
-        ldVxByte(0x6011, registersMock)
-        assertEquals(0x200 + 2, registersMock.pc)
+        ldVxByte(0x6028, registersMock)
 
-        ldVxByte(0x6122, registersMock)
-        assertEquals(0x200 + 4, registersMock.pc)
+        then(vRegMock).should()[0x0] = 0x28
+        then(registersMock).should().pc = 0x200 + 2
 
-        ldVxByte(0x6233, registersMock)
-        assertEquals(0x200 + 6, registersMock.pc)
-
-        ldVxByte(0x6344, registersMock)
-        assertEquals(0x200 + 8, registersMock.pc)
-
-        ldVxByte(0x6455, registersMock)
-        assertEquals(0x200 + 10, registersMock.pc)
-
-        ldVxByte(0x6566, registersMock)
-        assertEquals(0x200 + 12, registersMock.pc)
-
-        ldVxByte(0x6677, registersMock)
-        assertEquals(0x200 + 14, registersMock.pc)
-
-        ldVxByte(0x6788, registersMock)
-        assertEquals(0x200 + 16, registersMock.pc)
-
-        ldVxByte(0x6899, registersMock)
-        assertEquals(0x200 + 18, registersMock.pc)
-
-        ldVxByte(0x69AA, registersMock)
-        assertEquals(0x200 + 20, registersMock.pc)
-
-        ldVxByte(0x6ABB, registersMock)
-        assertEquals(0x200 + 22, registersMock.pc)
-
-        ldVxByte(0x6BCC, registersMock)
-        assertEquals(0x200 + 24, registersMock.pc)
-
-        ldVxByte(0x6CDD, registersMock)
-        assertEquals(0x200 + 26, registersMock.pc)
-
-        ldVxByte(0x6DEE, registersMock)
-        assertEquals(0x200 + 28, registersMock.pc)
+        given(registersMock.pc).willReturn(0x202)
 
         ldVxByte(0x6EFF, registersMock)
-        assertEquals(0x200 + 30, registersMock.pc)
 
-        ldVxByte(0x6F00, registersMock)
-        assertEquals(0x200 + 32, registersMock.pc)
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x0] = 0x11
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x1] = 0x22
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x2] = 0x33
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x3] = 0x44
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x4] = 0x55
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x5] = 0x66
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x6] = 0x77
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x7] = 0x88.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x8] = 0x99.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0x9] = 0xAA.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0xA] = 0xBB.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0xB] = 0xCC.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0xC] = 0xDD.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0xD] = 0xEE.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0xE] = 0xFF.toByte()
-
-        Mockito.verify(
-                registersMemoryMock,
-                times(1)
-        )[0xF] = 0x00
+        then(vRegMock).should()[0xE] = 0xFF.toByte()
+        then(registersMock).should().pc = 0x202 + 2
     }
 
     @Test
