@@ -808,26 +808,68 @@ class InstructionSetTests {
 
         ldIVx(0xFE55, registersMock, memoryMock)
 
-        then(memoryMock).should(times(1))[0x300 + 0x0] = 15
-        then(memoryMock).should(times(1))[0x300 + 0x1] = 16
-        then(memoryMock).should(times(1))[0x300 + 0x2] = 17
-        then(memoryMock).should(times(1))[0x300 + 0x3] = 18
-        then(memoryMock).should(times(1))[0x300 + 0x4] = 19
-        then(memoryMock).should(times(1))[0x300 + 0x5] = 20
-        then(memoryMock).should(times(1))[0x300 + 0x6] = 21
-        then(memoryMock).should(times(1))[0x300 + 0x7] = 22
-        then(memoryMock).should(times(1))[0x300 + 0x8] = 23
-        then(memoryMock).should(times(1))[0x300 + 0x9] = 24
-        then(memoryMock).should(times(1))[0x300 + 0xA] = 25
-        then(memoryMock).should(times(1))[0x300 + 0xB] = 26
-        then(memoryMock).should(times(1))[0x300 + 0xC] = 27
-        then(memoryMock).should(times(1))[0x300 + 0xD] = 28
-        then(memoryMock).should(times(1))[0x300 + 0xE] = 29
+        then(memoryMock).should(times(1))[0x300] = 15
+        then(memoryMock).should(times(1))[0x301] = 16
+        then(memoryMock).should(times(1))[0x302] = 17
+        then(memoryMock).should(times(1))[0x303] = 18
+        then(memoryMock).should(times(1))[0x304] = 19
+        then(memoryMock).should(times(1))[0x305] = 20
+        then(memoryMock).should(times(1))[0x306] = 21
+        then(memoryMock).should(times(1))[0x307] = 22
+        then(memoryMock).should(times(1))[0x308] = 23
+        then(memoryMock).should(times(1))[0x309] = 24
+        then(memoryMock).should(times(1))[0x30A] = 25
+        then(memoryMock).should(times(1))[0x30B] = 26
+        then(memoryMock).should(times(1))[0x30C] = 27
+        then(memoryMock).should(times(1))[0x30D] = 28
+        then(memoryMock).should(times(1))[0x30E] = 29
         then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
     fun ldVxITest() {
+        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
 
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(registersMock.i).willReturn(0x300)
+
+        given(memoryMock[0x300]).willReturn(15)
+        given(memoryMock[0x301]).willReturn(16)
+        given(memoryMock[0x302]).willReturn(17)
+        given(memoryMock[0x303]).willReturn(18)
+        given(memoryMock[0x304]).willReturn(19)
+        given(memoryMock[0x305]).willReturn(20)
+        given(memoryMock[0x306]).willReturn(21)
+        given(memoryMock[0x307]).willReturn(22)
+        given(memoryMock[0x308]).willReturn(23)
+        given(memoryMock[0x309]).willReturn(24)
+        given(memoryMock[0x30A]).willReturn(25)
+        given(memoryMock[0x30B]).willReturn(26)
+        given(memoryMock[0x30C]).willReturn(27)
+        given(memoryMock[0x30D]).willReturn(28)
+        given(memoryMock[0x30E]).willReturn(29)
+
+        ldVxI(0xFE65, registersMock, memoryMock)
+
+        then(vRegMock).should(times(1))[0x0] = 15
+        then(vRegMock).should(times(1))[0x1] = 16
+        then(vRegMock).should(times(1))[0x2] = 17
+        then(vRegMock).should(times(1))[0x3] = 18
+        then(vRegMock).should(times(1))[0x4] = 19
+        then(vRegMock).should(times(1))[0x5] = 20
+        then(vRegMock).should(times(1))[0x6] = 21
+        then(vRegMock).should(times(1))[0x7] = 22
+        then(vRegMock).should(times(1))[0x8] = 23
+        then(vRegMock).should(times(1))[0x9] = 24
+        then(vRegMock).should(times(1))[0xA] = 25
+        then(vRegMock).should(times(1))[0xB] = 26
+        then(vRegMock).should(times(1))[0xC] = 27
+        then(vRegMock).should(times(1))[0xD] = 28
+        then(vRegMock).should(times(1))[0xE] = 29
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 }
