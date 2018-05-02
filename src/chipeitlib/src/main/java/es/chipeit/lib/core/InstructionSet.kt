@@ -33,8 +33,11 @@ internal fun jpAddr(instruction: Int, registers: IRegisters) {
 
 // 2nnn - CALL addr
 internal fun call(instruction: Int, registers: IRegisters, stack: IMemory<Int>) {
-    registers.sp += 1
-    stack[registers.sp] = registers.pc
+    val newStackPointer = registers.sp + 1
+
+    stack[newStackPointer] = registers.pc
+
+    registers.sp = newStackPointer
 
     registers.pc = instruction and 0x0FFF
 }

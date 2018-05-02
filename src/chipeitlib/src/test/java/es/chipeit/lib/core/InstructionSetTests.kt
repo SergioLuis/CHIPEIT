@@ -1,35 +1,29 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.*
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.mockito.invocation.InvocationOnMock
 import org.mockito.Mockito
 import org.mockito.BDDMockito.*
-import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.times
 import org.mockito.Mockito.never
-import org.mockito.stubbing.Answer
 
+import es.chipeit.lib.interfaces.*
 import es.chipeit.lib.io.IUserKeyboard
 
 class InstructionSetTests {
     @Test
     fun clsTest() {
-        val graphicMemory = Mockito.mock(ICoreGraphicMemory::class.java)
-        val registers = Registers(ByteMemory(ByteArray(16)))
+        val graphicMemoryMock = Mockito.mock(ICoreGraphicMemory::class.java)
+        val registersMock = Mockito.mock(IRegisters::class.java)
 
-        registers.pc = 0x200
+        given(registersMock.pc).willReturn(0x200)
 
-        cls(registers, graphicMemory)
+        cls(registersMock, graphicMemoryMock)
 
-        assertEquals(0x200 + 2, registers.pc)
-        Mockito.verify(
-                graphicMemory,
-                times(1)
-        ).clear()
+        then(graphicMemoryMock).should().clear()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
@@ -73,62 +67,31 @@ class InstructionSetTests {
 
     @Test
     fun jpAddrTest() {
-        val registersMock = Mockito.mock(IRegisters::class.java)
 
-        jpAddr(0x1225, registersMock)
-        jpAddr(0x1512, registersMock)
-        jpAddr(0x1FFF, registersMock)
-
-        Mockito.verify(
-                registersMock,
-                times(1)
-        ).pc = 0x225
-
-        Mockito.verify(
-                registersMock,
-                times(1)
-        ).pc = 0x512
-
-        Mockito.verify(
-                registersMock,
-                times(1)
-        ).pc = 0xFFF
     }
 
     @Test
     fun callTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
+        val registersMock = Mockito.mock(IRegisters::class.java)
         val stackMock = Mockito.mock(IMemory::class.java) as IMemory<Int>
 
-        registers.sp = -1
-        registers.pc = 0x789
+        given(registersMock.sp).willReturn(-1)
+        given(registersMock.pc).willReturn(0x200)
 
-        call(0x2345, registers, stackMock)
+        call(0x2345, registersMock, stackMock)
 
-        assertEquals(0, registers.sp)
-        assertEquals(0x345, registers.pc)
-        Mockito.verify(
-                stackMock,
-                times(1)
-        )[0] = 0x789
+        then(registersMock).should(times(1)).sp = 0
+        then(registersMock).should(times(1)).pc = 0x345
+        then(stackMock).should()[0] = 0x200
 
-        call(0x2200, registers, stackMock)
+        given(registersMock.sp).willReturn(0)
+        given(registersMock.pc).willReturn(0x345)
 
-        assertEquals(1, registers.sp)
-        assertEquals(0x200, registers.pc)
-        Mockito.verify(
-                stackMock,
-                times(1)
-        )[1] = 0x345
+        call(0x2FFF, registersMock, stackMock)
 
-        call(0x2FFF, registers, stackMock)
-
-        assertEquals(2, registers.sp)
-        assertEquals(0xFFF, registers.pc)
-        Mockito.verify(
-                stackMock,
-                times(1)
-        )[2] = 0x200
+        then(registersMock).should(times(1)).sp = 1
+        then(registersMock).should(times(1)).pc = 0xFFF
+        then(stackMock).should()[1] = 0x345
     }
 
     @Test
