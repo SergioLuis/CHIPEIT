@@ -28,41 +28,24 @@ class InstructionSetTests {
 
     @Test
     fun retTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
+        val registersMock = Mockito.mock(IRegisters::class.java)
         val stackMock = Mockito.mock(IMemory::class.java) as IMemory<Int>
 
-        Mockito.`when`(stackMock[2]).thenReturn(0x222)
-        Mockito.`when`(stackMock[1]).thenReturn(0x456)
-        Mockito.`when`(stackMock[0]).thenReturn(0x789)
+        given(registersMock.sp).willReturn(1)
+        given(stackMock[1]).willReturn(0x345)
 
-        registers.sp = 2
+        ret(registersMock, stackMock)
 
-        ret(registers, stackMock)
+        then(registersMock).should(times(1)).sp = 0
+        then(registersMock).should(times(1)).pc = 0x345
 
-        assertEquals(1, registers.sp)
-        assertEquals(0x222, registers.pc)
-        Mockito.verify(
-                stackMock,
-                times(1)
-        )[2]
+        given(registersMock.sp).willReturn(0)
+        given(stackMock[0]).willReturn(0xFFF)
 
-        ret(registers, stackMock)
+        ret(registersMock, stackMock)
 
-        assertEquals(0, registers.sp)
-        assertEquals(0x456, registers.pc)
-        Mockito.verify(
-                stackMock,
-                times(1)
-        )[1]
-
-        ret(registers, stackMock)
-
-        assertEquals(-1, registers.sp)
-        assertEquals(0x789, registers.pc)
-        Mockito.verify(
-                stackMock,
-                times(1)
-        )[0]
+        then(registersMock).should(times(1)).sp = -1
+        then(registersMock).should(times(1)).pc = 0xFFF
     }
 
     @Test
