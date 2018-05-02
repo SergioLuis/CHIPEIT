@@ -1,5 +1,7 @@
 package es.chipeit.lib.core
 
+import java.lang.Math.random
+
 import es.chipeit.lib.interfaces.*
 
 internal class Cpu(
@@ -9,7 +11,8 @@ internal class Cpu(
         private val stack: IMemory<Int>,
         private val memory: IMemory<Byte>,
         private val graphicMemory: ICoreGraphicMemory,
-        private val keyboard: ICoreKeyboard
+        private val keyboard: ICoreKeyboard,
+        private val randomNumber: IRandomNumber = RandomNumber()
 ) : IClockObserver {
     init {
         registers.pc = Constants.CodeStartAddress
@@ -91,7 +94,6 @@ internal class Cpu(
                 0x9000 -> sneVxVy(instruction, registers)
                 else -> haltAndCatchFire(instruction)
             }
-            0x9000 -> TODO("Instruction $instruction not implemented")
 
             // Annn - LD I, addr
             0xA000 -> ldIAddr(instruction, registers)
@@ -100,10 +102,10 @@ internal class Cpu(
             0xB000 -> jpV0Addr(instruction, registers)
 
             // Cxkk - RND Vx, byte
-            0xC000 -> rndVxByte(instruction, registers)
+            0xC000 -> rndVxByte(instruction, registers, randomNumber)
 
             // Dxyn - DRW Vx, Vy, nibble
-            0xD000 -> TODO("Instruction $instruction not implemented")
+            0xD000 -> drwVxVyNibble(instruction, registers, memory, graphicMemory)
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx

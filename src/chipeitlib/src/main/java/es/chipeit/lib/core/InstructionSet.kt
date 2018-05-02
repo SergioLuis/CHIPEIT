@@ -1,12 +1,6 @@
 package es.chipeit.lib.core
 
-import java.lang.Math.random
-
-import es.chipeit.lib.interfaces.ICoreGraphicMemory
-import es.chipeit.lib.interfaces.ICoreKeyboard
-import es.chipeit.lib.interfaces.IMemory
-import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.interfaces.ITimer
+import es.chipeit.lib.interfaces.*
 import es.chipeit.lib.io.IUserKeyboard
 
 // 0nnn - SYS addr
@@ -252,11 +246,11 @@ internal fun jpV0Addr(instruction: Int, registers: IRegisters) {
 }
 
 // Cxkk - RND Vx, byte
-internal fun rndVxByte(instruction: Int, registers: IRegisters) {
+internal fun rndVxByte(instruction: Int, registers: IRegisters, random: IRandomNumber) {
     val x = instruction shr 2 * 4 and 0xF
-    val kk = (random() * 255).toInt()
+    val kk = instruction and 0xFF
 
-    registers.v[x] = (x and kk).toByte()
+    registers.v[x] = (random.nextInt(0, 255) and kk).toByte()
 
     registers.pc += 2
 }
