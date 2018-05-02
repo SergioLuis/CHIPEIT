@@ -724,7 +724,18 @@ class InstructionSetTests {
 
     @Test
     fun addIVxTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
+        given(registersMock.pc).willReturn(0x200)
+        given(registersMock.i).willReturn(0x300)
+        given(vRegMock[0x0]).willReturn(4)
+
+        addIVx(0xF01E, registersMock)
+
+        then(registersMock).should(times(1)).i = 0x300 + 4
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
