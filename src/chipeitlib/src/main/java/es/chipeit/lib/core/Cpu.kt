@@ -6,18 +6,25 @@ internal class Cpu(
         private val registers: IRegisters,
         private val delayTimer: ITimer,
         private val soundTimer: ITimer,
-        private val stack: IMemory<Short>,
+        private val stack: IMemory<Int>,
         private val memory: IMemory<Byte>,
-        private val graphicMemory: IGraphicMemory
+        private val graphicMemory: ICoreGraphicMemory,
+        private val keyboard: ICoreKeyboard
 ) : IClockObserver {
     init {
-        registers.pc = 0x200
+        registers.pc = Constants.CodeStartAddress
+        registers.sp = -1
+
+        if (stack.size < Constants.StackDepth)
+            throw IllegalArgumentException(
+                    "Parameter stack has ${stack.size} elements, " +
+                            "at least 16 needed")
     }
 
     override fun onClockTick() {
-        val higherBytes = memory[registers.pc].toInt()
-        val lowerBytes = memory[registers.pc + 1].toInt()
-        val instruction = (higherBytes shl 8) or lowerBytes
+        val higherBytes = memory[registers.pc].toInt() and 0xFF
+        val lowerBytes = memory[registers.pc + 1].toInt() and 0xFF
+        val instruction = higherBytes shl 2 * 4 or lowerBytes
 
         decodeAndExecute(instruction)
     }
@@ -29,15 +36,15 @@ internal class Cpu(
             // 00EE - RET
             0x0000 -> when (instruction) {
                 0x00E0 -> cls(registers, graphicMemory)
-                0x00EE -> ret(registers)
-                else -> return // 0nnn - SYS addr (unused)
+                0x00EE -> ret(registers, stack)
+                else -> sysAddr(registers)
             }
 
             // 1nnn - JP addr
             0x1000 -> jpAddr(instruction, registers)
 
             // 2nnn - CALL addr
-            0x2000 -> TODO("Instruction $instruction not implemented")
+            0x2000 -> call(instruction, registers, stack)
 
             // 3xkk - SE Vx, byte
             0x3000 -> seVxByte(instruction, registers)
@@ -55,20 +62,35 @@ internal class Cpu(
             0x6000 -> ldVxByte(instruction, registers)
 
             // 7xkk - ADD Vx, byte
-            0x7000 -> TODO("Instruction $instruction not implemented")
+            0x7000 -> addVxByte(instruction, registers)
 
             // 8xy0 - LD Vx, Vy
             // 8xy1 - OR Vx, Vy
             // 8xy2 - AND Vx, Vy
-            // 8xy3 - XOW Vx, Vy
+            // 8xy3 - XOR Vx, Vy
             // 8xy4 - ADD Vx, Vy
             // 8xy5 - SUB Vx, Vy
             // 8xy6 - SHR Vx {, Vy}
             // 8xy7 - SUBN Vx, Vy
             // 8xyE - SHL Vx {, Vy}
-            0x8000 -> TODO("Instruction $instruction not implemented")
+            0x8000 -> when(instruction and 0xF00F) {
+                0x8000 -> ldVxVy(instruction, registers)
+                0x8001 -> orVxVy(instruction, registers)
+                0x8002 -> andVxVy(instruction, registers)
+                0x8003 -> xorVxVy(instruction, registers)
+                0x8004 -> addVxVy(instruction, registers)
+                0x8005 -> subVxVy(instruction, registers)
+                0x8006 -> shrVxVy(instruction, registers)
+                0x8007 -> subnVxVy(instruction, registers)
+                0x800E -> shlVxVy(instruction, registers)
+                else -> haltAndCatchFire(instruction)
+            }
 
             // 9xy0 - SNE Vx, Vy
+            0x9000 -> when(instruction and 0xF00F) {
+                0x9000 -> sneVxVy(instruction, registers)
+                else -> haltAndCatchFire(instruction)
+            }
             0x9000 -> TODO("Instruction $instruction not implemented")
 
             // Annn - LD I, addr
@@ -85,7 +107,11 @@ internal class Cpu(
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx
-            0xE000 -> TODO("Instruction $instruction not implemented")
+            0xE000 -> when (instruction and 0xF0FF) {
+                0xE09E -> skpVx(instruction, registers, keyboard)
+                0xE0A1 -> sknpVx(instruction, registers, keyboard)
+                else -> haltAndCatchFire(instruction)
+            }
 
             // Fx07 - LD Vx, DT
             // Fx0A - LD Vx, K
@@ -97,17 +123,25 @@ internal class Cpu(
             // Fx55 - LD [I], Vx
             // Fx65 - LD Vx, [I]
             0xF000 -> when(instruction and 0xF0FF) {
+                0xF007 -> ldVxTimer(instruction, registers, delayTimer)
+                0xF00A -> ldVxK(instruction, registers, keyboard)
+                0xF015 -> ldTimerVx(instruction, registers, delayTimer)
+                0xF018 -> ldTimerVx(instruction, registers, soundTimer)
                 0xF01E -> addIVx(instruction, registers)
+                0xF029 -> ldFVx(instruction, registers)
+                0xF033 -> ldBVx(instruction, registers, memory)
                 0xF055 -> ldIVx(instruction, registers, memory)
                 0xF065 -> ldVxI(instruction, registers, memory)
-                else -> TODO("Instruction $instruction not implemented")
+                else -> haltAndCatchFire(instruction)
             }
 
-            else -> {
-                throw IllegalStateException(
-                        "The instruction $instruction does not comply with " +
-                                "the original CHIP-8 specification")
-            }
+            else -> haltAndCatchFire(instruction)
         }
+    }
+
+    private fun haltAndCatchFire(instruction: Int) {
+        throw IllegalStateException(
+                "The instruction $instruction does not comply with " +
+                        "the original CHIP-8 specification")
     }
 }

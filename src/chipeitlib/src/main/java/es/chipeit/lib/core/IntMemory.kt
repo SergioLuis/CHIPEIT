@@ -2,15 +2,15 @@ package es.chipeit.lib.core
 
 import es.chipeit.lib.interfaces.IMemory
 
-internal class ShortMemory(private val memory: ShortArray): IMemory<Short> {
+internal class IntMemory(private val memory: IntArray): IMemory<Int> {
     override val size: Int
         get() = memory.size
 
-    override fun get(index: Int): Short {
+    override fun get(index: Int): Int {
         return memory[index]
     }
 
-    override fun set(index: Int, value: Short) {
+    override fun set(index: Int, value: Int) {
         memory[index] = value
     }
 }
