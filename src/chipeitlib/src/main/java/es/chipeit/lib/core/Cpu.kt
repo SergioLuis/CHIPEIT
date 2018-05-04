@@ -1,5 +1,7 @@
 package es.chipeit.lib.core
 
+import java.lang.Math.random
+
 import es.chipeit.lib.interfaces.*
 
 internal class Cpu(
@@ -9,7 +11,8 @@ internal class Cpu(
         private val stack: IMemory<Int>,
         private val memory: IMemory<Byte>,
         private val graphicMemory: ICoreGraphicMemory,
-        private val keyboard: ICoreKeyboard
+        private val keyboard: ICoreKeyboard,
+        private val randomNumber: IRandomNumber = RandomNumber()
 ) : IClockObserver {
     init {
         registers.pc = Constants.CodeStartAddress
@@ -47,13 +50,16 @@ internal class Cpu(
             0x2000 -> call(instruction, registers, stack)
 
             // 3xkk - SE Vx, byte
-            0x3000 -> TODO("Instruction $instruction not implemented")
+            0x3000 -> seVxByte(instruction, registers)
 
             // 4xkk - SNE Vx, byte
-            0x4000 -> TODO("Instruction $instruction not implemented")
+            0x4000 -> sneVxByte(instruction, registers)
 
             // 5xy0 - SE Vx, Vy
-            0x5000 -> TODO("Instruction $instruction not implemented")
+            0x5000 -> when (instruction and 0xF00F) {
+                0x5000 -> seVxVy(instruction, registers)
+                else -> throw IllegalStateException() // FIXME: integration branch
+            }
 
             // 6xkk - LD Vx, byte
             0x6000 -> ldVxByte(instruction, registers)
@@ -90,16 +96,16 @@ internal class Cpu(
             }
 
             // Annn - LD I, addr
-            0xA000 -> TODO("Instruction $instruction not implemented")
+            0xA000 -> ldIAddr(instruction, registers)
 
             // Bnnn - JP V0, addr
-            0xB000 -> TODO("Instruction $instruction not implemented")
+            0xB000 -> jpV0Addr(instruction, registers)
 
             // Cxkk - RND Vx, byte
-            0xC000 -> TODO("Instruction $instruction not implemented")
+            0xC000 -> rndVxByte(instruction, registers, randomNumber)
 
             // Dxyn - DRW Vx, Vy, nibble
-            0xD000 -> TODO("Instruction $instruction not implemented")
+            0xD000 -> drwVxVyNibble(instruction, registers, memory, graphicMemory)
 
             // Ex9E - SKP Vx
             // ExA1 - SKNP Vx
@@ -123,11 +129,11 @@ internal class Cpu(
                 0xF00A -> ldVxK(instruction, registers, keyboard)
                 0xF015 -> ldTimerVx(instruction, registers, delayTimer)
                 0xF018 -> ldTimerVx(instruction, registers, soundTimer)
-                0xF01E -> TODO("Instruction $instruction not implemented")
+                0xF01E -> addIVx(instruction, registers)
                 0xF029 -> ldFVx(instruction, registers)
                 0xF033 -> ldBVx(instruction, registers, memory)
-                0xF055 -> TODO("Instruction $instruction not implemented")
-                0xF065 -> TODO("Instruction $instruction not implemented")
+                0xF055 -> ldIVx(instruction, registers, memory)
+                0xF065 -> ldVxI(instruction, registers, memory)
                 else -> haltAndCatchFire(instruction)
             }
 

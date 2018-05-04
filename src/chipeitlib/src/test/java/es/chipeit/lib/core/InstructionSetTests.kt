@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package es.chipeit.lib.core
 
 import org.junit.Test
@@ -86,6 +88,21 @@ class InstructionSetTests {
     }
 
     @Test
+    fun seVxByteTest() {
+
+    }
+
+    @Test
+    fun sneVxByteTest() {
+
+    }
+
+    @Test
+    fun seVxVyTest() {
+
+    }
+
+    @Test
     fun ldVxByteTest() {
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registersMock = Mockito.mock(IRegisters::class.java)
@@ -104,6 +121,414 @@ class InstructionSetTests {
 
         then(vRegMock).should()[0xE] = 0xFF.toByte()
         then(registersMock).should().pc = 0x202 + 2
+    }
+
+    @Test
+    fun addVxByteTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(254.toByte())
+
+        addVxByte(0x7001, registersMock)
+
+        then(vRegMock).should()[0x0] = 255.toByte()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x1]).willReturn(200.toByte())
+
+        addVxByte(0x7138, registersMock)
+
+        then(vRegMock).should()[0x1] = 0
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun ldVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x1]).willReturn(255.toByte())
+
+        ldVxVy(0x8010, registersMock)
+
+        then(vRegMock).should()[0x0] = 255.toByte()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+    }
+
+
+    @Test
+    fun andVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x5C) // 0101 1100
+        given(vRegMock[0x1]).willReturn(0x53) // 0101 0011
+
+        andVxVy(0x8013, registersMock)
+
+        then(vRegMock).should()[0x0] = 0x50   // 0101 0000
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+    }
+
+    @Test
+    fun xorVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x5C) // 0101 1100
+        given(vRegMock[0x1]).willReturn(0x53) // 0101 0011
+
+        xorVxVy(0x8013, registersMock)
+
+        then(vRegMock).should()[0x0] = 0x0F   // 0000 1111
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+    }
+
+    @Test
+    fun orVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x5C)          // 0101 1100
+        given(vRegMock[0x1]).willReturn(0xA3.toByte()) // 1010 0011
+
+        orVxVy(0x8011, registersMock)
+
+        then(vRegMock).should()[0x0] = 0xFF.toByte()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+    }
+
+    @Test
+    fun addVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(127.toByte())
+        given(vRegMock[0x1]).willReturn(128.toByte())
+
+        addVxVy(0x8014, registersMock)
+
+        then(vRegMock).should()[0x0] = 255.toByte()
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(128.toByte())
+        given(vRegMock[0x3]).willReturn(128.toByte())
+
+        addVxVy(0x8234, registersMock)
+
+        then(vRegMock).should()[0x2] = 0
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun subVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(255.toByte())
+        given(vRegMock[0x1]).willReturn(254.toByte())
+
+        subVxVy(0x8015, registersMock)
+
+        then(vRegMock).should()[0x0] = 1
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(254.toByte())
+        given(vRegMock[0x3]).willReturn(255.toByte())
+
+        subVxVy(0x8235, registersMock)
+
+        then(vRegMock).should()[0x2] = 255.toByte()
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun shrVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x1]).willReturn(0x02)
+
+        shrVxVy(0x801E, registersMock)
+
+        then(vRegMock).should()[0x0] = 1
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x3]).willReturn(0x03)
+
+        shrVxVy(0x823E, registersMock)
+
+        then(vRegMock).should()[0x2] = 1
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun subnVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(254.toByte())
+        given(vRegMock[0x1]).willReturn(255.toByte())
+
+        subnVxVy(0x8017, registersMock)
+
+        then(vRegMock).should()[0x0] = 1
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(255.toByte())
+        given(vRegMock[0x3]).willReturn(254.toByte())
+
+        subnVxVy(0x8237, registersMock)
+
+        then(vRegMock).should()[0x2] = 255.toByte()
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun shlVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x1]).willReturn(0x01)
+
+        shlVxVy(0x801E, registersMock)
+
+        then(vRegMock).should()[0x0] = 2
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x3]).willReturn(0x80.toByte())
+
+        shlVxVy(0x823E, registersMock)
+
+        then(vRegMock).should()[0x2] = 0
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun sneVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(5)
+        given(vRegMock[0x1]).willReturn(5)
+
+        sneVxVy(0x9010, registersMock)
+
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(5)
+        given(vRegMock[0x3]).willReturn(4)
+
+        sneVxVy(0x9230, registersMock)
+
+        then(registersMock).should(times(2)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun ldIAddrTest() {
+        val registersMock = Mockito.mock(IRegisters::class.java)
+
+        given(registersMock.pc).willReturn(0x200)
+
+        ldIAddr(0xA345, registersMock)
+
+        then(registersMock).should(times(1)).i = 0x345
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+    }
+
+    @Test
+    fun jpV0AddrTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x20)
+
+        jpV0Addr(0xB400, registersMock)
+
+        then(registersMock).should(times(1)).pc = 0x20 + 0x400
+    }
+
+    @Test
+    fun rndVxByteTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        val randomMock = Mockito.mock(IRandomNumber::class.java)
+        given(randomMock.nextInt(0, 255)).willReturn(0x94) // 1001 0100
+
+        given(registersMock.pc).willReturn(0x200)
+
+        rndVxByte(0xCD84, registersMock, randomMock)       // 1000 0100
+
+        then(vRegMock).should()[0xD] = 0x84.toByte()
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+    }
+
+    @Test
+    fun drwVxVyNibbleTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.v[0] = 4
+        registers.v[1] = 3
+
+        registers.pc = 0x200
+        registers.i = 0x02
+
+        val memory = ByteMemory(ByteArray(4))
+
+        // Not use.
+        memory[0] = 0xAA.toByte() // 1010 1010b
+        memory[1] = 0xAA.toByte() // 1010 1010b
+
+        // Sprite from here.
+        memory[2] = 0x7F.toByte() // 0111 1111b
+        memory[3] = 0xFE.toByte() // 1111 1110b
+
+        val rawMatrix = Array(4) { Array(8) { false } }
+        val graphicMemory = GraphicMemory(rawMatrix)
+
+        drwVxVyNibble(0xD010, registers, memory, graphicMemory)
+        for (column in rawMatrix)
+            for (cell in column)
+                assertEquals(false, cell)
+
+        /*
+            1110 1111b = 0xEF
+            0000 0000b
+            0000 0000b
+            1111 0111b = 0xF7
+        */
+        val expectedMatrix = arrayOf(
+                arrayOf(true, true, true, false, true, true, true, true),
+                arrayOf(false, false, false, false, false, false, false, false),
+                arrayOf(false, false, false, false, false, false, false, false),
+                arrayOf(true, true, true, true, false, true, true, true)
+        )
+
+        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
+        assertTrue { rawMatrix contentDeepEquals expectedMatrix }
+
+        assertEquals(0x200 + 2 * 0x2, registers.pc)
+    }
+
+    @Test
+    fun drwVxVyNibbleWithoutClearTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.v[0] = 0
+        registers.v[1] = 0
+
+        registers.pc = 0x200
+        registers.i = 0x00
+
+        val memory = ByteMemory(byteArrayOf(
+                0x00,
+                0x00,
+                0xFF.toByte()
+        ))
+
+        val rawMatrix = Array(memory.size) { Array(8) { false } }
+        val graphicMemory = GraphicMemory(rawMatrix)
+
+        // Drawing a zero-height sprite will not clear a pixel.
+        registers.v[0xF] = 1
+        drwVxVyNibble(0xD010, registers, memory, graphicMemory)
+        assertEquals(0x00, registers.v[0xF])
+
+        /*
+            If no pixel is cleared, VF must be set to zero. (Don't use 0xFF xor 0xFF!)
+            Graphic memory xor sprite notation.
+            0x00 xor 0x00 -> 0x00
+            0xFF xor 0x00 -> 0xFF
+            0x00 xor 0xFF -> 0xFF
+         */
+        for (column in rawMatrix)
+            for (cell in column)
+                assertEquals(false, cell)
+
+        val j = 1
+        for (i in 0 until rawMatrix[j].size)
+            rawMatrix[j][i] = true
+
+        registers.v[0xF] = 1
+        drwVxVyNibble(0xD010 or memory.size, registers, memory, graphicMemory)
+        assertEquals(0x00, registers.v[0xF])
+    }
+
+    @Test
+    fun drwVxVyNibbleWithClearTest() {
+        val registers = Registers(ByteMemory(ByteArray(16)))
+
+        registers.v[0] = 0
+        registers.v[1] = 0
+
+        registers.pc = 0x200
+        registers.i = 0x00
+
+        val memory = ByteMemory(byteArrayOf(
+                0xFF.toByte(),
+                0x00
+        ))
+
+        val rawMatrix = Array(memory.size) { Array(8) { false } }
+        val graphicMemory = GraphicMemory(rawMatrix)
+
+        /*
+            If a pixel is cleared, VF must be set to one even if it was not in the last row.
+            Graphic memory xor sprite notation.
+            0xFF xor 0xFF -> 0x00
+            0x00 xor 0x00 -> 0x00
+         */
+        val j = 0
+        for (i in 0 until rawMatrix[j].size)
+            rawMatrix[j][i] = true
+
+        registers.v[0xF] = 0
+        drwVxVyNibble(0xD010 or memory.size, registers, memory, graphicMemory)
+        assertEquals(0x01, registers.v[0xF])
     }
 
     @Test
@@ -154,6 +579,22 @@ class InstructionSetTests {
 
         // Next instruction NOT SKIPPED
         then(registersMock).should(times(3)).pc += 2
+    }
+
+    @Test
+    fun ldVxTimerTest() {
+        val timerMock = Mockito.mock(ITimer::class.java)
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(timerMock.t).willReturn(4)
+
+        ldVxTimer(0xF007, registersMock, timerMock)
+
+        then(vRegMock).should()[0x0] = 4
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
@@ -286,304 +727,6 @@ class InstructionSetTests {
     }
 
     @Test
-    fun addVxByteTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(254.toByte())
-
-        addVxByte(0x7001, registersMock)
-
-        then(vRegMock).should()[0x0] = 255.toByte()
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x1]).willReturn(200.toByte())
-
-        addVxByte(0x7138, registersMock)
-
-        then(vRegMock).should()[0x1] = 0
-        then(registersMock).should(times(1)).pc = 0x202 + 2
-    }
-
-    @Test
-    fun ldVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x1]).willReturn(255.toByte())
-
-        ldVxVy(0x8010, registersMock)
-
-        then(vRegMock).should()[0x0] = 255.toByte()
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-    }
-
-    @Test
-    fun orVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(0x5C)          // 0101 1100
-        given(vRegMock[0x1]).willReturn(0xA3.toByte()) // 1010 0011
-
-        orVxVy(0x8011, registersMock)
-
-        then(vRegMock).should()[0x0] = 0xFF.toByte()
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-    }
-
-    @Test
-    fun addVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(127.toByte())
-        given(vRegMock[0x1]).willReturn(128.toByte())
-
-        addVxVy(0x8014, registersMock)
-
-        then(vRegMock).should()[0x0] = 255.toByte()
-        then(vRegMock).should()[0xF] = 0
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x2]).willReturn(128.toByte())
-        given(vRegMock[0x3]).willReturn(128.toByte())
-
-        addVxVy(0x8234, registersMock)
-
-        then(vRegMock).should()[0x2] = 0
-        then(vRegMock).should()[0xF] = 1
-        then(registersMock).should(times(1)).pc = 0x202 + 2
-    }
-
-    @Test
-    fun subVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(255.toByte())
-        given(vRegMock[0x1]).willReturn(254.toByte())
-
-        subVxVy(0x8015, registersMock)
-
-        then(vRegMock).should()[0x0] = 1
-        then(vRegMock).should()[0xF] = 1
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x2]).willReturn(254.toByte())
-        given(vRegMock[0x3]).willReturn(255.toByte())
-
-        subVxVy(0x8235, registersMock)
-
-        then(vRegMock).should()[0x2] = 255.toByte()
-        then(vRegMock).should()[0xF] = 0
-        then(registersMock).should(times(1)).pc = 0x202 + 2
-    }
-
-    @Test
-    fun subnVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(254.toByte())
-        given(vRegMock[0x1]).willReturn(255.toByte())
-
-        subnVxVy(0x8017, registersMock)
-
-        then(vRegMock).should()[0x0] = 1
-        then(vRegMock).should()[0xF] = 1
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x2]).willReturn(255.toByte())
-        given(vRegMock[0x3]).willReturn(254.toByte())
-
-        subnVxVy(0x8237, registersMock)
-
-        then(vRegMock).should()[0x2] = 255.toByte()
-        then(vRegMock).should()[0xF] = 0
-        then(registersMock).should(times(1)).pc = 0x202 + 2
-    }
-
-    @Test
-    fun sneVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(5)
-        given(vRegMock[0x1]).willReturn(5)
-
-        sneVxVy(0x9010, registersMock)
-
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x2]).willReturn(5)
-        given(vRegMock[0x3]).willReturn(4)
-
-        sneVxVy(0x9230, registersMock)
-
-        then(registersMock).should(times(2)).pc = 0x202 + 2
-    }
-
-    @Test
-    fun drwVxVyNibbleTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
-
-        registers.v[0] = 4
-        registers.v[1] = 3
-
-        registers.pc = 0x200
-        registers.i = 0x02
-
-        val memory = ByteMemory(ByteArray(4))
-
-        // Not use.
-        memory[0] = 0xAA.toByte() // 1010 1010b
-        memory[1] = 0xAA.toByte() // 1010 1010b
-
-        // Sprite from here.
-        memory[2] = 0x7F.toByte() // 0111 1111b
-        memory[3] = 0xFE.toByte() // 1111 1110b
-
-        val rawMatrix = Array(4) { Array(8) { false } }
-        val graphicMemory = GraphicMemory(rawMatrix)
-
-        drwVxVyNibble(0xD010, registers, memory, graphicMemory)
-        for (column in rawMatrix)
-            for (cell in column)
-                assertEquals(false, cell)
-
-        /*
-            1110 1111b = 0xEF
-            0000 0000b
-            0000 0000b
-            1111 0111b = 0xF7
-        */
-        val expectedMatrix = arrayOf(
-                arrayOf(true, true, true, false, true, true, true, true),
-                arrayOf(false, false, false, false, false, false, false, false),
-                arrayOf(false, false, false, false, false, false, false, false),
-                arrayOf(true, true, true, true, false, true, true, true)
-        )
-
-        drwVxVyNibble(0xD012, registers, memory, graphicMemory)
-        assertTrue { rawMatrix contentDeepEquals expectedMatrix }
-
-        assertEquals(0x200 + 2 * 0x2, registers.pc)
-    }
-
-    @Test
-    fun drwVxVyNibbleWithoutClearTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
-
-        registers.v[0] = 0
-        registers.v[1] = 0
-
-        registers.pc = 0x200
-        registers.i = 0x00
-
-        val memory = ByteMemory(byteArrayOf(
-                0x00,
-                0x00,
-                0xFF.toByte()
-        ))
-
-        val rawMatrix = Array(memory.size) { Array(8) { false } }
-        val graphicMemory = GraphicMemory(rawMatrix)
-
-        // Drawing a zero-height sprite will not clear a pixel.
-        registers.v[0xF] = 1
-        drwVxVyNibble(0xD010, registers, memory, graphicMemory)
-        assertEquals(0x00, registers.v[0xF])
-
-        /*
-            If no pixel is cleared, VF must be set to zero. (Don't use 0xFF xor 0xFF!)
-            Graphic memory xor sprite notation.
-            0x00 xor 0x00 -> 0x00
-            0xFF xor 0x00 -> 0xFF
-            0x00 xor 0xFF -> 0xFF
-         */
-        for (column in rawMatrix)
-            for (cell in column)
-                assertEquals(false, cell)
-
-        val j = 1
-        for (i in 0 until rawMatrix[j].size)
-            rawMatrix[j][i] = true
-
-        registers.v[0xF] = 1
-        drwVxVyNibble(0xD010 or memory.size, registers, memory, graphicMemory)
-        assertEquals(0x00, registers.v[0xF])
-    }
-
-    @Test
-    fun drwVxVyNibbleWithClearTest() {
-        val registers = Registers(ByteMemory(ByteArray(16)))
-
-        registers.v[0] = 0
-        registers.v[1] = 0
-
-        registers.pc = 0x200
-        registers.i = 0x00
-
-        val memory = ByteMemory(byteArrayOf(
-                0xFF.toByte(),
-                0x00
-        ))
-
-        val rawMatrix = Array(memory.size) { Array(8) { false } }
-        val graphicMemory = GraphicMemory(rawMatrix)
-
-        /*
-            If a pixel is cleared, VF must be set to one even if it was not in the last row.
-            Graphic memory xor sprite notation.
-            0xFF xor 0xFF -> 0x00
-            0x00 xor 0x00 -> 0x00
-         */
-        val j = 0
-        for (i in 0 until rawMatrix[j].size)
-            rawMatrix[j][i] = true
-
-        registers.v[0xF] = 0
-        drwVxVyNibble(0xD010 or memory.size, registers, memory, graphicMemory)
-        assertEquals(0x01, registers.v[0xF])
-    }
-
-    @Test
-    fun ldVxTimerTest() {
-        val timerMock = Mockito.mock(ITimer::class.java)
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(timerMock.t).willReturn(4)
-
-        ldVxTimer(0xF007, registersMock, timerMock)
-
-        then(vRegMock).should()[0x0] = 4
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-    }
-
-    @Test
     fun ldTimerVxTest() {
         val timerMock = Mockito.mock(ITimer::class.java)
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
@@ -605,6 +748,22 @@ class InstructionSetTests {
 
         then(timerMock).should().t = 8
         then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun addIVxTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(registersMock.i).willReturn(0x300)
+        given(vRegMock[0x0]).willReturn(4)
+
+        addIVx(0xF01E, registersMock)
+
+        then(registersMock).should(times(1)).i = 0x300 + 4
+        then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
@@ -660,84 +819,96 @@ class InstructionSetTests {
     }
 
     @Test
-    fun andVxVyTest() {
+    fun ldIVxTest() {
+        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registersMock = Mockito.mock(IRegisters::class.java)
         given(registersMock.v).willReturn(vRegMock)
 
         given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(0x5C) // 0101 1100
-        given(vRegMock[0x1]).willReturn(0x53) // 0101 0011
+        given(registersMock.i).willReturn(0x300)
 
-        andVxVy(0x8013, registersMock)
+        given(vRegMock[0x0]).willReturn(15)
+        given(vRegMock[0x1]).willReturn(16)
+        given(vRegMock[0x2]).willReturn(17)
+        given(vRegMock[0x3]).willReturn(18)
+        given(vRegMock[0x4]).willReturn(19)
+        given(vRegMock[0x5]).willReturn(20)
+        given(vRegMock[0x6]).willReturn(21)
+        given(vRegMock[0x7]).willReturn(22)
+        given(vRegMock[0x8]).willReturn(23)
+        given(vRegMock[0x9]).willReturn(24)
+        given(vRegMock[0xA]).willReturn(25)
+        given(vRegMock[0xB]).willReturn(26)
+        given(vRegMock[0xC]).willReturn(27)
+        given(vRegMock[0xD]).willReturn(28)
+        given(vRegMock[0xE]).willReturn(29)
 
-        then(vRegMock).should()[0x0] = 0x50   // 0101 0000
+        ldIVx(0xFE55, registersMock, memoryMock)
+
+        then(memoryMock).should(times(1))[0x300] = 15
+        then(memoryMock).should(times(1))[0x301] = 16
+        then(memoryMock).should(times(1))[0x302] = 17
+        then(memoryMock).should(times(1))[0x303] = 18
+        then(memoryMock).should(times(1))[0x304] = 19
+        then(memoryMock).should(times(1))[0x305] = 20
+        then(memoryMock).should(times(1))[0x306] = 21
+        then(memoryMock).should(times(1))[0x307] = 22
+        then(memoryMock).should(times(1))[0x308] = 23
+        then(memoryMock).should(times(1))[0x309] = 24
+        then(memoryMock).should(times(1))[0x30A] = 25
+        then(memoryMock).should(times(1))[0x30B] = 26
+        then(memoryMock).should(times(1))[0x30C] = 27
+        then(memoryMock).should(times(1))[0x30D] = 28
+        then(memoryMock).should(times(1))[0x30E] = 29
         then(registersMock).should(times(1)).pc = 0x200 + 2
     }
 
     @Test
-    fun xorVxVyTest() {
+    fun ldVxITest() {
+        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registersMock = Mockito.mock(IRegisters::class.java)
         given(registersMock.v).willReturn(vRegMock)
 
         given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x0]).willReturn(0x5C) // 0101 1100
-        given(vRegMock[0x1]).willReturn(0x53) // 0101 0011
+        given(registersMock.i).willReturn(0x300)
 
-        xorVxVy(0x8013, registersMock)
+        given(memoryMock[0x300]).willReturn(15)
+        given(memoryMock[0x301]).willReturn(16)
+        given(memoryMock[0x302]).willReturn(17)
+        given(memoryMock[0x303]).willReturn(18)
+        given(memoryMock[0x304]).willReturn(19)
+        given(memoryMock[0x305]).willReturn(20)
+        given(memoryMock[0x306]).willReturn(21)
+        given(memoryMock[0x307]).willReturn(22)
+        given(memoryMock[0x308]).willReturn(23)
+        given(memoryMock[0x309]).willReturn(24)
+        given(memoryMock[0x30A]).willReturn(25)
+        given(memoryMock[0x30B]).willReturn(26)
+        given(memoryMock[0x30C]).willReturn(27)
+        given(memoryMock[0x30D]).willReturn(28)
+        given(memoryMock[0x30E]).willReturn(29)
 
-        then(vRegMock).should()[0x0] = 0x0F   // 0000 1111
+        ldVxI(0xFE65, registersMock, memoryMock)
+
+        then(vRegMock).should(times(1))[0x0] = 15
+        then(vRegMock).should(times(1))[0x1] = 16
+        then(vRegMock).should(times(1))[0x2] = 17
+        then(vRegMock).should(times(1))[0x3] = 18
+        then(vRegMock).should(times(1))[0x4] = 19
+        then(vRegMock).should(times(1))[0x5] = 20
+        then(vRegMock).should(times(1))[0x6] = 21
+        then(vRegMock).should(times(1))[0x7] = 22
+        then(vRegMock).should(times(1))[0x8] = 23
+        then(vRegMock).should(times(1))[0x9] = 24
+        then(vRegMock).should(times(1))[0xA] = 25
+        then(vRegMock).should(times(1))[0xB] = 26
+        then(vRegMock).should(times(1))[0xC] = 27
+        then(vRegMock).should(times(1))[0xD] = 28
+        then(vRegMock).should(times(1))[0xE] = 29
         then(registersMock).should(times(1)).pc = 0x200 + 2
-    }
-
-    @Test
-    fun shrVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x1]).willReturn(0x02)
-
-        shrVxVy(0x801E, registersMock)
-
-        then(vRegMock).should()[0x0] = 1
-        then(vRegMock).should()[0xF] = 0
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x3]).willReturn(0x03)
-
-        shrVxVy(0x823E, registersMock)
-
-        then(vRegMock).should()[0x2] = 1
-        then(vRegMock).should()[0xF] = 1
-        then(registersMock).should(times(1)).pc = 0x202 + 2
-    }
-
-    @Test
-    fun shlVxVyTest() {
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(vRegMock[0x1]).willReturn(0x01)
-
-        shlVxVy(0x801E, registersMock)
-
-        then(vRegMock).should()[0x0] = 2
-        then(vRegMock).should()[0xF] = 0
-        then(registersMock).should(times(1)).pc = 0x200 + 2
-
-        given(registersMock.pc).willReturn(0x202)
-        given(vRegMock[0x3]).willReturn(0x80.toByte())
-
-        shlVxVy(0x823E, registersMock)
-
-        then(vRegMock).should()[0x2] = 0
-        then(vRegMock).should()[0xF] = 1
-        then(registersMock).should(times(1)).pc = 0x202 + 2
     }
 }

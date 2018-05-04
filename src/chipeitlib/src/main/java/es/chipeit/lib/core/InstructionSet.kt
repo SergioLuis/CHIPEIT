@@ -1,10 +1,6 @@
 package es.chipeit.lib.core
 
-import es.chipeit.lib.interfaces.ICoreGraphicMemory
-import es.chipeit.lib.interfaces.ICoreKeyboard
-import es.chipeit.lib.interfaces.IMemory
-import es.chipeit.lib.interfaces.IRegisters
-import es.chipeit.lib.interfaces.ITimer
+import es.chipeit.lib.interfaces.*
 import es.chipeit.lib.io.IUserKeyboard
 
 // 0nnn - SYS addr
@@ -43,10 +39,37 @@ internal fun call(instruction: Int, registers: IRegisters, stack: IMemory<Int>) 
 }
 
 // 3xkk - SE Vx, byte
+internal fun seVxByte(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val byte = (instruction and 0xFF).toByte()
+
+    if (registers.v[x] == byte)
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // 4xkk - SNE Vx, byte
+internal fun sneVxByte(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val byte = (instruction and 0xFF).toByte()
+
+    if (registers.v[x] != byte)
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // 5xy0 - SE Vx, Vy
+internal fun seVxVy(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+    val y = instruction shr 1 * 4 and 0xF
+
+    if (registers.v[x] == registers.v[y])
+        registers.pc += 2
+
+    registers.pc += 2
+}
 
 // 6xkk - LD Vx, byte
 internal fun ldVxByte(instruction: Int, registers: IRegisters) {
@@ -205,10 +228,32 @@ internal fun sneVxVy(instruction: Int, registers: IRegisters) {
 }
 
 // Annn - LD I, addr
+internal fun ldIAddr(instruction: Int, registers: IRegisters) {
+    val addr = instruction and 0xFFF
+
+    registers.i = addr
+
+    registers.pc += 2
+}
 
 // Bnnn - JP V0, addr
+internal fun jpV0Addr(instruction: Int, registers: IRegisters) {
+    val addr = instruction and 0xFFF
+
+    val v0 = registers.v[0x0].toInt() and 0xFF
+
+    registers.pc = addr + v0
+}
 
 // Cxkk - RND Vx, byte
+internal fun rndVxByte(instruction: Int, registers: IRegisters, random: IRandomNumber) {
+    val x = instruction shr 2 * 4 and 0xF
+    val kk = instruction and 0xFF
+
+    registers.v[x] = (random.nextInt(0, 255) and kk).toByte()
+
+    registers.pc += 2
+}
 
 // Dxyn - DRW Vx, Vy, Nibble
 internal fun drwVxVyNibble(
@@ -312,6 +357,15 @@ internal fun ldTimerVx(instruction: Int, registers: IRegisters, timer: ITimer) {
 }
 
 // Fx1E - ADD I, Vx
+internal fun addIVx(instruction: Int, registers: IRegisters) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    val vx = registers.v[x].toInt() and 0xFF
+
+    registers.i += vx
+
+    registers.pc += 2
+}
 
 // Fx29 - LD F, Vx
 internal fun ldFVx(instruction: Int, registers: IRegisters) {
@@ -345,5 +399,25 @@ internal fun ldBVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte
 }
 
 // Fx55 - LD [I], Vx
+internal fun ldIVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte>) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    var address = registers.i
+
+    for (i in 0..x)
+        memory[address++] = registers.v[i]
+
+    registers.pc += 2
+}
 
 // Fx65 - LD Vx, [I]
+internal fun ldVxI(instruction: Int, registers: IRegisters, memory: IMemory<Byte>) {
+    val x = instruction shr 2 * 4 and 0xF
+
+    var address = registers.i
+
+    for (i in 0..x)
+        registers.v[i] = memory[address++]
+
+    registers.pc +=2
+}
