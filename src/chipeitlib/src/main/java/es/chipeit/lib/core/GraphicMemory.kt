@@ -21,9 +21,9 @@ internal class GraphicMemory(private val memory: Array<Array<Boolean>>) : ICoreG
         return memory[y][x]
     }
 
-    override fun drawLine(x: Int, y: Int, line: Byte): Boolean {
+    override fun drawSpriteRow(x: Int, y: Int, spriteRow: Byte): Boolean {
         val row = memory[getCircularIndex(y, height)]
-        val pixels: Int = line.toInt() and 0xFF
+        val pixels: Int = spriteRow.toInt() and 0xFF
 
         var pixelCleared = false
 
