@@ -2,8 +2,8 @@ package es.chipeit.lib.interfaces
 
 internal interface IRegisters {
     val v: IMemory<Byte>
-    var i: Short
+    var i: Int
     var pc: Int
 
-    var sp: Byte
+    var sp: Int
 }
