@@ -53,3 +53,4 @@ freeline_project_description.json
 # Finder should not be used
 .DS_Store
 /src/console/.idea/libraries/
+/src/android/app/src/main/res/raw/

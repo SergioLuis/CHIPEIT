@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_splashscreen_title_textsize">100sp</dimen>
+    <dimen name="text_splashscreen_title_height">70sp</dimen>
+    <dimen name="bar_splashscreen_rainbow_height">6dp</dimen>
+</resources>

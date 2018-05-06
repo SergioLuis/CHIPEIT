@@ -1,7 +1,8 @@
-package es.chipeit.android
+package es.chipeit.android.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import es.chipeit.android.R
 
 class MainActivity : AppCompatActivity() {
 
