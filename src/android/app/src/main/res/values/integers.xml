@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="text_splashscreen_title_duration">1500</integer>
+    <integer name="activity_splashscreen_title_txt_anim_duration">1500</integer>
+    <integer name="anim_gamelibrary_marquee_duration">15000</integer>
+
+    <integer name="splash_to_main_delay">500</integer>
 </resources>

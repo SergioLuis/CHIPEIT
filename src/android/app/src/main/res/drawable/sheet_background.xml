@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape android:shape="rectangle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:topLeftRadius="@dimen/activity_gamelibrary_sheet_cornerRadius"
+        android:topRightRadius="@dimen/activity_gamelibrary_sheet_cornerRadius" />
+
+    <solid android:color="@color/activity_gamelibrary_sheet_background_color" />
+</shape>

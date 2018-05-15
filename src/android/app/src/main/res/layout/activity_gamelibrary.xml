@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/activity_gamelibrary_content" />
+
+    <View
+        android:id="@+id/activity_gamelibrary_content_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@color/activity_gamelibrary_content_overlay_background" />
+
+    <include layout="@layout/activity_gamelibrary_sheet" />
+
+</android.support.design.widget.CoordinatorLayout>

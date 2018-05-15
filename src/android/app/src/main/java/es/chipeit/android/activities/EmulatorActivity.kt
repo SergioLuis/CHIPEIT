@@ -1,13 +1,14 @@
 package es.chipeit.android.activities
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+
 import es.chipeit.android.R
 
-class MainActivity : AppCompatActivity() {
+class EmulatorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_gamelibrary_content)
     }
 }

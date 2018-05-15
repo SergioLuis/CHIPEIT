@@ -1,6 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="text_splashscreen_title_textsize">100sp</dimen>
-    <dimen name="text_splashscreen_title_height">70sp</dimen>
-    <dimen name="bar_splashscreen_rainbow_height">6dp</dimen>
+    <dimen name="activity_splashscreen_title_txt_size">50sp</dimen>
+    <dimen name="activity_splashscreen_title_txt_height">70sp</dimen>
+
+    <dimen name="activity_splashscreen_gplv3_img_marginBottom">10dp</dimen>
+    <dimen name="activity_splashscreen_rainbow_view_height">6dp</dimen>
+
+    <dimen name="activity_emulator_btn_side">75dp</dimen>
+    <dimen name="activity_emulator_keyboard_view_margin">25dp</dimen>
+    <dimen name="activity_emulator_screen_view_height">200dp</dimen>
+
+    <dimen name="text_toolbar_title_textSize">25sp</dimen>
+
+    <dimen name="list_gamelibrary_item_marginLeft">10dp</dimen>
+    <dimen name="list_gamelibrary_item_marginRight">10dp</dimen>
+    <dimen name="list_gamelibrary_item_marginTop">5dp</dimen>
+    <dimen name="list_gamelibrary_item_marginBottom">5dp</dimen>
+
+    <dimen name="list_gamelibrary_item_height">100dp</dimen>
+    <dimen name="list_gamelibrary_item_cornerRadius">4dp</dimen>
+
+    <dimen name="list_gamelibrary_item_foregroundtitle_txt_textSize">15sp</dimen>
+    <dimen name="list_gamelibrary_item_foregroundtitle_txt_marginStart">15dp</dimen>
+    <dimen name="list_gamelibrary_item_foregroundtitle_background_height">40dp</dimen>
+
+    <dimen name="list_gamelibrary_item_backgroundtitle_marginTop">6dp</dimen>
+    <dimen name="list_gamelibrary_item_backgroundtitle_txt_textSize">40sp</dimen>
+    <dimen name="list_gamelibrary_item_backgroundtitle_txt_marginStart">15dp</dimen>
+
+    <dimen name="activity_gamelibrary_toolbar_elevation">4dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_elevation">4dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_title_marginTop">10dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_title_marginBottom">40dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_title_marginStart">20dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_title_textSize">32sp</dimen>
+    <dimen name="activity_gamelibrary_sheet_cornerRadius">15dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_draghandle_width">30dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_draghandle_height">6dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_draghandle_margin">10dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_draghandle_cornerRadius">3dp</dimen>
+
+
+    <dimen name="activity_gamelibrary_sheet_btn_width">110dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_btn_margin">10dp</dimen>
+    <dimen name="activity_gamelibrary_sheet_buttons_marginBottom">40dp</dimen>
 </resources>
