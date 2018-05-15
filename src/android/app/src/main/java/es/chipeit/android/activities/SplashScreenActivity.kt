@@ -57,7 +57,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private fun startMainActivity() {
         Handler().postDelayed({
-            Intents.startMainActivity(this)
+            Intents.startGameLibraryActivity(this)
         }, resources.getInteger(R.integer.splash_to_main_delay).toLong())
     }
 

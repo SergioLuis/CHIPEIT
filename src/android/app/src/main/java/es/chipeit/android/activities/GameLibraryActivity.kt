@@ -2,6 +2,7 @@ package es.chipeit.android.activities
 
 import android.content.res.Resources
 import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v4.content.res.ResourcesCompat
@@ -12,12 +13,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 
 import es.chipeit.android.R
 import es.chipeit.android.io.ResourceReader
 import es.chipeit.android.models.LibraryGame
 import es.chipeit.android.ui.Fonts
+import es.chipeit.android.ui.Intents
 import es.chipeit.android.ui.gamelibrary.GameItemAdapter
 import es.chipeit.android.ui.recyclerview.ItemClickListener
 
@@ -36,6 +37,11 @@ class GameLibraryActivity : AppCompatActivity() {
         initializeView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
     private fun initializeView() {
         initializeToolbar()
         initializeBottomSheet()
@@ -47,7 +53,7 @@ class GameLibraryActivity : AppCompatActivity() {
                 )
         )
 
-        val actionButtonsClickListener = ActionButtonsClickListener()
+        val actionButtonsClickListener = ActionButtonsClickListener(this)
         val sheetViewHolder = GameLibrarySheetViewHolder(
                 findViewById(R.id.activity_gamelibrary_sheet)
         )
@@ -77,7 +83,13 @@ class GameLibraryActivity : AppCompatActivity() {
                 R.id.activity_gamelibrary_toolbar_title_txt
         )
         Fonts.Companion.setTypeface(titleTextView, assets, Fonts.PressStart2P)
-        titleTextView.setTextColor(resources.getColor(R.color.white))
+        titleTextView.setTextColor(
+                ResourcesCompat.getColor(
+                        resources,
+                        R.color.white,
+                        null
+                )
+        )
     }
 
     private fun initializeBottomSheet() {
@@ -152,7 +164,7 @@ class GameLibraryActivity : AppCompatActivity() {
     }
 
     private class GameLibrarySheetViewHolder(sheet: View) {
-        val backgroundDrawable = sheet.background.current
+        val backgroundDrawable: Drawable = sheet.background.current
         val titleTextView: TextView = sheet.findViewById(
                 R.id.activity_gamelibrary_sheet_title_txt
         )
@@ -182,20 +194,31 @@ class GameLibraryActivity : AppCompatActivity() {
         }
     }
 
-    private class ActionButtonsClickListener : View.OnClickListener {
+    private class ActionButtonsClickListener(
+            private val gameLibraryActivity: GameLibraryActivity
+    ) : View.OnClickListener {
         var game: LibraryGame? = null
 
         override fun onClick(v: View?) {
-            if (v?.id == R.id.activity_gamelibrary_sheet_resume_btn) {
-                Toast.makeText(v?.context, "RESUME %s".format(game?.title), Toast.LENGTH_SHORT).show()
-            }
+            when (v?.id) {
+                R.id.activity_gamelibrary_sheet_resume_btn ->
+                    Intents.startEmulatorActivity(
+                            gameLibraryActivity,
+                            EmulatorActivity.Params(
+                                    EmulatorActivity.Params.Action.RESUME,
+                                    game
+                            )
+                    )
 
-            if (v?.id == R.id.activity_gamelibrary_sheet_play_btn) {
-                Toast.makeText(v?.context, "PLAY %s".format(game?.title), Toast.LENGTH_SHORT).show()
-            }
-
-            if (v?.id == R.id.activity_gamelibrary_sheet_restart_btn) {
-                Toast.makeText(v?.context, "RESTART %s".format(game?.title), Toast.LENGTH_SHORT).show()
+                R.id.activity_gamelibrary_sheet_play_btn,
+                R.id.activity_gamelibrary_sheet_restart_btn ->
+                    Intents.startEmulatorActivity(
+                            gameLibraryActivity,
+                            EmulatorActivity.Params(
+                                    EmulatorActivity.Params.Action.PLAY,
+                                    game
+                            )
+                    )
             }
         }
     }
