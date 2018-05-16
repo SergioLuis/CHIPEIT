@@ -26,7 +26,7 @@ internal class LoggedKeyboard(private val keyboard: Keyboard) : IUserKeyboard, I
 
     override fun captureNextKeyRelease() {
         // TODO add log
-        keyboard.capturedKeyRelease
+        keyboard.captureNextKeyRelease()
     }
 
     override fun clearLastCapturedKeyRelease() {
