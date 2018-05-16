@@ -18,10 +18,10 @@ class Chipeit(
         romContent: ByteArray,
         cpuClockRate: Short = 500,
         timersClockRate: Short = 60,
+        enableLoadStoreQuirk: Boolean = false,
+        enableShiftQuirk: Boolean = false,
         private val sleeper: ISleeper
 ) {
-    @Volatile
-    private var running: Boolean = false
     private val registers = Registers(LoggedMemory(
             "Registers memory",
             ByteMemory(ByteArray(Constants.VRegistersCount)))
@@ -54,7 +54,11 @@ class Chipeit(
             stack,
             memory,
             _graphicMemory,
-            _keyboard
+            _keyboard,
+            Cpu.QuirkSettings(
+                    enableLoadStoreQuirk,
+                    enableShiftQuirk
+            )
     )
 
     val UserKeyboard: IUserKeyboard = _keyboard

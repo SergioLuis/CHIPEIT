@@ -1,5 +1,6 @@
 package es.chipeit.lib.core
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import es.chipeit.lib.interfaces.*
 import es.chipeit.lib.io.IUserKeyboard
 
@@ -24,14 +25,14 @@ internal fun ret(registers: IRegisters, stack: IMemory<Int>) {
 
 // 1nnn - JP addr
 internal fun jpAddr(instruction: Int, registers: IRegisters) {
-    registers.pc = instruction and 0x0FFF
+    registers.pc = instruction and 0xFFF
 }
 
 // 2nnn - CALL addr
 internal fun call(instruction: Int, registers: IRegisters, stack: IMemory<Int>) {
     val newStackPointer = registers.sp + 1
 
-    stack[newStackPointer] = registers.pc
+    stack[newStackPointer] = registers.pc + 2
 
     registers.sp = newStackPointer
 
@@ -74,7 +75,7 @@ internal fun seVxVy(instruction: Int, registers: IRegisters) {
 // 6xkk - LD Vx, byte
 internal fun ldVxByte(instruction: Int, registers: IRegisters) {
     val x = instruction shr 2 * 4 and 0xF
-    val byte = (instruction and 0x00FF).toByte()
+    val byte = (instruction and 0xFF).toByte()
 
     registers.v[x] = byte
 
@@ -86,7 +87,7 @@ internal fun addVxByte(instruction: Int, registers: IRegisters) {
     val x = instruction shr 2 * 4 and 0xF
 
     val vx = registers.v[x].toInt() and 0xFF
-    val byte = instruction and 0x00FF
+    val byte = instruction and 0xFF
 
     registers.v[x] = (vx + byte).toByte()
 
@@ -152,7 +153,7 @@ internal fun addVxVy(instruction: Int, registers: IRegisters) {
 
     val add = vx + vy
 
-    registers.v[0xF] = (add shr 8).toByte()
+    registers.v[0xF] = if (add > 255) 0x01 else 0x00
     registers.v[x] = add.toByte()
 
     registers.pc += 2
@@ -168,21 +169,25 @@ internal fun subVxVy(instruction: Int, registers: IRegisters) {
 
     val sub = vx - vy
 
-    registers.v[0xF] = if (sub > 0) 1 else 0
+    registers.v[0xF] = if (sub < 0) 0 else 1
     registers.v[x] = sub.toByte()
 
     registers.pc += 2
 }
 
 // 8xy6 - SHR Vx {, Vy}
-internal fun shrVxVy(instruction: Int, registers: IRegisters) {
+internal fun shrVxVy(instruction: Int, registers: IRegisters, shiftQuirkEnabled: Boolean) {
     val x = instruction shr 2 * 4 and 0xF
     val y = instruction shr 1 * 4 and 0xF
 
-    val vy = registers.v[y].toInt() and 0xFF
+    val value = if (shiftQuirkEnabled) {
+        registers.v[x].toInt() and 0xFF
+    } else {
+        registers.v[y].toInt() and 0xFF
+    }
 
-    registers.v[0xF] = (vy and 0x1).toByte()
-    registers.v[x] = (vy shr 1).toByte()
+    registers.v[0xF] = (value and 0x1).toByte()
+    registers.v[x] = (value shr 1).toByte()
 
     registers.pc += 2
 }
@@ -197,21 +202,25 @@ internal fun subnVxVy(instruction: Int, registers: IRegisters) {
 
     val sub = vy - vx
 
-    registers.v[0xF] = if (sub > 0) 1 else 0
+    registers.v[0xF] = if (sub < 0) 0 else 1
     registers.v[x] = sub.toByte()
 
     registers.pc += 2
 }
 
 // 8xyE - SHL Vx {, Vy}
-internal fun shlVxVy(instruction: Int, registers: IRegisters) {
+internal fun shlVxVy(instruction: Int, registers: IRegisters, shiftQuirkEnabled: Boolean) {
     val x = instruction shr 2 * 4 and 0xF
     val y = instruction shr 1 * 4 and 0xF
 
-    val vy = registers.v[y].toInt() and 0xFF
+    val value = if (shiftQuirkEnabled) {
+        registers.v[x].toInt() and 0xFF
+    } else {
+        registers.v[y].toInt() and 0xFF
+    }
 
-    registers.v[0xF] = (vy shr 7 and 0x1).toByte()
-    registers.v[x] = (vy shl 1).toByte()
+    registers.v[0xF] = (value shr 7 and 0x1).toByte()
+    registers.v[x] = (value shl 1).toByte()
 
     registers.pc += 2
 }
@@ -399,7 +408,11 @@ internal fun ldBVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte
 }
 
 // Fx55 - LD [I], Vx
-internal fun ldIVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte>) {
+internal fun ldIVx(
+        instruction: Int,
+        registers: IRegisters,
+        memory: IMemory<Byte>,
+        loadStoreQuirkEnabled: Boolean) {
     val x = instruction shr 2 * 4 and 0xF
 
     var address = registers.i
@@ -407,17 +420,27 @@ internal fun ldIVx(instruction: Int, registers: IRegisters, memory: IMemory<Byte
     for (i in 0..x)
         memory[address++] = registers.v[i]
 
+    if (!loadStoreQuirkEnabled)
+        registers.i += x + 1
+
     registers.pc += 2
 }
 
 // Fx65 - LD Vx, [I]
-internal fun ldVxI(instruction: Int, registers: IRegisters, memory: IMemory<Byte>) {
+internal fun ldVxI(
+        instruction: Int,
+        registers: IRegisters,
+        memory: IMemory<Byte>,
+        loadStoreQuirkEnabled: Boolean) {
     val x = instruction shr 2 * 4 and 0xF
 
     var address = registers.i
 
     for (i in 0..x)
         registers.v[i] = memory[address++]
+
+    if (!loadStoreQuirkEnabled)
+        registers.i += x + 1
 
     registers.pc +=2
 }

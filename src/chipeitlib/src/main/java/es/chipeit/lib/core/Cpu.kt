@@ -1,7 +1,5 @@
 package es.chipeit.lib.core
 
-import java.lang.Math.random
-
 import es.chipeit.lib.interfaces.*
 
 internal class Cpu(
@@ -12,6 +10,7 @@ internal class Cpu(
         private val memory: IMemory<Byte>,
         private val graphicMemory: ICoreGraphicMemory,
         private val keyboard: ICoreKeyboard,
+        private val quirkSettings: QuirkSettings,
         private val randomNumber: IRandomNumber = RandomNumber()
 ) : IClockObserver {
     init {
@@ -33,7 +32,7 @@ internal class Cpu(
     }
 
     private fun decodeAndExecute(instruction: Int) {
-        when (instruction and 0xF000) {
+            when (instruction and 0xF000) {
             // 0nnn - SYS addr
             // 00E0 - CLS
             // 00EE - RET
@@ -58,7 +57,7 @@ internal class Cpu(
             // 5xy0 - SE Vx, Vy
             0x5000 -> when (instruction and 0xF00F) {
                 0x5000 -> seVxVy(instruction, registers)
-                else -> throw IllegalStateException() // FIXME: integration branch
+                else -> haltAndCatchFire(instruction)
             }
 
             // 6xkk - LD Vx, byte
@@ -83,9 +82,9 @@ internal class Cpu(
                 0x8003 -> xorVxVy(instruction, registers)
                 0x8004 -> addVxVy(instruction, registers)
                 0x8005 -> subVxVy(instruction, registers)
-                0x8006 -> shrVxVy(instruction, registers)
+                0x8006 -> shrVxVy(instruction, registers, quirkSettings.shiftQuirkEnabled)
                 0x8007 -> subnVxVy(instruction, registers)
-                0x800E -> shlVxVy(instruction, registers)
+                0x800E -> shlVxVy(instruction, registers, quirkSettings.shiftQuirkEnabled)
                 else -> haltAndCatchFire(instruction)
             }
 
@@ -132,8 +131,8 @@ internal class Cpu(
                 0xF01E -> addIVx(instruction, registers)
                 0xF029 -> ldFVx(instruction, registers)
                 0xF033 -> ldBVx(instruction, registers, memory)
-                0xF055 -> ldIVx(instruction, registers, memory)
-                0xF065 -> ldVxI(instruction, registers, memory)
+                0xF055 -> ldIVx(instruction, registers, memory, quirkSettings.loadStoreQuirkEnabled)
+                0xF065 -> ldVxI(instruction, registers, memory, quirkSettings.loadStoreQuirkEnabled)
                 else -> haltAndCatchFire(instruction)
             }
 
@@ -146,4 +145,6 @@ internal class Cpu(
                 "The instruction $instruction does not comply with " +
                         "the original CHIP-8 specification")
     }
+
+    class QuirkSettings(val loadStoreQuirkEnabled: Boolean, val shiftQuirkEnabled: Boolean)
 }
