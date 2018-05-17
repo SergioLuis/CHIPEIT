@@ -23,4 +23,7 @@
     <string name="activity_gamelibrary_sheet_btn_play">Play</string>
     <string name="activity_gamelibrary_sheet_btn_resume">Resume</string>
     <string name="activity_gamelibrary_sheet_btn_restart">Restart</string>
+
+    <string name="activity_gamelibrary_loadstorequirk_chkbx">Enable CPU load/store quirk</string>
+    <string name="activity_gamelibrary_shiftquirk_chkbx">Enable CPU shift quirk</string>
 </resources>

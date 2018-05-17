@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -53,10 +54,10 @@ class GameLibraryActivity : AppCompatActivity() {
                 )
         )
 
-        val actionButtonsClickListener = ActionButtonsClickListener(this)
         val sheetViewHolder = GameLibrarySheetViewHolder(
                 findViewById(R.id.activity_gamelibrary_sheet)
         )
+        val actionButtonsClickListener = ActionButtonsClickListener(this, sheetViewHolder)
 
         Fonts.setTypeface(
                 sheetViewHolder.titleTextView,
@@ -149,6 +150,9 @@ class GameLibraryActivity : AppCompatActivity() {
                     if (item.hasSavedContent) View.GONE
                     else View.VISIBLE
 
+            sheetViewHolder.cpuLoadStoreQuirkCheckBox.isChecked = false
+            sheetViewHolder.cpuShiftQuirkCheckBox.isChecked = false
+
             buttonsClickLister.game = item
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
@@ -171,6 +175,14 @@ class GameLibraryActivity : AppCompatActivity() {
         val playButton: Button = sheet.findViewById(R.id.activity_gamelibrary_sheet_play_btn)
         val resumeButton: Button = sheet.findViewById(R.id.activity_gamelibrary_sheet_resume_btn)
         val restartButton: Button = sheet.findViewById(R.id.activity_gamelibrary_sheet_restart_btn)
+
+        val cpuLoadStoreQuirkCheckBox: CheckBox = sheet.findViewById(
+                R.id.activity_gamelibrary_sheet_loadstorequirk_chkbx
+        )
+
+        val cpuShiftQuirkCheckBox: CheckBox = sheet.findViewById(
+                R.id.activity_gamelibrary_sheet_shiftquirk_chkbx
+        )
     }
 
     private class ContentOverlayClickListener(
@@ -195,7 +207,8 @@ class GameLibraryActivity : AppCompatActivity() {
     }
 
     private class ActionButtonsClickListener(
-            private val gameLibraryActivity: GameLibraryActivity
+            private val gameLibraryActivity: GameLibraryActivity,
+            private val sheetViewHolder: GameLibrarySheetViewHolder
     ) : View.OnClickListener {
         var game: LibraryGame? = null
 
@@ -206,6 +219,8 @@ class GameLibraryActivity : AppCompatActivity() {
                             gameLibraryActivity,
                             EmulatorActivity.Params(
                                     EmulatorActivity.Params.Action.RESUME,
+                                    sheetViewHolder.cpuLoadStoreQuirkCheckBox.isChecked,
+                                    sheetViewHolder.cpuShiftQuirkCheckBox.isChecked,
                                     game
                             )
                     )
@@ -216,6 +231,8 @@ class GameLibraryActivity : AppCompatActivity() {
                             gameLibraryActivity,
                             EmulatorActivity.Params(
                                     EmulatorActivity.Params.Action.PLAY,
+                                    sheetViewHolder.cpuLoadStoreQuirkCheckBox.isChecked,
+                                    sheetViewHolder.cpuShiftQuirkCheckBox.isChecked,
                                     game
                             )
                     )
