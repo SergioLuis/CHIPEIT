@@ -3,9 +3,11 @@
 package es.chipeit.lib.core
 
 import org.junit.Test
+
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+
 import org.mockito.Mockito
 import org.mockito.BDDMockito.*
 import org.mockito.Mockito.times
@@ -75,7 +77,7 @@ class InstructionSetTests {
 
         then(registersMock).should(times(1)).sp = 0
         then(registersMock).should(times(1)).pc = 0x345
-        then(stackMock).should()[0] = 0x200
+        then(stackMock).should()[0] = 0x200 + 2
 
         given(registersMock.sp).willReturn(0)
         given(registersMock.pc).willReturn(0x345)
@@ -84,7 +86,7 @@ class InstructionSetTests {
 
         then(registersMock).should(times(1)).sp = 1
         then(registersMock).should(times(1)).pc = 0xFFF
-        then(stackMock).should()[1] = 0x345
+        then(stackMock).should()[1] = 0x345 + 2
     }
 
     @Test
@@ -265,7 +267,32 @@ class InstructionSetTests {
     }
 
     @Test
-    fun shrVxVyTest() {
+    fun shrVxVyQuirkEnabledTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x02)
+
+        shrVxVy(0x801E, registersMock, true)
+
+        then(vRegMock).should()[0x0] = 1
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(0x03)
+
+        shrVxVy(0x823E, registersMock, true)
+
+        then(vRegMock).should()[0x2] = 1
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun shrVxVyQuirkDisabledTest() {
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registersMock = Mockito.mock(IRegisters::class.java)
         given(registersMock.v).willReturn(vRegMock)
@@ -273,7 +300,7 @@ class InstructionSetTests {
         given(registersMock.pc).willReturn(0x200)
         given(vRegMock[0x1]).willReturn(0x02)
 
-        shrVxVy(0x801E, registersMock)
+        shrVxVy(0x801E, registersMock, false)
 
         then(vRegMock).should()[0x0] = 1
         then(vRegMock).should()[0xF] = 0
@@ -282,7 +309,7 @@ class InstructionSetTests {
         given(registersMock.pc).willReturn(0x202)
         given(vRegMock[0x3]).willReturn(0x03)
 
-        shrVxVy(0x823E, registersMock)
+        shrVxVy(0x823E, registersMock, false)
 
         then(vRegMock).should()[0x2] = 1
         then(vRegMock).should()[0xF] = 1
@@ -317,7 +344,32 @@ class InstructionSetTests {
     }
 
     @Test
-    fun shlVxVyTest() {
+    fun shlVxVyQuirkEnabledTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x01)
+
+        shlVxVy(0x801E, registersMock, true)
+
+        then(vRegMock).should()[0x0] = 2
+        then(vRegMock).should()[0xF] = 0
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x202)
+        given(vRegMock[0x2]).willReturn(0x80.toByte())
+
+        shlVxVy(0x823E, registersMock, true)
+
+        then(vRegMock).should()[0x2] = 0
+        then(vRegMock).should()[0xF] = 1
+        then(registersMock).should(times(1)).pc = 0x202 + 2
+    }
+
+    @Test
+    fun shlVxVyQuirkDisabledTest() {
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
         val registersMock = Mockito.mock(IRegisters::class.java)
         given(registersMock.v).willReturn(vRegMock)
@@ -325,7 +377,7 @@ class InstructionSetTests {
         given(registersMock.pc).willReturn(0x200)
         given(vRegMock[0x1]).willReturn(0x01)
 
-        shlVxVy(0x801E, registersMock)
+        shlVxVy(0x801E, registersMock, false)
 
         then(vRegMock).should()[0x0] = 2
         then(vRegMock).should()[0xF] = 0
@@ -334,7 +386,7 @@ class InstructionSetTests {
         given(registersMock.pc).willReturn(0x202)
         given(vRegMock[0x3]).willReturn(0x80.toByte())
 
-        shlVxVy(0x823E, registersMock)
+        shlVxVy(0x823E, registersMock, false)
 
         then(vRegMock).should()[0x2] = 0
         then(vRegMock).should()[0xF] = 1
@@ -819,54 +871,26 @@ class InstructionSetTests {
     }
 
     @Test
-    fun ldIVxTest() {
-        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-
-        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
-        val registersMock = Mockito.mock(IRegisters::class.java)
-        given(registersMock.v).willReturn(vRegMock)
-
-        given(registersMock.pc).willReturn(0x200)
-        given(registersMock.i).willReturn(0x300)
-
-        given(vRegMock[0x0]).willReturn(15)
-        given(vRegMock[0x1]).willReturn(16)
-        given(vRegMock[0x2]).willReturn(17)
-        given(vRegMock[0x3]).willReturn(18)
-        given(vRegMock[0x4]).willReturn(19)
-        given(vRegMock[0x5]).willReturn(20)
-        given(vRegMock[0x6]).willReturn(21)
-        given(vRegMock[0x7]).willReturn(22)
-        given(vRegMock[0x8]).willReturn(23)
-        given(vRegMock[0x9]).willReturn(24)
-        given(vRegMock[0xA]).willReturn(25)
-        given(vRegMock[0xB]).willReturn(26)
-        given(vRegMock[0xC]).willReturn(27)
-        given(vRegMock[0xD]).willReturn(28)
-        given(vRegMock[0xE]).willReturn(29)
-
-        ldIVx(0xFE55, registersMock, memoryMock)
-
-        then(memoryMock).should(times(1))[0x300] = 15
-        then(memoryMock).should(times(1))[0x301] = 16
-        then(memoryMock).should(times(1))[0x302] = 17
-        then(memoryMock).should(times(1))[0x303] = 18
-        then(memoryMock).should(times(1))[0x304] = 19
-        then(memoryMock).should(times(1))[0x305] = 20
-        then(memoryMock).should(times(1))[0x306] = 21
-        then(memoryMock).should(times(1))[0x307] = 22
-        then(memoryMock).should(times(1))[0x308] = 23
-        then(memoryMock).should(times(1))[0x309] = 24
-        then(memoryMock).should(times(1))[0x30A] = 25
-        then(memoryMock).should(times(1))[0x30B] = 26
-        then(memoryMock).should(times(1))[0x30C] = 27
-        then(memoryMock).should(times(1))[0x30D] = 28
-        then(memoryMock).should(times(1))[0x30E] = 29
-        then(registersMock).should(times(1)).pc = 0x200 + 2
+    fun ldIVxQuirkEnabkedTest() {
+        ldIVxTest(quirkEnabled = true)
     }
 
     @Test
-    fun ldVxITest() {
+    fun ldIVxQuirkDisabkedTest() {
+        ldIVxTest(quirkEnabled = false)
+    }
+
+    @Test
+    fun ldVxIQuirkEnabledTest() {
+        ldVxITest(quirkEnabled = true)
+    }
+
+    @Test
+    fun ldVxIQuirkDisabledTest() {
+        ldVxITest(quirkEnabled = false)
+    }
+
+    private fun ldVxITest(quirkEnabled: Boolean) {
         val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
 
         val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
@@ -892,7 +916,7 @@ class InstructionSetTests {
         given(memoryMock[0x30D]).willReturn(28)
         given(memoryMock[0x30E]).willReturn(29)
 
-        ldVxI(0xFE65, registersMock, memoryMock)
+        ldVxI(0xFE65, registersMock, memoryMock, quirkEnabled)
 
         then(vRegMock).should(times(1))[0x0] = 15
         then(vRegMock).should(times(1))[0x1] = 16
@@ -910,5 +934,57 @@ class InstructionSetTests {
         then(vRegMock).should(times(1))[0xD] = 28
         then(vRegMock).should(times(1))[0xE] = 29
         then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        if (quirkEnabled)
+            then(registersMock).should(times(1)).i += 0xE + 1
+    }
+
+    private fun ldIVxTest(quirkEnabled: Boolean) {
+        val memoryMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
+
+        given(registersMock.pc).willReturn(0x200)
+        given(registersMock.i).willReturn(0x300)
+
+        given(vRegMock[0x0]).willReturn(15)
+        given(vRegMock[0x1]).willReturn(16)
+        given(vRegMock[0x2]).willReturn(17)
+        given(vRegMock[0x3]).willReturn(18)
+        given(vRegMock[0x4]).willReturn(19)
+        given(vRegMock[0x5]).willReturn(20)
+        given(vRegMock[0x6]).willReturn(21)
+        given(vRegMock[0x7]).willReturn(22)
+        given(vRegMock[0x8]).willReturn(23)
+        given(vRegMock[0x9]).willReturn(24)
+        given(vRegMock[0xA]).willReturn(25)
+        given(vRegMock[0xB]).willReturn(26)
+        given(vRegMock[0xC]).willReturn(27)
+        given(vRegMock[0xD]).willReturn(28)
+        given(vRegMock[0xE]).willReturn(29)
+
+        ldIVx(0xFE55, registersMock, memoryMock, quirkEnabled)
+
+        then(memoryMock).should(times(1))[0x300] = 15
+        then(memoryMock).should(times(1))[0x301] = 16
+        then(memoryMock).should(times(1))[0x302] = 17
+        then(memoryMock).should(times(1))[0x303] = 18
+        then(memoryMock).should(times(1))[0x304] = 19
+        then(memoryMock).should(times(1))[0x305] = 20
+        then(memoryMock).should(times(1))[0x306] = 21
+        then(memoryMock).should(times(1))[0x307] = 22
+        then(memoryMock).should(times(1))[0x308] = 23
+        then(memoryMock).should(times(1))[0x309] = 24
+        then(memoryMock).should(times(1))[0x30A] = 25
+        then(memoryMock).should(times(1))[0x30B] = 26
+        then(memoryMock).should(times(1))[0x30C] = 27
+        then(memoryMock).should(times(1))[0x30D] = 28
+        then(memoryMock).should(times(1))[0x30E] = 29
+        then(registersMock).should(times(1)).pc = 0x200 + 2
+
+        if (quirkEnabled)
+            then(registersMock).should(times(1)).i += 0xE + 1
     }
 }
