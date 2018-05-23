@@ -91,17 +91,65 @@ class InstructionSetTests {
 
     @Test
     fun seVxByteTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x22)
+
+        seVxByte(0x3021, registersMock)
+
+        then(registersMock).should(times(1)).pc += 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x404)
+
+        seVxByte(0x3022, registersMock)
+
+        then(registersMock).should(times(2)).pc = 0x404 + 2
     }
 
     @Test
     fun sneVxByteTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x22)
+
+        sneVxByte(0x4022, registersMock)
+
+        then(registersMock).should(times(1)).pc += 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x404)
+
+        sneVxByte(0x4021, registersMock)
+
+        then(registersMock).should(times(2)).pc = 0x404 + 2
     }
 
     @Test
     fun seVxVyTest() {
+        val vRegMock = Mockito.mock(IMemory::class.java) as IMemory<Byte>
+        val registersMock = Mockito.mock(IRegisters::class.java)
+        given(registersMock.v).willReturn(vRegMock)
 
+        given(registersMock.pc).willReturn(0x200)
+        given(vRegMock[0x0]).willReturn(0x22)
+        given(vRegMock[0x1]).willReturn(0x21)
+
+        seVxVy(0x5010, registersMock)
+
+        then(registersMock).should(times(1)).pc += 0x200 + 2
+
+        given(registersMock.pc).willReturn(0x404)
+        given(vRegMock[0x2]).willReturn(0x45)
+        given(vRegMock[0x3]).willReturn(0x45)
+
+        seVxVy(0x5230, registersMock)
+
+        then(registersMock).should(times(2)).pc = 0x404 + 2
     }
 
     @Test
