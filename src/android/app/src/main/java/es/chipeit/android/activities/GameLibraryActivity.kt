@@ -43,6 +43,13 @@ class GameLibraryActivity : AppCompatActivity() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
+    override fun onBackPressed() {
+        if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        else
+            super.onBackPressed()
+    }
+
     private fun initializeView() {
         initializeToolbar()
         initializeBottomSheet()

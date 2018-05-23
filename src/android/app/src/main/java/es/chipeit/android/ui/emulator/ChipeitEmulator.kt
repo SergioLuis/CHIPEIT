@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.MotionEvent
 import android.view.View
+import es.chipeit.android.R
 import es.chipeit.android.io.ResourceReader
 import es.chipeit.lib.emulator.Chipeit
 import es.chipeit.lib.emulator.ISleeper
@@ -19,7 +20,20 @@ class ChipeitEmulator(
         enableLoadStoreQuirk: Boolean,
         enableShiftQuirk: Boolean) {
     private val core = Chipeit(
-            soundPlayer = EmulatorSoundPlayer(),
+            soundPlayer = object : ISwitchObserver {
+                val musicPlayer = MusicPlayer(context, R.raw.factory_noise)
+                init {
+                    musicPlayer.isLooping = true
+                }
+
+                override fun onEnable() {
+                    musicPlayer.play()
+                }
+
+                override fun onDisable() {
+                    musicPlayer.stop()
+                }
+            },
             romContent = loadRom(context, romFileName),
             cpuClockRate = 500,
             timersClockRate = 60,
@@ -88,16 +102,6 @@ class ChipeitEmulator(
 
                 else -> false
             }
-        }
-    }
-
-    private class EmulatorSoundPlayer : ISwitchObserver {
-        override fun onEnable() {
-            // TODO
-        }
-
-        override fun onDisable() {
-            // TODO
         }
     }
 
