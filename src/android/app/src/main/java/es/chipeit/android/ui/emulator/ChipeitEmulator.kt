@@ -21,17 +21,18 @@ class ChipeitEmulator(
         enableShiftQuirk: Boolean) {
     private val core = Chipeit(
             soundPlayer = object : ISwitchObserver {
+                /*
                 val musicPlayer = MusicPlayer(context, R.raw.factory_noise)
                 init {
                     musicPlayer.isLooping = true
-                }
+                }*/
 
                 override fun onEnable() {
-                    musicPlayer.play()
+                   // musicPlayer.play()
                 }
 
                 override fun onDisable() {
-                    musicPlayer.stop()
+                    //musicPlayer.stop()
                 }
             },
             romContent = loadRom(context, romFileName),
