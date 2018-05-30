@@ -58,28 +58,29 @@ def romsSource = Paths.get(
         "../../../roms"
 )
 
-def romsDestination = Paths.get(
+def musicSource = Paths.get(
+        projectDir.toString(),
+        "../../../music"
+)
+
+def rawResourcesDir = Paths.get(
         projectDir.toString(),
         "src/main/res/raw"
 )
 
 def romsIndex = new File(
-        romsDestination.toString(),
+        rawResourcesDir.toString(),
         "index"
 )
 
 task copyRoms(type: Copy) {
     description = "Copy ROMs to res/raw directory, and creates a ROM index file"
 
-    dependsOn {
-        deleteRoms
-    }
-
     from (romsSource) {
         exclude "README.md"
     }
 
-    into romsDestination
+    into rawResourcesDir
 
     // Resource files name must match regex:
     // [a-z]+([a-z] | [0-9] | _)+
@@ -91,18 +92,27 @@ task copyRoms(type: Copy) {
     }
 }
 
-task deleteRoms(type: Delete) {
-    description = "Delete ROMs from res/raw directory"
-    delete fileTree(romsDestination)
+task copyMusic(type: Copy) {
+    description = "Copy music to res/raw directory"
+
+    from musicSource
+    into rawResourcesDir
 }
 
-clean.dependsOn(deleteRoms)
+task deleteRawResources(type: Delete) {
+    description = "Delete raw resources (ROMs, music) from res/raw directory"
+    delete fileTree(rawResourcesDir)
+}
+
+clean.dependsOn(deleteRawResources)
 
 tasks.whenTaskAdded { task ->
-    if (task.name != "assembleDebug" && task.name != "assembleRelease")
+    if (!task.name.contains("compileDebug") && !task.name.contains("compileRelease"))
         return
 
     task.doFirst {
+        deleteRawResources.execute()
         copyRoms.execute()
+        copyMusic.execute()
     }
 }
