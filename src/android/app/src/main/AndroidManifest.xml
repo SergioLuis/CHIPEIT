@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".activities.SplashScreenActivity"
+            android:name=".activities.LegacySplashScreenActivity"
             android:theme="@style/SplashScreenActivityTheme"
             android:noHistory="true">
             <intent-filter>
