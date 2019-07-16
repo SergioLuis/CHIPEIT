@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_gamelibrary_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sheet_background"
+    android:elevation="@dimen/activity_gamelibrary_sheet_elevation"
+    android:orientation="vertical"
+    app:behavior_hideable="true"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <View
+        android:layout_width="@dimen/activity_gamelibrary_sheet_draghandle_width"
+        android:layout_height="@dimen/activity_gamelibrary_sheet_draghandle_height"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/activity_gamelibrary_sheet_draghandle_margin"
+        android:layout_marginTop="@dimen/activity_gamelibrary_sheet_draghandle_margin"
+        android:background="@drawable/drag_handle" />
+
+    <!-- Game title -->
+    <TextView
+        android:id="@+id/activity_gamelibrary_sheet_title_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_gamelibrary_sheet_title_marginTop"
+        android:layout_marginBottom="@dimen/activity_gamelibrary_sheet_title_marginBottom"
+        android:layout_marginStart="@dimen/activity_gamelibrary_sheet_title_marginStart"
+        android:text="TETRIS"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/activity_gamelibrary_sheet_title_textSize"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_gamelibrary_sheet_buttons_marginBottom"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- Restart button -->
+        <Button
+            android:id="@+id/activity_gamelibrary_sheet_restart_btn"
+            android:layout_width="@dimen/activity_gamelibrary_sheet_btn_width"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_replay_black_24dp"
+            android:layout_marginEnd="@dimen/activity_gamelibrary_sheet_btn_margin"
+            android:backgroundTint="@color/activity_gamelibrary_btn_background"
+            android:text="@string/activity_gamelibrary_sheet_btn_restart" />
+
+        <!-- Resume button -->
+        <Button
+            android:id="@+id/activity_gamelibrary_sheet_resume_btn"
+            android:layout_width="@dimen/activity_gamelibrary_sheet_btn_width"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_play_arrow_black_24dp"
+            android:backgroundTint="@color/activity_gamelibrary_btn_background"
+            android:text="@string/activity_gamelibrary_sheet_btn_resume" />
+
+        <!-- Play button -->
+        <Button
+            android:id="@+id/activity_gamelibrary_sheet_play_btn"
+            android:layout_width="@dimen/activity_gamelibrary_sheet_btn_width"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_play_arrow_black_24dp"
+            android:backgroundTint="@color/activity_gamelibrary_btn_background"
+            android:text="@string/activity_gamelibrary_sheet_btn_play" />
+    </LinearLayout>
+
+</LinearLayout>

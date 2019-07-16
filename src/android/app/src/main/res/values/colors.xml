@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#795548</color>
+    <color name="colorPrimaryDark">#5D4037</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="red">#F44336</color>
+    <color name="orange">#FF9800</color>
+    <color name="yellow">#FFC107</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#2196F3</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="purple">#9C27B0</color>
+
+    <color name="red_primary">#b71c1c</color>
+    <color name="red_dark">#7f0000</color>
+
+    <color name="orange_primary">#e65100</color>
+    <color name="orange_dark">#ac1900</color>
+
+    <color name="yellow_primary">#f57f17</color>
+    <color name="yellow_dark">#bc5100</color>
+
+    <color name="green_primary">#1b5e20</color>
+    <color name="green_dark">#003300</color>
+
+    <color name="blue_primary">#0d47a1</color>
+    <color name="blue_dark">#002171</color>
+
+    <color name="indigo_primary">#1a237e</color>
+    <color name="indigo_dark">#000051</color>
+
+    <color name="purple_primary">#4a148c</color>
+    <color name="purple_dark">#12005e</color>
+
+    <color name="activity_splashscreen_title_txt_paintStrokeColor">#FFFFFF</color>
+    <color name="activity_splashscreen_title_txt_pathStrokeColor">#FFFFFF</color>
+
+    <color name="activity_gamelibrary_sheet_background_color">#000000</color>
+    <color name="activity_gamelibrary_sheet_draghandle_color">#AAFFFFFF</color>
+    <color name="activity_gamelibrary_content_overlay_background">#99000000</color>
+    <color name="activity_gamelibrary_resume_btn_background">#AAFFFFFF</color>
+    <color name="activity_gamelibrary_btn_background">#FFFFFF</color>
+
+    <color name="list_gamelibrary_item_background">#000000</color>
+    <color name="list_gamelibrary_item_backgroundtitle_textColor">#616161</color>
+    <color name="list_gamelibrary_item_foregroundtitle_textColor">#FFFFFF</color>
 </resources>

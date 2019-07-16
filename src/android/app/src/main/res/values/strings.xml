@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">CHIPEIT</string>
+
+    <!-- Keyboard keys -->
+    <string name="activity_emulator_key_zero_btn">0</string>
+    <string name="activity_emulator_key_one_btn">1</string>
+    <string name="activity_emulator_key_two_btn">2</string>
+    <string name="activity_emulator_key_three_btn">3</string>
+    <string name="activity_emulator_key_four_btn">4</string>
+    <string name="activity_emulator_key_five_btn">5</string>
+    <string name="activity_emulator_key_six_btn">6</string>
+    <string name="activity_emulator_key_seven_btn">7</string>
+    <string name="activity_emulator_key_eight_btn">8</string>
+    <string name="activity_emulator_key_nine_btn">9</string>
+    <string name="activity_emulator_key_a_btn">A</string>
+    <string name="activity_emulator_key_b_btn">B</string>
+    <string name="activity_emulator_key_c_btn">C</string>
+    <string name="activity_emulator_key_d_btn">D</string>
+    <string name="activity_emulator_key_e_btn">E</string>
+    <string name="activity_emulator_key_f_btn">F</string>
+
+    <string name="activity_splashscreen_gplv3_img_contentDescription">GPLv3 Logo</string>
+    <string name="activity_gamelibrary_sheet_btn_play">Play</string>
+    <string name="activity_gamelibrary_sheet_btn_resume">Resume</string>
+    <string name="activity_gamelibrary_sheet_btn_restart">Restart</string>
 </resources>

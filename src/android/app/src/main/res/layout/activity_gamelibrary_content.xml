@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <android.support.v7.widget.Toolbar android:id="@+id/activity_gamelibrary_toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="@dimen/activity_gamelibrary_toolbar_elevation">
+
+        <!-- Toolbar title -->
+        <TextView
+            android:id="@+id/activity_gamelibrary_toolbar_title_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="@dimen/text_toolbar_title_textSize"
+            android:layout_gravity="center" />
+    </android.support.v7.widget.Toolbar>
+
+    <!-- Game library list -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activity_gamelibrary_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/list_gamelibrary_item_marginTop"
+        android:paddingBottom="@dimen/list_gamelibrary_item_marginBottom"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"/>
+</LinearLayout>
